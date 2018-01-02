@@ -43,7 +43,7 @@ def opt(sample, jid=None):
 
 def submit_pre_jobs_fastq(sample, fname, synid):
     jid = q.submit(opt(sample), 
-        "{pipe_home}/job_scripts/pre_1.download_fastq.sh {sample} {fname} {synid}".format(
+        "{pipe_home}/job_scripts/pre_1.download.sh {sample} {fname} {synid}".format(
             pipe_home=pipe_home, sample=sample, fname=fname, synid=synid))
     
     jid = q.submit(opt(sample, jid),
@@ -54,8 +54,12 @@ def submit_pre_jobs_fastq(sample, fname, synid):
 
 def submit_pre_jobs_bam(sample, fname, synid):
     jid = q.submit(opt(sample), 
-        "{pipe_home}/job_scripts/pre_1.download_bam.sh {sample} {fname} {synid}".format(
+        "{pipe_home}/job_scripts/pre_1.download.sh {sample} {fname} {synid}".format(
             pipe_home=pipe_home, sample=sample, fname=fname, synid=synid))
+
+    jid = q.submit(opt(sample), 
+        "{pipe_home}/job_scripts/pre_1b.bam2fastq.sh {sample} {fname}".format(
+            pipe_home=pipe_home, sample=sample, fname=fname))
         
     jid_list = []
     for read in ["R1", "R2"]:
