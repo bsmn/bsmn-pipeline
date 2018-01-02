@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 72 
+#$ -pe threaded 18 
 
 set -eu -o pipefail
 
@@ -15,7 +15,14 @@ SM=$1
 
 printf -- "[$(date)] Start markdup.\n---\n"
 
-$SAMBAMBA markdup -t 72 --tmpdir=tmp $SM/bam/$SM.merged.bam $SM/bam/$SM.markduped.bam 
+$JAVA -Xmx30G -jar $PICARD MarkDuplicates \
+    I=$SM/bam/$SM.merged.bam \
+    O=$SM/bam/$SM.markduped.bam \
+    METRICS_FILE=$SM/markduplicates_metrics.txt \
+    OPTICAL_DUPLICATE_PIXEL_DISTANCE=2500 \
+    CREATE_INDEX=true \
+    TMP_DIR=tmp 
+
 rm $SM/bam/$SM.merged.bam{,.bai}
 
 printf -- "---\n[$(date)] Finish markdup.\n"
