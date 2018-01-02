@@ -22,4 +22,4 @@ else
 fi
 rm $SM/bam/$SM.*.sorted.bam{,.bai}
 
-printf -- "---\n[$(date)] Finish merge_markdup.\n"
+printf -- "---\n[$(date)] Finish merge_bam.\n"
