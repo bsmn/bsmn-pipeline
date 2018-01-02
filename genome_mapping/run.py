@@ -57,7 +57,7 @@ def submit_pre_jobs_bam(sample, fname, synid):
         "{pipe_home}/job_scripts/pre_1.download.sh {sample} {fname} {synid}".format(
             pipe_home=pipe_home, sample=sample, fname=fname, synid=synid))
 
-    jid = q.submit(opt(sample), 
+    jid = q.submit(opt(sample, jid), 
         "{pipe_home}/job_scripts/pre_1b.bam2fastq.sh {sample} {fname}".format(
             pipe_home=pipe_home, sample=sample, fname=fname))
         
