@@ -16,7 +16,7 @@ FNAME=$2
 
 printf -- "---\n[$(date)] Start bam2fastq: $FNAME\n---\n"
 
-$SAMBAMBA sort -m 32GB -t 18 -n -o /dev/stdout --tmpdir=tmp $SM/downloads/$FNAME \
+$SAMTOOLS collate -uOn 128 $SM/downloads/$FNAME $SM/tmp.collate \
     |$SAMTOOLS fastq -O -F 0x900 -1 $SM/fastq/$SM.R1.fastq.gz -2 $SM/fastq/$SM.R2.fastq.gz -
 rm $SM/downloads/$FNAME
 
