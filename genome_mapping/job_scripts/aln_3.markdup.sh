@@ -15,7 +15,7 @@ SM=$1
 
 printf -- "[$(date)] Start markdup.\n---\n"
 
-$JAVA -Xmx30G -jar $PICARD MarkDuplicates \
+$JAVA -Xmx26G -jar $PICARD MarkDuplicates \
     I=$SM/bam/$SM.merged.bam \
     O=$SM/bam/$SM.markduped.bam \
     METRICS_FILE=$SM/markduplicates_metrics.txt \
