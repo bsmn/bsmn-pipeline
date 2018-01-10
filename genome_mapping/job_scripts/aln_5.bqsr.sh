@@ -15,7 +15,7 @@ SM=$1
 
 printf -- "[$(date)] Start BQSR recal_table.\n---\n"
 
-$JAVA -Xmx60G -jar $GATK \
+$JAVA -Xmx58G -jar $GATK \
     -T BaseRecalibrator -nct 36 \
     -R $REF -knownSites $DBSNP -knownSites $MILLS -knownSites $ONEKG \
     -I $SM/bam/$SM.realigned.bam \
@@ -24,7 +24,7 @@ $JAVA -Xmx60G -jar $GATK \
 printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 printf -- "---\n[$(date)] Start BQSR PrintReads.\n---\n"
 
-$JAVA -Xmx60G -jar $GATK \
+$JAVA -Xmx58G -jar $GATK \
     -T PrintReads -nct 36 \
     --emit_original_quals \
     -R $REF -BQSR $SM/recal_data.table \
