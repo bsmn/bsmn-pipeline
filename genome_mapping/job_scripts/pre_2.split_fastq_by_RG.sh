@@ -28,9 +28,10 @@ fi
 
 printf -- "[$(date)] Start split fastq: $FQ\n---\n"
 
-$CAT $FQ |paste - - - - |awk -v SM=$SM -v RD=$RD '{
+$CAT $FQ |paste - - - - |awk -F"\t" -v SM=$SM -v RD=$RD '{
     h=$1;
     sub(/^@/,"",h);
+    sub(/ .+$/,"",h);
     l=split(h,arr,":");
     FCX=arr[l-4];
     LN=arr[l-3];
