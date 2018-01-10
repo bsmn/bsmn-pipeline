@@ -13,6 +13,11 @@ source $(pwd)/run_info
 
 SM=$1
 
+printf -- "[$(date)] Start flagstat: $SM.bam \n---\n"
+
+$SAMTOOLS flagstat $SM/bam/$SM.bam > $SM/flagstat.txt
+
+printf -- "---\n[$(date)] Finish flagstat: $SM.bam\n"
 printf -- "[$(date)] Start upload: $SM.{bam,bai} \n---\n"
 
 cd $SM/bam
