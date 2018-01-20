@@ -2,11 +2,12 @@
 BSMN common data processing pipeline
 
 # Usage
+## genome_mapping
 ```bash
 genome_mapping/run.py sample_list.txt
 ```
 
-## sample_list.txt format
+### sample_list.txt format
 The first line should be a header line. Eg.
 ```
 sample_id       file    synapse_id
