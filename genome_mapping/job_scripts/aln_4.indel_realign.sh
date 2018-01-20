@@ -30,6 +30,6 @@ $JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
     -targetIntervals $SM/realigner.intervals \
     -I $SM/bam/$SM.markduped.bam \
     -o $SM/bam/$SM.realigned.bam
-rm $SM/bam/$SM.markduped.{bam,bai}
+rm $SM/bam/$SM.markduped.{bam,bai} $SM/realigner.intervals
 
 printf -- "---\n[$(date)] Finish IndelRealigner.\n"
