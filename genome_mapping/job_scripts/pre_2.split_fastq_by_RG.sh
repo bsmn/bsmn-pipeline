@@ -35,7 +35,9 @@ $CAT $FQ |paste - - - - |awk -F"\t" -v SM=$SM -v RD=$RD '{
     l=split(h,arr,":");
     FCX=arr[l-4];
     LN=arr[l-3];
-    print $1"\n"$2"\n+\n"$4|"gzip >"SM"/fastq/"SM"."FCX"_L"LN"."RD".fastq.gz"}'
+    print $1"\n"$2"\n+\n"$4|"gzip >"SM"/fastq/"SM"."FCX"_L"LN"."RD".fastq.gz"}
+    END {
+    print "READ N: "NR}'
 rm $FQ
 
 printf -- "---\n[$(date)] Finish split fastq: $FQ\n"
