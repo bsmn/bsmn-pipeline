@@ -29,6 +29,6 @@ fi
     
 $SAMTOOLS collate -uOn $TMP_N $SM/downloads/$FNAME $SM/tmp.collate \
     |$SAMTOOLS fastq -F 0x900 -1 $SM/fastq/$SM.R1.fastq.gz -2 $SM/fastq/$SM.R2.fastq.gz -
-#rm $SM/downloads/$FNAME
+rm $SM/downloads/$FNAME
 
 printf -- "---\n[$(date)] Finish bam2fastq: $FNAME\n"
