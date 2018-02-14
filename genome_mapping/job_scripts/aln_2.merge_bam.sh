@@ -17,9 +17,10 @@ printf -- "[$(date)] Start merge_bam.\n---\n"
 
 if [[ $(ls $SM/bam/$SM.*.sorted.bam|wc -l) == 1 ]]; then
     mv $SM/bam/$SM.*.sorted.bam $SM/bam/$SM.merged.bam
+    rm $SM/bam/$SM.*.sorted.bam.bai
 else
     $SAMBAMBA merge -t 18 $SM/bam/$SM.merged.bam $SM/bam/$SM.*.sorted.bam
+    rm $SM/bam/$SM.*.sorted.bam{,.bai}
 fi
-rm $SM/bam/$SM.*.sorted.bam{,.bai}
 
 printf -- "---\n[$(date)] Finish merge_bam.\n"
