@@ -35,7 +35,7 @@ def vaf_info(target):
         except ZeroDivisionError:
             vaf = 0
             
-        result = '{vaf:f}\t{depth}\t{ref_n}\t{alt_n}\t{p_binom:f}'.format(
+        result = '{vaf:f}\t{depth}\t{ref_n}\t{alt_n}\t{p_binom:e}'.format(
             vaf=vaf, depth=depth, ref_n=ref_n, alt_n=alt_n, p_binom=binom_test(alt_n, depth))
 
 def main():
