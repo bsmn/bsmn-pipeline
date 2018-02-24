@@ -56,10 +56,10 @@ def strand_info(target):
             alt_ratio = math.inf
             
         result = ('{total}\t{total_fwd}\t{total_rev}\t{total_ratio:f}\t'
-                + '{p_poisson:f}\t' 
+                + '{p_poisson:e}\t' 
                 + '{ref_n}\t{ref_fwd}\t{ref_rev}\t{ref_ratio:f}\t'
                 + '{alt_n}\t{alt_fwd}\t{alt_rev}\t{alt_ratio:f}\t'
-                + '{p_fisher:f}').format(
+                + '{p_fisher:e}').format(
             total=total, total_fwd=total_fwd, total_rev=total_rev, total_ratio=total_ratio, 
             p_poisson=p_poisson(total_fwd, total_rev),
             ref_n=ref_n, ref_fwd=ref_fwd, ref_rev=ref_rev, ref_ratio=ref_ratio,
