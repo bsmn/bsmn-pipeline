@@ -1,14 +1,22 @@
+import os
 import sys
 import re
 import subprocess
 from .utils import coroutine
+
+config = os.path.dirname(os.path.realpath(__file__)) + "/../pipeline.conf"
+with open(config) as f:
+    for line in f:
+        if line[:9] == "SAMTOOLS=":
+            SAMTOOLS=line.strip().split('=')[1]
+            break
 
 @coroutine
 def pileup(bam, min_MQ, min_BQ, target):
     result = None
     while True:
         chrom, pos = (yield result)
-        cmd = ['samtools', 'mpileup', '-d', '8000',
+        cmd = [SAMTOOLS, 'mpileup', '-d', '8000',
                '-q', str(min_MQ), '-Q', str(min_BQ),
                '-r', '{}:{}-{}'.format(chrom, pos, pos), bam]
         
