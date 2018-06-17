@@ -1,4 +1,4 @@
-#!/shared/apps/pyenv/versions/3.6.2/bin/python
+#!/usr/bin/env python3
 
 import synapseclient
 import sys
