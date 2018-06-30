@@ -9,7 +9,13 @@ import os
 from collections import defaultdict
 from library.job_queue import GridEngineQueue
 
-pipe_home = os.path.dirname(os.path.realpath(__file__))
+cmd_home = os.path.dirname(os.path.realpath(__file__))
+pipe_home = os.path.normpath(cmd_home + "/..")
+util_home = pipe_home + "/analysis_utils"
+job_home = cmd_home + "/job_scripts"
+sys.path.append(pipe_home)
+
+from library.job_queue import GridEngineQueue
 q = GridEngineQueue()
 
 def main():
@@ -43,38 +49,38 @@ def opt(sample, jid=None):
 
 def submit_pre_jobs_fastq(sample, fname, synid):
     jid = q.submit(opt(sample), 
-        "{pipe_home}/job_scripts/pre_1.download.sh {sample} {fname} {synid}".format(
-            pipe_home=pipe_home, sample=sample, fname=fname, synid=synid))
+        "{job_home}/pre_1.download.sh {sample} {fname} {synid}".format(
+            job_home=job_home, sample=sample, fname=fname, synid=synid))
     
     jid = q.submit(opt(sample, jid),
-        "{pipe_home}/job_scripts/pre_2.split_fastq_by_RG.sh {sample}/downloads/{fname}".format(
-            pipe_home=pipe_home, sample=sample, fname=fname))
+        "{job_home}/pre_2.split_fastq_by_RG.sh {sample}/downloads/{fname}".format(
+            job_home=job_home, sample=sample, fname=fname))
 
     return jid
 
 def submit_pre_jobs_bam(sample, fname, synid):
     jid = q.submit(opt(sample), 
-        "{pipe_home}/job_scripts/pre_1.download.sh {sample} {fname} {synid}".format(
-            pipe_home=pipe_home, sample=sample, fname=fname, synid=synid))
+        "{job_home}/pre_1.download.sh {sample} {fname} {synid}".format(
+            job_home=job_home, sample=sample, fname=fname, synid=synid))
 
     jid = q.submit(opt(sample, jid), 
-        "{pipe_home}/job_scripts/pre_1b.bam2fastq.sh {sample} {fname}".format(
-            pipe_home=pipe_home, sample=sample, fname=fname))
+        "{job_home}/pre_1b.bam2fastq.sh {sample} {fname}".format(
+            job_home=job_home, sample=sample, fname=fname))
         
     jid_list = []
     for read in ["R1", "R2"]:
         fastq = "{sample}/fastq/{sample}.{read}.fastq.gz".format(sample=sample, read=read)
         jid_list.append(q.submit(opt(sample, jid),
-            "{pipe_home}/job_scripts/pre_2.split_fastq_by_RG.sh {sample}/fastq/{sample}.{read}.fastq.gz".format(
-                pipe_home=pipe_home, sample=sample, read=read)))
+            "{job_home}/pre_2.split_fastq_by_RG.sh {sample}/fastq/{sample}.{read}.fastq.gz".format(
+                job_home=job_home, sample=sample, read=read)))
     jid = ",".join(jid_list)
 
     return jid
 
 def submit_aln_jobs(sample, jid):
     q.submit(opt(sample, jid),
-        "{pipe_home}/job_scripts/pre_3.submit_aln_jobs.sh {host} {sample}".format(
-            pipe_home=pipe_home, host=os.getenv("HOSTNAME"), sample=sample))
+        "{job_home}/pre_3.submit_aln_jobs.sh {host} {sample}".format(
+            job_home=job_home, host=os.getenv("HOSTNAME"), sample=sample))
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Genome Mapping Pipeline')
@@ -105,7 +111,8 @@ def synapse_login():
 
 def save_run_info(config):
     with open("run_info", "w") as run_file:
-        run_file.write("PIPE_HOME={pipe_home}\n\n".format(pipe_home=pipe_home))
+        run_file.write("CMD_HOME={path}\n\n".format(path=cmd_home))
+        run_file.write("UTIL_HOME={path}\n\n".format(path=util_home))
         with open(config) as cfg_file:
             for line in cfg_file:
                 run_file.write(line)

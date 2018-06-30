@@ -17,7 +17,7 @@ printf -- "[$(date)] Start RealignerTargetCreator.\n---\n"
 
 $JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
     -T RealignerTargetCreator -nt 36 \
-    -R $REF -known $MILLS -known $ONEKG \
+    -R $REF -known $MILLS -known $INDEL1KG \
     -I $SM/bam/$SM.markduped.bam \
     -o $SM/realigner.intervals
 
@@ -26,7 +26,7 @@ printf -- "---\n[$(date)] Start IndelRealigner.\n---\n"
 
 $JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
     -T IndelRealigner \
-    -R $REF -known $MILLS -known $ONEKG \
+    -R $REF -known $MILLS -known $INDEL1KG \
     -targetIntervals $SM/realigner.intervals \
     -I $SM/bam/$SM.markduped.bam \
     -o $SM/bam/$SM.realigned.bam
