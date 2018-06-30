@@ -5,9 +5,13 @@ import pathlib
 import glob
 import os
 import sys
-from library.job_queue import GridEngineQueue
 
-pipe_home = os.path.dirname(os.path.realpath(__file__))
+cmd_home = os.path.dirname(os.path.realpath(__file__))
+pipe_home = os.path.normpath(cmd_home + "/..")
+job_home = cmd_home + "/job_scripts"
+sys.path.append(pipe_home)
+
+from library.job_queue import GridEngineQueue
 
 def main():
     args = parse_args()
@@ -16,23 +20,23 @@ def main():
     jid_list = []
     for pu in [fastq.split(".")[1] for fastq in glob.glob("{sample}/fastq/{sample}.*.R1.fastq.gz".format(sample=args.sample))]:
         jid_list.append(q.submit(opt(args.sample), 
-            "{pipe_home}/job_scripts/aln_1.align_sort.sh {sample} {pu}".format(pipe_home=pipe_home, sample=args.sample, pu=pu)))
+            "{job_home}/aln_1.align_sort.sh {sample} {pu}".format(job_home=job_home, sample=args.sample, pu=pu)))
     jid = ",".join(jid_list)
     
     jid = q.submit(opt(args.sample, jid), 
-        "{pipe_home}/job_scripts/aln_2.merge_bam.sh {sample}".format(pipe_home=pipe_home, sample=args.sample))
+        "{job_home}/aln_2.merge_bam.sh {sample}".format(job_home=job_home, sample=args.sample))
 
     jid = q.submit(opt(args.sample, jid),
-        "{pipe_home}/job_scripts/aln_3.markdup.sh {sample}".format(pipe_home=pipe_home, sample=args.sample))
+        "{job_home}/aln_3.markdup.sh {sample}".format(job_home=job_home, sample=args.sample))
 
     jid = q.submit(opt(args.sample, jid),
-        "{pipe_home}/job_scripts/aln_4.indel_realign.sh {sample}".format(pipe_home=pipe_home, sample=args.sample))
+        "{job_home}/aln_4.indel_realign.sh {sample}".format(job_home=job_home, sample=args.sample))
 
     jid = q.submit(opt(args.sample, jid), 
-        "{pipe_home}/job_scripts/aln_5.bqsr.sh {sample}".format(pipe_home=pipe_home, sample=args.sample))
+        "{job_home}/aln_5.bqsr.sh {sample}".format(job_home=job_home, sample=args.sample))
 
     q.submit(opt(args.sample, jid), 
-        "{pipe_home}/job_scripts/aln_6.upload_bam.sh {sample}".format(pipe_home=pipe_home, sample=args.sample))
+        "{job_home}/aln_6.upload_bam.sh {sample}".format(job_home=job_home, sample=args.sample))
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Alignment job submitter')
