@@ -1,6 +1,7 @@
 import os
 import sys
 import re
+import shutil
 import subprocess
 from .utils import coroutine
 
@@ -10,6 +11,8 @@ with open(config) as f:
         if line[:9] == "SAMTOOLS=":
             SAMTOOLS=line.strip().split('=')[1]
             break
+if not os.path.isfile(SAMTOOLS) or not os.access(SAMTOOLS, os.X_OK):
+    SAMTOOLS = shutil.which("samtools")
 
 @coroutine
 def pileup(bam, min_MQ, min_BQ, target):
