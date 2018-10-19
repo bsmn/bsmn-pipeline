@@ -22,6 +22,7 @@ RECAL_INDEL=$SM/vqsr/recalibrate_INDEL.ploidy_$PL.recal
 TRANCHES_SNP=$SM/vqsr/recalibrate_SNP.ploidy_$PL.tranches
 TRANCHES_INDEL=$SM/vqsr/recalibrate_INDEL.ploidy_$PL.tranches
 RSCRIPT_SNP=$SM/vqsr/recalibrate_SNP_plots.ploidy_$PL.R
+RSCRIPT_INDEL=$SM/vqsr/recalibrate_INDEL_plots.ploidy_$PL.R
 
 printf -- "---\n[$(date)] Start VQSR.\n" 
 
