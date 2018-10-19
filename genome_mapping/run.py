@@ -6,8 +6,8 @@ import synapseclient
 import subprocess
 import pathlib
 import os
+import sys
 from collections import defaultdict
-from library.job_queue import GridEngineQueue
 
 cmd_home = os.path.dirname(os.path.realpath(__file__))
 pipe_home = os.path.normpath(cmd_home + "/..")
