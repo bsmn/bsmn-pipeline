@@ -1,6 +1,24 @@
 # bsmn_pipeline
 BSMN common data processing pipeline
 
+# Setup and installation
+
+## cfncluster
+
+This pipeline runs using [`cfncluster`](https://cfncluster.readthedocs.io).
+
+## Installing cfncluster
+
+It's recommended to use a Python virtual environment (https://virtualenv.pypa.io/en/stable/).
+
+To install `cfncluster`:
+
+```
+pip install cfncluster
+```
+
+To get the pipeline software installed on the cluster, a post-install script is run after the cluster starts. You can see this file as a GitHub Gist [here](https://gist.github.com/kdaily/1e0a2d1fcef1c6847f743f637301a3d5).
+ 
 # Usage
 ## genome_mapping
 ```bash
