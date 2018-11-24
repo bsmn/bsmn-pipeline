@@ -82,13 +82,13 @@ cd $WD
 # Installing vt
 mkdir -p tools/vt/2018-06-07/bin
 mkdir -p tools/vt/2018-06-07/src
-cd tools/vt/2018-06-17/src
+cd tools/vt/2018-06-07/src
 wget -qO- http://github.com/atks/vt/archive/ee9f613.tar.gz \
     |tar xvz --strip-components=1
 make
 mv vt ../bin
 cd $WD
-rm -r tools/vt/2018-06-17/src
+rm -r tools/vt/2018-06-07/src
 
 # Installing root
 # prerequisite cmake > 3.4.3
