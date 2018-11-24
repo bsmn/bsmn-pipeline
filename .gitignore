@@ -3,5 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Installed tools directory
+# tools / resources directories
 /tools/
+/resources/
