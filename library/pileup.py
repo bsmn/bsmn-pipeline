@@ -1,3 +1,4 @@
+import configparser
 import os
 import sys
 import re
@@ -5,12 +6,12 @@ import shutil
 import subprocess
 from .utils import coroutine
 
-config = os.path.dirname(os.path.realpath(__file__)) + "/../pipeline.conf"
-with open(config) as f:
-    for line in f:
-        if line[:9] == "SAMTOOLS=":
-            SAMTOOLS=line.strip().split('=')[1]
-            break
+lib_home = os.path.dirname(os.path.realpath(__file__))
+pipe_home = os.path.normpath(lib_home + "/..")
+config = configparser.ConfigParser()
+config.read(pipe_home + "/config.ini")
+
+SAMTOOLS = pipe_home + "/" + config["TOOLS"]["SAMTOOLS"]
 if not os.path.isfile(SAMTOOLS) or not os.access(SAMTOOLS, os.X_OK):
     SAMTOOLS = shutil.which("samtools")
 
