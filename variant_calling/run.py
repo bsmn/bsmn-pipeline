@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import configparser
 import pandas as pd
 import synapseclient
 import subprocess
@@ -94,17 +95,10 @@ def submit_post_jobs(sample, jid):
     return jid
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description='Variant Calling Pipeline')
-
+    parser = argparse.ArgumentParser(description='Variant Calling Pipeline')
     parser.add_argument(
         'infile', metavar='sample_list.txt', 
         help='Sample list file shoud have sample_id, synapse_id, and file_name.')
-
-    parser.add_argument(
-        '-c', '--config', metavar='config file',
-        help='Default: [pipeline home]/pipeline.conf', 
-        default="{pipe_home}/pipeline.conf".format(pipe_home=pipe_home))
 
     return parser.parse_args()
 
@@ -124,12 +118,18 @@ def synapse_login():
         subprocess.run(['synapse', 'login', '--remember-me'])
 
 def save_run_info(config):
+    config = configparser.ConfigParser()
+    config.read(pipe_home + "/config.ini")
+
     with open("run_info", "w") as run_file:
         run_file.write("CMD_HOME={path}\n".format(path=cmd_home))
-        run_file.write("UTIL_HOME={path}\n\n".format(path=util_home))
-        with open(config) as cfg_file:
-            for line in cfg_file:
-                run_file.write(line)
+        run_file.write("UTIL_HOME={path}\n".format(path=util_home))
+
+        for section in config.sections():
+            run_file.write("\n#{section}\n".format(section=section))
+            for key in config[section]:
+                run_file.write("{key}={path}/{val}\n".format(
+                    key=key.upper(), val=config[section][key], path=pipe_home))
 
 def log_dir(sample):
     log_dir = sample+"/logs"
