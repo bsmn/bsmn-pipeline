@@ -24,7 +24,7 @@ if [[ ! -f $OUT_VCF.tbi ]]; then
         |$VT normalize -n -r $REF - \
         |$VT uniq - \
         |$BCFTOOLS view -v snps \
-        |$PYTHON3 $PIPE_HOME/analysis_utils/germline_filter.py -V $KNOWN_GERM_SNP \
+        |$PYTHON3 $PIPE_HOME/utils/germline_filter.py -V $KNOWN_GERM_SNP \
         |$BGZIP > $OUT_VCF
     $TABIX $OUT_VCF
 else

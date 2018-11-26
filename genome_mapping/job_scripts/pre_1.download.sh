@@ -21,7 +21,7 @@ mkdir -p $SM/downloads
 if [[ $LOC =~ ^syn[0-9]+ ]]; then
     $SYNAPSE get $LOC --downloadLocation $SM/downloads/
 elif [[ $LOC =~ ^s3:.+ ]]; then
-    source <($PIPE_HOME/analysis_utils/nda_aws_token.sh -r ~/.nda_credential)
+    source <($PIPE_HOME/utils/nda_aws_token.sh -r ~/.nda_credential)
     $AWS s3 cp $LOC $SM/downloads/
 fi
 
