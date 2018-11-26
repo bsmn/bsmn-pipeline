@@ -4,7 +4,7 @@ import re
 import shutil
 import subprocess
 from .config import read_config
-from .utils import coroutine
+from .misc import coroutine
 
 config = read_config()
 SAMTOOLS = config["TOOLS"]["SAMTOOLS"]
