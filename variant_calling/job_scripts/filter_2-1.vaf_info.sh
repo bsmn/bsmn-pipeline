@@ -23,6 +23,6 @@ mkdir -p $SM/vaf
 
 $BCFTOOLS view -H -f PASS $IN_VCF \
     |grep -v ^# |cut -f1,2,4,5 \
-    |$PYTHON3 $UTIL_HOME/somatic_vaf.py -b $BAM > $VAF
+    |$PYTHON3 $PIPE_HOME/analysis_utils/somatic_vaf.py -b $BAM > $VAF
 
 printf -- "[$(date)] Finish generate vaf info.\n---\n"

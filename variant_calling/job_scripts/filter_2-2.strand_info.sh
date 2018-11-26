@@ -23,6 +23,6 @@ mkdir -p $SM/strand
 
 $BCFTOOLS view -H -f PASS $IN_VCF \
     |cut -f1,2,4,5 \
-    |$PYTHON3 $UTIL_HOME/strand_bias.py -b $BAM > $STR
+    |$PYTHON3 $PIPE_HOME/analysis_utils/strand_bias.py -b $BAM > $STR
 
 printf -- "[$(date)] Finish generate strand info.\n---\n"
