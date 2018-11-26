@@ -30,14 +30,13 @@ def main():
     for key, val in samples.items():
         sample, filetype = key
         print(sample)
-        if filetype == "bam":
-            fname, synid = val[0]
-            jid = submit_pre_jobs_bam(sample, fname, synid)
-        else:
-            jid_list = []
-            for sdata in val:
-                fname, synid = sdata
-                jid_list.append(submit_pre_jobs_fastq(sample, fname, synid))
+        jid_list = []
+        for sdata in val:
+            fname, loc = sdata
+            if filetype == "bam":
+                jid_list.append(submit_pre_jobs_bam(sample, fname, loc))
+            else:
+                jid_list.append(submit_pre_jobs_fastq(sample, fname, loc))
             jid = ",".join(jid_list)
         submit_aln_jobs(sample, jid)
         print()
@@ -48,10 +47,10 @@ def opt(sample, jid=None):
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt
 
-def submit_pre_jobs_fastq(sample, fname, synid):
+def submit_pre_jobs_fastq(sample, fname, loc):
     jid = q.submit(opt(sample), 
-        "{job_home}/pre_1.download.sh {sample} {fname} {synid}".format(
-            job_home=job_home, sample=sample, fname=fname, synid=synid))
+        "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
+            job_home=job_home, sample=sample, fname=fname, loc=loc))
     
     jid = q.submit(opt(sample, jid),
         "{job_home}/pre_2.split_fastq_by_RG.sh {sample}/downloads/{fname}".format(
@@ -59,10 +58,10 @@ def submit_pre_jobs_fastq(sample, fname, synid):
 
     return jid
 
-def submit_pre_jobs_bam(sample, fname, synid):
+def submit_pre_jobs_bam(sample, fname, loc):
     jid = q.submit(opt(sample), 
-        "{job_home}/pre_1.download.sh {sample} {fname} {synid}".format(
-            job_home=job_home, sample=sample, fname=fname, synid=synid))
+        "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
+            job_home=job_home, sample=sample, fname=fname, loc=loc))
 
     jid = q.submit(opt(sample, jid), 
         "{job_home}/pre_1b.bam2fastq.sh {sample} {fname}".format(
@@ -70,10 +69,9 @@ def submit_pre_jobs_bam(sample, fname, synid):
         
     jid_list = []
     for read in ["R1", "R2"]:
-        fastq = "{sample}/fastq/{sample}.{read}.fastq.gz".format(sample=sample, read=read)
         jid_list.append(q.submit(opt(sample, jid),
-            "{job_home}/pre_2.split_fastq_by_RG.sh {sample}/fastq/{sample}.{read}.fastq.gz".format(
-                job_home=job_home, sample=sample, read=read)))
+            "{job_home}/pre_2.split_fastq_by_RG.sh {sample}/fastq/{fname}.{read}.fastq.gz".format(
+                job_home=job_home, sample=sample, fname=fname, read=read)))
     jid = ",".join(jid_list)
 
     return jid
