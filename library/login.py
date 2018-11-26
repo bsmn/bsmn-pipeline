@@ -5,7 +5,7 @@ from .config import read_config
 
 config = read_config()
 SYNAPSE = config["TOOLS"]["SYNAPSE"]
-NDA_TOKEN = config["PATH"]["pipe_home"] + "/analysis_utils/nda_aws_token.sh"
+NDA_TOKEN = config["PATH"]["pipe_home"] + "/utils/nda_aws_token.sh"
 
 def synapse_login():
     print("- Check synapse login")
