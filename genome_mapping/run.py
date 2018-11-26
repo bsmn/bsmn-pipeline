@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import pandas as pd
 import pathlib
 import os
 import sys
@@ -14,6 +13,7 @@ sys.path.append(pipe_home)
 
 from library.config import run_info, run_info_append
 from library.login import synapse_login, nda_login
+from library.parser import sample_list
 from library.job_queue import GridEngineQueue
 q = GridEngineQueue()
 
@@ -26,7 +26,7 @@ def main():
     run_info()
     run_info_append("\n#SYNAPSE\nPARENTID={}".format(args.parentid))
 
-    samples = parse_sample_file(args.infile)
+    samples = sample_list(args.infile)
     for key, val in samples.items():
         sample, filetype = key
         print(sample)
@@ -86,26 +86,17 @@ def submit_aln_jobs(sample, jid):
 def parse_args():
     parser = argparse.ArgumentParser(description='Genome Mapping Pipeline')
     parser.add_argument('infile', metavar='sample_list.txt', 
-        help='Sample list file shoud have sample_id, synapse_id, and file_name.')
+        help='''Sample list file. 
+        Each line format is "sample_id\\tfile_name\\tlocation".
+        Header line should start with "#". Trailing columns will be ignored.
+        "location" is either a synapse_id, or a s3_location of the NDA. 
+        For data download, synapse or aws clients will be used, respectively.''')
     parser.add_argument('--parentid', metavar='syn123', 
         help='''Synapse ID of project or folder where to upload result bam files. 
-If it is not set, the result bam files will be locally saved.
-Default: None''', default=None)
-
+        If it is not set, the result bam files will be locally saved.
+        [ Default: None ]''', default=None)
     return parser.parse_args()
 
-def filetype(fname):
-    return "bam" if os.path.splitext(fname)[1] == ".bam" else "fastq"
-
-def parse_sample_file(sfile):
-    samples = defaultdict(list)
-    for sname, group in pd.read_table(sfile).groupby("sample_id"):
-        for idx, sdata in group.iterrows():
-            key = (sname, filetype(sdata["file"]))
-            val = (sdata["file"], sdata["synapse_id"])
-            samples[key].append(val)
-    return samples
-    
 def log_dir(sample):
     log_dir = sample+"/logs"
     pathlib.Path(log_dir).mkdir(parents=True, exist_ok=True)

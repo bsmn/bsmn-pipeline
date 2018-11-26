@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import pandas as pd
 import pathlib
 import os
 import sys
@@ -14,6 +13,7 @@ sys.path.append(pipe_home)
 
 from library.config import run_info
 from library.login import synapse_login, nda_login
+from library.parser import sample_list
 from library.job_queue import GridEngineQueue
 q = GridEngineQueue()
 
@@ -25,7 +25,7 @@ def main():
 
     run_info()
     
-    samples = parse_sample_file(args.infile)
+    samples = sample_list(args.infile)
     for sample, sdata in samples.items():
         print(sample)
         jid_pre = submit_pre_jobs(sample, sdata)
@@ -97,21 +97,14 @@ def submit_post_jobs(sample, jid):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Variant Calling Pipeline')
-    parser.add_argument(
-        'infile', metavar='sample_list.txt', 
-        help='Sample list file shoud have sample_id, synapse_id, and file_name.')
-
+    parser.add_argument('infile', metavar='sample_list.txt',
+        help='''Sample list file. 
+        Each line format is "sample_id\\tfile_name\\tlocation".
+        Header line should start with "#". Trailing columns will be ignored.
+        "location" is either a synapse_id, or a s3_location of the NDA. 
+        For data download, synapse or aws clients will be used, respectively.''')
     return parser.parse_args()
 
-def parse_sample_file(sfile):
-    samples = defaultdict(list)
-    for sname, group in pd.read_table(sfile).groupby("sample_id"):
-        for idx, sdata in group.iterrows():
-            key = sname
-            val = (sdata["file"], sdata["synapse_id"])
-            samples[key].append(val)
-    return samples
-    
 def log_dir(sample):
     log_dir = sample+"/logs"
     pathlib.Path(log_dir).mkdir(parents=True, exist_ok=True)
