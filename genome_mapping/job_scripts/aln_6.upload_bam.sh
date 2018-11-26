@@ -2,8 +2,6 @@
 #$ -cwd
 #$ -pe threaded 1
 
-set -eu -o pipefail
-
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [sample name]"
     exit 1
@@ -11,9 +9,11 @@ fi
 
 source $(pwd)/run_info
 
+set -eu -o pipefail
+
 SM=$1
 
-printf -- "[$(date)] Start flagstat: $SM.bam \n---\n"
+printf -- "---\n[$(date)] Start flagstat: $SM.bam\n"
 
 $SAMTOOLS flagstat $SM/bam/$SM.bam > $SM/flagstat.txt
 
@@ -28,4 +28,4 @@ cd ..
 rmdir downloads fastq bam
 touch done
 
-printf -- "---\n[$(date)] Finish upload: $SM.{bam,bai}\n"
+printf -- "[$(date)] Finish upload: $SM.{bam,bai}\n---\n"

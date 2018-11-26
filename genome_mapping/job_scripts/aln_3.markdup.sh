@@ -2,8 +2,6 @@
 #$ -cwd
 #$ -pe threaded 18 
 
-set -eu -o pipefail
-
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [sample name]"
     exit 1
@@ -11,9 +9,11 @@ fi
 
 source $(pwd)/run_info
 
+set -eu -o pipefail
+
 SM=$1
 
-printf -- "[$(date)] Start markdup.\n---\n"
+printf -- "---\n[$(date)] Start markdup.\n"
 
 $JAVA -Xmx26G -jar $PICARD MarkDuplicates \
     I=$SM/bam/$SM.merged.bam \
@@ -25,4 +25,4 @@ $JAVA -Xmx26G -jar $PICARD MarkDuplicates \
 
 rm $SM/bam/$SM.merged.bam{,.bai}
 
-printf -- "---\n[$(date)] Finish markdup.\n"
+printf -- "[$(date)] Finish markdup.\n---\n"

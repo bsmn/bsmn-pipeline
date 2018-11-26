@@ -2,8 +2,6 @@
 #$ -cwd
 #$ -pe threaded 36 
 
-set -eu -o pipefail
-
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [sample name]"
     exit 1
@@ -11,9 +9,11 @@ fi
 
 source $(pwd)/run_info
 
+set -eu -o pipefail
+
 SM=$1
 
-printf -- "[$(date)] Start RealignerTargetCreator.\n---\n"
+printf -- "---\n[$(date)] Start RealignerTargetCreator.\n"
 
 $JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
     -T RealignerTargetCreator -nt 36 \
@@ -32,4 +32,4 @@ $JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
     -o $SM/bam/$SM.realigned.bam
 rm $SM/bam/$SM.markduped.{bam,bai} $SM/realigner.intervals
 
-printf -- "---\n[$(date)] Finish IndelRealigner.\n"
+printf -- "[$(date)] Finish IndelRealigner.\n---\n"
