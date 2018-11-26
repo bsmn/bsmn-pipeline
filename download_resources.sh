@@ -2,6 +2,9 @@
 
 mkdir -p resources
 
+# Synapse login
+tools/python/3.6.2/bin/synapse login --remember-me
+
 # Download and index the human ref genome
 tools/python/3.6.2/bin/synapse get syn10347383 --downloadLocation resources/
 gunzip resources/hs37d5.fa.gz
