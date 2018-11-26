@@ -14,7 +14,7 @@ util_home = pipe_home + "/analysis_utils"
 job_home = cmd_home + "/job_scripts"
 sys.path.append(pipe_home)
 
-from library.login import synapse_login
+from library.login import synapse_login, nda_login
 from library.job_queue import GridEngineQueue
 q = GridEngineQueue()
 
@@ -22,6 +22,7 @@ def main():
     args = parse_args()
     samples = parse_sample_file(args.infile)
     synapse_login()
+    nda_login()
     save_run_info(args.parentid)
     
     for key, val in samples.items():
