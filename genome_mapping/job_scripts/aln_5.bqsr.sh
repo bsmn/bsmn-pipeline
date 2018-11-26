@@ -2,8 +2,6 @@
 #$ -cwd
 #$ -pe threaded 36 
 
-set -eu -o pipefail
-
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [sample name]"
     exit 1
@@ -11,9 +9,11 @@ fi
 
 source $(pwd)/run_info
 
+set -eu -o pipefail
+
 SM=$1
 
-printf -- "[$(date)] Start BQSR recal_table.\n---\n"
+printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 
 $JAVA -Xmx58G -jar $GATK \
     -T BaseRecalibrator -nct 36 \
@@ -32,4 +32,4 @@ $JAVA -Xmx58G -jar $GATK \
     -o $SM/bam/$SM.bam
 rm $SM/bam/$SM.realigned.{bam,bai}
 
-printf -- "---\n[$(date)] Finish BQSR PrintReads.\n"
+printf -- "[$(date)] Finish BQSR PrintReads.\n---\n"
