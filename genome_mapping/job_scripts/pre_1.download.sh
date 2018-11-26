@@ -2,22 +2,27 @@
 #$ -cwd
 #$ -pe threaded 1
 
-set -eu -o pipefail
-
 if [[ $# -lt 3 ]]; then
-    echo "Usage: $(basename $0) [sample name] [file name] [synapse id]"
+    echo "Usage: $(basename $0) [sample name] [file name] [location]"
     exit 1
 fi
 
 source $(pwd)/run_info
 
+set -eu -o pipefail
+
 SM=$1
 FNAME=$2
-SINID=$3
+LOC=$3
 
-printf -- "[$(date)] Start download: $FNAME\n---\n"
+printf -- "---\n[$(date)] Start download: $FNAME\n"
 
-mkdir -p $SM/downloads $SM/fastq
-$SYNAPSE get $SINID --downloadLocation $SM/downloads/
+mkdir -p $SM/downloads
+if [[ $LOC =~ ^syn[0-9]+ ]]; then
+    $SYNAPSE get $LOC --downloadLocation $SM/downloads/
+elif [[ $LOC =~ ^s3:.+ ]]; then
+    source <($PIPE_HOME/analysis_utils/nda_aws_token.sh -r ~/.nda_credential)
+    $AWS s3 cp $LOC $SM/downloads/
+fi
 
-printf -- "---\n[$(date)] Finish downlaod: $FNAME\n"
+printf -- "[$(date)] Finish downlaod: $FNAME\n---\n"

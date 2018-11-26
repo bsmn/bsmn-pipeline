@@ -15,7 +15,7 @@ rm -r tools/python/3.6.2/src
 
 # Installing Python modules needed
 tools/python/3.6.2/bin/pip3 install --upgrade pip
-tools/python/3.6.2/bin/pip3 install pandas synapseclient statsmodels scipy rpy2
+tools/python/3.6.2/bin/pip3 install awscli synapseclient statsmodels scipy rpy2
 
 # Installling Java8
 mkdir -p tools/java

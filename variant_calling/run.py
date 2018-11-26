@@ -46,11 +46,11 @@ def opt(sample, jid=None):
 
 def submit_pre_jobs(sample, sdata):
     jid_list = []
-    for fname, synid in sdata:
+    for fname, loc in sdata:
         jid_list.append(
             q.submit(opt(sample), 
-                "{job_home}/pre_1.download.sh {sample} {fname} {synid}".format(
-                    job_home=job_home, sample=sample, fname=fname, synid=synid)))
+                "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
+                    job_home=job_home, sample=sample, fname=fname, loc=loc)))
     jid = ",".join(jid_list)
     q.submit(opt(sample, jid), 
         "{job_home}/pre_2.cnvnator.sh {sample}".format(
