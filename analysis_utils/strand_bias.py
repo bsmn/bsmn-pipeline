@@ -9,7 +9,7 @@ from scipy.stats import fisher_exact
 
 pipe_home = os.path.dirname(os.path.realpath(__file__)) + "/.."
 sys.path.append(pipe_home)
-from library.utils import coroutine, printer
+from library.misc import coroutine, printer
 from library.pileup import pileup, clean, count
 
 def run(args):
