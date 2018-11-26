@@ -3,8 +3,6 @@
 import argparse
 import configparser
 import pandas as pd
-import synapseclient
-import subprocess
 import pathlib
 import os
 import sys
@@ -16,6 +14,7 @@ util_home = pipe_home + "/analysis_utils"
 job_home = cmd_home + "/job_scripts"
 sys.path.append(pipe_home)
 
+from library.login import synapse_login
 from library.job_queue import GridEngineQueue
 q = GridEngineQueue()
 
@@ -104,12 +103,6 @@ def parse_sample_file(sfile):
             samples[key].append(val)
     return samples
     
-def synapse_login():
-    try:
-        synapseclient.login()
-    except:
-        subprocess.run(['synapse', 'login', '--remember-me'])
-
 def save_run_info(parentid):
     config = configparser.ConfigParser()
     config.read(pipe_home + "/config.ini")
