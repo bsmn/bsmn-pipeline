@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import configparser
 import pandas as pd
 import pathlib
 import os
@@ -10,21 +9,24 @@ from collections import defaultdict
 
 cmd_home = os.path.dirname(os.path.realpath(__file__))
 pipe_home = os.path.normpath(cmd_home + "/..")
-util_home = pipe_home + "/analysis_utils"
 job_home = cmd_home + "/job_scripts"
 sys.path.append(pipe_home)
 
+from library.config import run_info, run_info_append
 from library.login import synapse_login, nda_login
 from library.job_queue import GridEngineQueue
 q = GridEngineQueue()
 
 def main():
     args = parse_args()
-    samples = parse_sample_file(args.infile)
+
     synapse_login()
     nda_login()
-    save_run_info(args.parentid)
-    
+
+    run_info()
+    run_info_append("\n#SYNAPSE\nPARENTID={}".format(args.parentid))
+
+    samples = parse_sample_file(args.infile)
     for key, val in samples.items():
         sample, filetype = key
         print(sample)
@@ -104,23 +106,6 @@ def parse_sample_file(sfile):
             samples[key].append(val)
     return samples
     
-def save_run_info(parentid):
-    config = configparser.ConfigParser()
-    config.read(pipe_home + "/config.ini")
-
-    with open("run_info", "w") as run_file:
-        run_file.write("CMD_HOME={path}\n".format(path=cmd_home))
-        run_file.write("UTIL_HOME={path}\n".format(path=util_home))
-
-        for section in config.sections():
-            run_file.write("\n#{section}\n".format(section=section))
-            for key in config[section]:
-                run_file.write("{key}={path}/{val}\n".format(
-                    key=key.upper(), val=config[section][key], path=pipe_home))
-
-        run_file.write("\n#SYNAPSE\n")
-        run_file.write("PARENTID={id}\n".format(id=parentid))
-
 def log_dir(sample):
     log_dir = sample+"/logs"
     pathlib.Path(log_dir).mkdir(parents=True, exist_ok=True)

@@ -1,17 +1,13 @@
-import configparser
 import os
 import sys
 import re
 import shutil
 import subprocess
+from .config import read_config
 from .utils import coroutine
 
-lib_home = os.path.dirname(os.path.realpath(__file__))
-pipe_home = os.path.normpath(lib_home + "/..")
-config = configparser.ConfigParser()
-config.read(pipe_home + "/config.ini")
-
-SAMTOOLS = pipe_home + "/" + config["TOOLS"]["SAMTOOLS"]
+config = read_config()
+SAMTOOLS = config["TOOLS"]["SAMTOOLS"]
 if not os.path.isfile(SAMTOOLS) or not os.access(SAMTOOLS, os.X_OK):
     SAMTOOLS = shutil.which("samtools")
 
