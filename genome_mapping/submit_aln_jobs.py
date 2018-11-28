@@ -35,13 +35,20 @@ def main():
     jid = q.submit(opt(args.sample, jid), 
         "{job_home}/aln_5.bqsr.sh {sample}".format(job_home=job_home, sample=args.sample))
 
-    q.submit(opt(args.sample, jid), 
-        "{job_home}/aln_6.upload_bam.sh {sample}".format(job_home=job_home, sample=args.sample))
+    if parentid() != "None":
+        q.submit(opt(args.sample, jid), 
+            "{job_home}/aln_6.upload_bam.sh {sample}".format(job_home=job_home, sample=args.sample))
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Alignment job submitter')
     parser.add_argument('sample', metavar='sample name')
     return parser.parse_args()
+
+def parentid():
+    with open('/efs/tmp/run_info') as run_info:
+        for line in run_info:
+            if line[:8] == "PARENTID":
+                return line.strip().split("=")[1]
 
 def log_dir(sample):
     log_dir = sample+"/logs"
