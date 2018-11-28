@@ -101,7 +101,7 @@ def parse_args():
         help='''Sample list file. 
         Each line format is "sample_id\\tfile_name\\tlocation".
         Header line should start with "#". Trailing columns will be ignored.
-        "location" is either a synapse_id, or a s3_location of the NDA. 
+        "location" is either a synapse_id, or a s3_uri of the NDA. 
         For data download, synapse or aws clients will be used, respectively.''')
     return parser.parse_args()
 
