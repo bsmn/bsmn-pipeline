@@ -28,7 +28,7 @@ else
 fi
     
 mkdir -p $SM/fastq
-$SAMTOOLS collate -uOn $TMP_N $SM/downloads/$FNAME $SM/tmp.collate \
+$SAMTOOLS collate -uOn $TMP_N $SM/downloads/$FNAME $SM/$FNAME.collate \
     |$SAMTOOLS fastq -F 0x900 -1 $SM/fastq/$FNAME.R1.fastq.gz -2 $SM/fastq/$FNAME.R2.fastq.gz -
 rm $SM/downloads/$FNAME
 
