@@ -22,7 +22,7 @@ if [[ $LOC =~ ^syn[0-9]+ ]]; then
     $SYNAPSE get $LOC --downloadLocation $SM/bam/
 elif [[ $LOC =~ ^s3:.+ ]]; then
     eval "$($PIPE_HOME/utils/nda_aws_token.sh -r ~/.nda_credential)"
-    $AWS s3 cp $LOC $SM/bam/
+    $AWS s3 cp --no-progress $LOC $SM/bam/
 fi
 
 printf -- "[$(date)] Finish downlaod: $FNAME\n---\n"
