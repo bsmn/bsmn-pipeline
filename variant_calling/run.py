@@ -98,11 +98,13 @@ def submit_post_jobs(sample, jid):
 def parse_args():
     parser = argparse.ArgumentParser(description='Variant Calling Pipeline')
     parser.add_argument('infile', metavar='sample_list.txt',
-        help='''Sample list file. 
+        help='''Sample list file.
         Each line format is "sample_id\\tfile_name\\tlocation".
-        Header line should start with "#". Trailing columns will be ignored.
-        "location" is either a synapse_id, or a s3_uri of the NDA. 
-        For data download, synapse or aws clients will be used, respectively.''')
+        Lines staring with "#" will omitted.
+        Header line should also start with "#".
+        Trailing columns will be ignored.
+        "location" is Synapse ID, S3Uri of the NDA or a user, or LocalPath.
+        For data download, synapse or aws clients, or symbolic link will be used, respectively.''')
     return parser.parse_args()
 
 if __name__ == "__main__":
