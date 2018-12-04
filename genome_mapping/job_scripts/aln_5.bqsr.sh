@@ -7,11 +7,11 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-source $(pwd)/run_info
+SM=$1
+
+source $(pwd)/$SM/run_info
 
 set -eu -o pipefail
-
-SM=$1
 
 printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 

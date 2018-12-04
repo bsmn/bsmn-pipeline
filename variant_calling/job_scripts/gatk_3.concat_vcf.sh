@@ -7,12 +7,12 @@ if [[ $# -lt 2 ]]; then
     exit 1
 fi
 
-source $(pwd)/run_info
-
-set -eu -o pipefail
-
 SM=$1
 PL=$2
+
+source $(pwd)/$SM/run_info
+
+set -eu -o pipefail
 
 RVCFS=""
 for i in $(seq 1 22) X Y; do

@@ -22,13 +22,15 @@ def main():
     synapse_login()
     nda_login()
 
-    run_info("run_info")
-    run_info_append("run_info", "\n#SYNAPSE\nPARENTID={}".format(args.parentid))
-
     samples = sample_list(args.infile)
     for key, val in samples.items():
         sample, filetype = key
         print(sample)
+
+        f_run_info = sample + "/run_info"
+        run_info(f_run_info)
+        run_info_append(f_run_info, "\n#SYNAPSE\nPARENTID={}".format(args.parentid))
+
         jid_list = []
         for sdata in val:
             fname, loc = sdata

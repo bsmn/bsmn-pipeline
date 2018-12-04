@@ -7,12 +7,13 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-source $(pwd)/run_info
+SM=$1
+
+source $(pwd)/$SM/run_info
 source $ROOTSYS/bin/thisroot.sh
 
 set -eu -o pipefail
 
-SM=$1
 BAM=$SM/bam/$SM.bam
 ROOT=$SM/cnv/$SM.root
 CNVCALL=$SM/cnv/$SM.cnvcall

@@ -7,12 +7,12 @@ if [[ $# -lt 2 ]]; then
     exit 1
 fi
 
-source $(pwd)/run_info
-
-set -eu -o pipefail
-
 SM=$1
 PL=$2
+
+source $(pwd)/$SM/run_info
+
+set -eu -o pipefail
 
 IN_VCF=$SM/recal_vcf/$SM.ploidy_$PL.vcf
 OUT_VCF=$SM/recal_vcf/$SM.ploidy_$PL.known_germ_filtered.snvs.vcf.gz

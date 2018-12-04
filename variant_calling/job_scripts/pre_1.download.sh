@@ -7,13 +7,13 @@ if [[ $# -lt 3 ]]; then
     exit 1
 fi
 
-source $(pwd)/run_info
-
-set -eu -o pipefail
-
 SM=$1
 FNAME=$2
 LOC=$3
+
+source $(pwd)/$SM/run_info
+
+set -eu -o pipefail
 
 printf -- "---\n[$(date)] Start download: $FNAME\n"
 
