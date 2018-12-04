@@ -2,9 +2,11 @@
 #$ -cwd
 #$ -pe threaded 1
 
+trap "exit 100" ERR
+
 if [[ $# -lt 2 ]]; then
     echo "Usage: $(basename $0) [sample name] [ploidy]"
-    exit 1
+    false
 fi
 
 SM=$1
@@ -12,7 +14,8 @@ PL=$2
 
 source $(pwd)/$SM/run_info
 
-set -eu -o pipefail
+set -o nounset
+set -o pipefail
 
 VAF=$SM/vaf/$SM.ploidy_$PL.known_germ_filtered.pass.snvs.txt
 STR=$SM/strand/$SM.ploidy_$PL.known_germ_filtered.pass.snvs.txt
