@@ -26,19 +26,19 @@ rc=0
 n=0
 until [[ $n -eq 5 ]]; do
     if [[ $LOC =~ ^syn[0-9]+ ]]; then
-        $SYNAPSE get $LOC --downloadLocation $SM/bam/ && break || rc=$?
+        $SYNAPSE get $LOC --downloadLocation $SM/bam/ && { rc=$?; break; } || rc=$?
     elif [[ $LOC =~ ^s3:.+ ]]; then
         $AWS s3 ls $LOC || {
-            printf "\nSet an NDA AWS token\n"
+            printf "Set an NDA AWS token\n\n"
             eval "$($PIPE_HOME/utils/nda_aws_token.sh -r ~/.nda_credential)"
         }
-        $AWS s3 cp --no-progress $LOC $SM/bam/ && break || rc=$?
+        $AWS s3 cp --no-progress $LOC $SM/bam/ && { rc=$?; break; } || rc=$?
     else
         ls -lh $LOC && ln -sf $(readlink -f $LOC) $SM/bam/ || rc=$?
         break
     fi
     n=$((n+1))
-    printf "Download try $n failed.\n"
+    printf "Download try $n failed.\n\n"
 done
 [[ $rc -eq 0 ]] || false
 
