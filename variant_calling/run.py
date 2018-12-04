@@ -22,11 +22,12 @@ def main():
     synapse_login()
     nda_login()
 
-    run_info("run_info")
-    
     samples = sample_list(args.infile)
     for sample, sdata in samples.items():
         print(sample)
+
+        run_info(sample + "/run_info")
+
         jid_pre = submit_pre_jobs(sample, sdata)
         jid_list = []
         for ploidy in range(2,11):

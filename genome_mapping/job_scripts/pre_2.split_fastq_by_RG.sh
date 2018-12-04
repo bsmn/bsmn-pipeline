@@ -7,12 +7,12 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-source $(pwd)/run_info
-
-set -eu -o pipefail
-
 FQ=$1
 SM=$(echo $FQ|cut -d"/" -f1)
+
+source $(pwd)/$SM/run_info
+
+set -eu -o pipefail
 
 if [[ $FQ == *.gz ]]; then
     CAT=zcat

@@ -7,12 +7,12 @@ if [[ $# -lt 2 ]]; then
     exit 1
 fi
 
-source $(pwd)/run_info
-
-set -eu -o pipefail
-
 HOST=$1
 SM=$2
+
+source $(pwd)/$SM/run_info
+
+set -eu -o pipefail
 
 printf -- "---\n[$(date)] Start submit_aln_jobs.\n"
 

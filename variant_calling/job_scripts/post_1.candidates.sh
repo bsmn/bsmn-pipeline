@@ -7,12 +7,12 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-source $(pwd)/run_info
+SM=$1
+
+source $(pwd)/$SM/run_info
 source $ROOTSYS/bin/thisroot.sh
 
 set -eu -o pipefail
-
-SM=$1
 
 SUM_PREFIX=$SM/bias_summary/$SM.ploidy_
 CANDALL=$SM/candidates/$SM.mosaic_snvs.all.txt
