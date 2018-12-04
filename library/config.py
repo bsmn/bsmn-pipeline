@@ -17,7 +17,7 @@ def read_config():
 
 def run_info(fname):
     config = read_config()
-
+    pathlib.Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
     with open(fname, "w") as run_file:
         run_file.write("#PATH\nPIPE_HOME={}\n".format(config["PATH"]["pipe_home"]))
         for section in ["TOOLS", "RESOURCES"]:
