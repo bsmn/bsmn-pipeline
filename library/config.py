@@ -1,4 +1,5 @@
 import configparser
+import pathlib
 import os
 
 def read_config():
@@ -14,10 +15,10 @@ def read_config():
 
     return config
 
-def run_info():
+def run_info(fname):
     config = read_config()
 
-    with open("run_info", "w") as run_file:
+    with open(fname, "w") as run_file:
         run_file.write("#PATH\nPIPE_HOME={}\n".format(config["PATH"]["pipe_home"]))
         for section in ["TOOLS", "RESOURCES"]:
             run_file.write("\n#{section}\n".format(section=section))
@@ -25,6 +26,11 @@ def run_info():
                 run_file.write("{key}={val}\n".format(
                     key=key.upper(), val=config[section][key]))
 
-def run_info_append(line):
-    with open("run_info", "a") as run_file:
+def run_info_append(fname, line):
+    with open(fname, "a") as run_file:
         run_file.write(line + "\n")
+
+def log_dir(sample):
+    log_dir = sample+"/logs"
+    pathlib.Path(log_dir).mkdir(parents=True, exist_ok=True)
+    return log_dir

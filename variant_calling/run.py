@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import pathlib
 import os
 import sys
 from collections import defaultdict
@@ -11,7 +10,7 @@ pipe_home = os.path.normpath(cmd_home + "/..")
 job_home = cmd_home + "/job_scripts"
 sys.path.append(pipe_home)
 
-from library.config import run_info
+from library.config import run_info, log_dir
 from library.login import synapse_login, nda_login
 from library.parser import sample_list
 from library.job_queue import GridEngineQueue
@@ -23,7 +22,7 @@ def main():
     synapse_login()
     nda_login()
 
-    run_info()
+    run_info("run_info")
     
     samples = sample_list(args.infile)
     for sample, sdata in samples.items():
@@ -104,11 +103,6 @@ def parse_args():
         "location" is either a synapse_id, or a s3_uri of the NDA. 
         For data download, synapse or aws clients will be used, respectively.''')
     return parser.parse_args()
-
-def log_dir(sample):
-    log_dir = sample+"/logs"
-    pathlib.Path(log_dir).mkdir(parents=True, exist_ok=True)
-    return log_dir
 
 if __name__ == "__main__":
     main()
