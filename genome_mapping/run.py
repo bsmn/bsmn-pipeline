@@ -84,12 +84,14 @@ def submit_aln_jobs(sample, jid):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Genome Mapping Pipeline')
-    parser.add_argument('infile', metavar='sample_list.txt', 
-        help='''Sample list file. 
+    parser.add_argument('infile', metavar='sample_list.txt',
+        help='''Sample list file.
         Each line format is "sample_id\\tfile_name\\tlocation".
-        Header line should start with "#". Trailing columns will be ignored.
-        "location" is either a synapse_id, or a s3_uri of the NDA. 
-        For data download, synapse or aws clients will be used, respectively.''')
+        Lines staring with "#" will omitted.
+        Header line should also start with "#".
+        Trailing columns will be ignored.
+        "location" is Synapse ID, S3Uri of the NDA or a user, or LocalPath.
+        For data download, synapse or aws clients, or symbolic link will be used, respectively.''')
     parser.add_argument('--parentid', metavar='syn123', 
         help='''Synapse ID of project or folder where to upload result bam files. 
         If it is not set, the result bam files will be locally saved.

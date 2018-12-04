@@ -20,12 +20,26 @@ set -o pipefail
 
 printf -- "---\n[$(date)] Start download: $FNAME\n"
 
-mkdir -p $SM/bam 
-if [[ $LOC =~ ^syn[0-9]+ ]]; then
-    $SYNAPSE get $LOC --downloadLocation $SM/bam/
-elif [[ $LOC =~ ^s3:.+ ]]; then
-    eval "$($PIPE_HOME/utils/nda_aws_token.sh -r ~/.nda_credential)"
-    $AWS s3 cp --no-progress $LOC $SM/bam/
-fi
+mkdir -p $SM/bam
+
+rc=0
+n=0
+until [[ $n -eq 5 ]]; do
+    if [[ $LOC =~ ^syn[0-9]+ ]]; then
+        $SYNAPSE get $LOC --downloadLocation $SM/bam/ && break || rc=$?
+    elif [[ $LOC =~ ^s3:.+ ]]; then
+        $AWS s3 ls $LOC || {
+            printf "\nSet an NDA AWS token\n"
+            eval "$($PIPE_HOME/utils/nda_aws_token.sh -r ~/.nda_credential)"
+        }
+        $AWS s3 cp --no-progress $LOC $SM/bam/ && break || rc=$?
+    else
+        ls -lh $LOC && ln -sf $(readlink -f $LOC) $SM/bam/ || rc=$?
+        break
+    fi
+    n=$((n+1))
+    printf "Download try $n failed.\n"
+done
+[[ $rc -eq 0 ]] || false
 
 printf -- "[$(date)] Finish downlaod: $FNAME\n---\n"
