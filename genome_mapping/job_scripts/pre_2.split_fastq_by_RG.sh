@@ -2,9 +2,11 @@
 #$ -cwd
 #$ -pe threaded 3
 
+trap "exit 100" ERR
+
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [fastq]"
-    exit 1
+    false
 fi
 
 FQ=$1
@@ -12,7 +14,8 @@ SM=$(echo $FQ|cut -d"/" -f1)
 
 source $(pwd)/$SM/run_info
 
-set -eu -o pipefail
+set -o nounset
+set -o pipefail
 
 if [[ $FQ == *.gz ]]; then
     CAT=zcat

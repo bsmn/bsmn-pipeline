@@ -2,9 +2,11 @@
 #$ -cwd
 #$ -pe threaded 1
 
+trap "exit 100" ERR
+
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [sample name]"
-    exit 1
+    false
 fi
 
 SM=$1
@@ -12,7 +14,8 @@ SM=$1
 source $(pwd)/$SM/run_info
 source $ROOTSYS/bin/thisroot.sh
 
-set -eu -o pipefail
+set -o nounset
+set -o pipefail
 
 SUM_PREFIX=$SM/bias_summary/$SM.ploidy_
 CANDALL=$SM/candidates/$SM.mosaic_snvs.all.txt

@@ -2,9 +2,11 @@
 #$ -cwd
 #$ -pe threaded 8
 
+trap "exit 100" ERR
+
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [sample name] [ploidy]"
-    exit 1
+    false
 fi
 
 SM=$1
@@ -12,7 +14,8 @@ PL=$2
 
 source $(pwd)/$SM/run_info
 
-set -eu -o pipefail
+set -o nounset
+set -o pipefail
 
 RVCF=$SM/raw_vcf/$SM.ploidy_$PL.vcf
 CVCF_SNP=$SM/recal_vcf/$SM.ploidy_$PL.snps.vcf

@@ -2,9 +2,11 @@
 #$ -cwd
 #$ -pe threaded 1
 
+trap "exit 100" ERR
+
 if [[ $# -lt 3 ]]; then
     echo "Usage: $(basename $0) [sample name] [file name] [location]"
-    exit 1
+    false
 fi
 
 SM=$1
@@ -13,7 +15,8 @@ LOC=$3
 
 source $(pwd)/$SM/run_info
 
-set -eu -o pipefail
+set -o nounset
+set -o pipefail
 
 printf -- "---\n[$(date)] Start download: $FNAME\n"
 

@@ -2,9 +2,11 @@
 #$ -cwd
 #$ -pe threaded 36 
 
+trap "exit 100" ERR
+
 if [[ $# -lt 2 ]]; then
     echo "Usage: $(basename $0) [sample name] [PU info]"
-    exit 1
+    false
 fi
 
 SM=$1
@@ -12,7 +14,8 @@ PU=$2
 
 source $(pwd)/$SM/run_info
 
-set -eu -o pipefail
+set -o nounset 
+set -o pipefail
 
 printf -- "---\n[$(date)] Start align_sort.\n"
 
