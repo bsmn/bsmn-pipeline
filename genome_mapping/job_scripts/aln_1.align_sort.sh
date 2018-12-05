@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 36 
+#$ -pe threaded 24 
 
 trap "exit 100" ERR
 
@@ -20,7 +20,7 @@ set -o pipefail
 printf -- "---\n[$(date)] Start align_sort.\n"
 
 mkdir -p $SM/bam
-$BWA mem -M -t 32 \
+$BWA mem -M -t $((NSLOTS - 4)) \
     -R "@RG\tID:$SM.$PU\tSM:$SM\tPL:illumina\tLB:$SM\tPU:$PU" \
     $REF $SM/fastq/$SM.$PU.R{1,2}.fastq.gz \
     |$SAMBAMBA view -S -f bam -l 0 /dev/stdin \

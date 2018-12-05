@@ -51,7 +51,7 @@ def parentid(sample):
                 return line.strip().split("=")[1]
 
 def opt(sample, jid=None):
-    opt = "-j y -o {log_dir} -l h_vmem=2G".format(log_dir=log_dir(sample))
+    opt = "-j y -o {log_dir} -l h_vmem=4G".format(log_dir=log_dir(sample))
     if jid is not None:
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt

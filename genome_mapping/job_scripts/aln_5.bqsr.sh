@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 36 
+#$ -pe threaded 24
 
 trap "exit 100" ERR
 
@@ -18,8 +18,8 @@ set -o pipefail
 
 printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 
-$JAVA -Xmx58G -jar $GATK \
-    -T BaseRecalibrator -nct 36 \
+$JAVA -Xmx72G -jar $GATK \
+    -T BaseRecalibrator -nct $NSLOTS \
     -R $REF -knownSites $DBSNP -knownSites $MILLS -knownSites $INDEL1KG \
     -I $SM/bam/$SM.realigned.bam \
     -o $SM/recal_data.table
@@ -27,8 +27,8 @@ $JAVA -Xmx58G -jar $GATK \
 printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 printf -- "---\n[$(date)] Start BQSR PrintReads.\n---\n"
 
-$JAVA -Xmx58G -jar $GATK \
-    -T PrintReads -nct 36 \
+$JAVA -Xmx72G -jar $GATK \
+    -T PrintReads -nct $NSLOTS \
     --emit_original_quals \
     -R $REF -BQSR $SM/recal_data.table \
     -I $SM/bam/$SM.realigned.bam \

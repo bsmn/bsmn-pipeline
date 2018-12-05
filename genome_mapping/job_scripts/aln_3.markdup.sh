@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 18 
+#$ -pe threaded 12
 
 trap "exit 100" ERR
 
@@ -18,7 +18,7 @@ set -o pipefail
 
 printf -- "---\n[$(date)] Start markdup.\n"
 
-$JAVA -Xmx26G -jar $PICARD MarkDuplicates \
+$JAVA -Xmx36G -jar $PICARD MarkDuplicates \
     I=$SM/bam/$SM.merged.bam \
     O=$SM/bam/$SM.markduped.bam \
     METRICS_FILE=$SM/markduplicates_metrics.txt \
