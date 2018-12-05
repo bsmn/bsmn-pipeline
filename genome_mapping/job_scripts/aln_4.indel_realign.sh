@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 36 
+#$ -pe threaded 24
 
 trap "exit 100" ERR
 
@@ -18,8 +18,8 @@ set -o pipefail
 
 printf -- "---\n[$(date)] Start RealignerTargetCreator.\n"
 
-$JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
-    -T RealignerTargetCreator -nt 36 \
+$JAVA -Xmx72G -Djava.io.tmpdir=tmp -jar $GATK \
+    -T RealignerTargetCreator -nt $NSLOTS \
     -R $REF -known $MILLS -known $INDEL1KG \
     -I $SM/bam/$SM.markduped.bam \
     -o $SM/realigner.intervals
@@ -27,7 +27,7 @@ $JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
 printf -- "---\n[$(date)] Finish RealignerTargetCreator.\n"
 printf -- "---\n[$(date)] Start IndelRealigner.\n---\n"
 
-$JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
+$JAVA -Xmx72G -Djava.io.tmpdir=tmp -jar $GATK \
     -T IndelRealigner \
     -R $REF -known $MILLS -known $INDEL1KG \
     -targetIntervals $SM/realigner.intervals \
