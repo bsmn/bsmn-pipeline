@@ -18,7 +18,7 @@ set -o pipefail
 
 printf -- "---\n[$(date)] Start RealignerTargetCreator.\n"
 
-$JAVA -Xmx72G -Djava.io.tmpdir=tmp -jar $GATK \
+$JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
     -T RealignerTargetCreator -nt $NSLOTS \
     -R $REF -known $MILLS -known $INDEL1KG \
     -I $SM/bam/$SM.markduped.bam \
@@ -27,7 +27,7 @@ $JAVA -Xmx72G -Djava.io.tmpdir=tmp -jar $GATK \
 printf -- "---\n[$(date)] Finish RealignerTargetCreator.\n"
 printf -- "---\n[$(date)] Start IndelRealigner.\n---\n"
 
-$JAVA -Xmx72G -Djava.io.tmpdir=tmp -jar $GATK \
+$JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
     -T IndelRealigner \
     -R $REF -known $MILLS -known $INDEL1KG \
     -targetIntervals $SM/realigner.intervals \

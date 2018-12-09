@@ -18,7 +18,7 @@ set -o pipefail
 
 printf -- "---\n[$(date)] Start markdup.\n"
 
-$JAVA -Xmx36G -jar $PICARD MarkDuplicates \
+$JAVA -Xmx26G -jar $PICARD MarkDuplicates \
     I=$SM/bam/$SM.merged.bam \
     O=$SM/bam/$SM.markduped.bam \
     METRICS_FILE=$SM/markduplicates_metrics.txt \

@@ -18,7 +18,7 @@ set -o pipefail
 
 printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 
-$JAVA -Xmx72G -jar $GATK \
+$JAVA -Xmx58G -jar $GATK \
     -T BaseRecalibrator -nct $NSLOTS \
     -R $REF -knownSites $DBSNP -knownSites $MILLS -knownSites $INDEL1KG \
     -I $SM/bam/$SM.realigned.bam \
@@ -27,7 +27,7 @@ $JAVA -Xmx72G -jar $GATK \
 printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 printf -- "---\n[$(date)] Start BQSR PrintReads.\n---\n"
 
-$JAVA -Xmx72G -jar $GATK \
+$JAVA -Xmx58G -jar $GATK \
     -T PrintReads -nct $NSLOTS \
     --emit_original_quals \
     -R $REF -BQSR $SM/recal_data.table \
