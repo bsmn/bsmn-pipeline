@@ -57,9 +57,11 @@ genome_mapping.sh sample_list.txt
 ### sample_list.txt format
 The lines starting with # will be commented out and ignored. The header line should start with # as well. Eg.
 ```
-#sample_id       file_name    location
-5154_brain-BSMN_REF_brain-534-U01MH106876       bulk_sorted.bam syn10639574
-5154_fibroblast-BSMN_REF_fibroblasts-534-U01MH106876    fibroblasts_sorted.bam  syn10639575
+#sample_id	file_name	location
+5154_brain-BSMN_REF_brain-534-U01MH106876	bulk_sorted.bam	syn10639574
+5154_fibroblast-BSMN_REF_fibroblasts-534-U01MH106876	fibroblasts_sorted.bam	syn10639575
+5154_NeuN_positive-BSMN_REF_NeuN+_E12-677-U01MH106876	E12_MDA_common_sorted.bam	s3://nda-bsmn/abyzova_1497485007384/data/E12_MDA_common_sorted.bam
+5154_NeuN_positive-BSMN_REF_NeuN+_C12-677-U01MH106876	C12_MDA_common_sorted.bam	/efs/data/C12_MDA_common_sorted.bam
 ```
 The "location" column can be a Synape ID, S3Uri of the NDA or a user, or LocalPath. For Data download, synapse or aws clients, or symbolic lins will be used, respectively.
 
