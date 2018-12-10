@@ -2,17 +2,20 @@
 #$ -cwd
 #$ -pe threaded 8 
 
+trap "exit 100" ERR
+
 if [[ $# -lt 2 ]]; then
     echo "Usage: $(basename $0) [sample name] [ploidy]"
-    exit 1
+    false
 fi
-
-source $(pwd)/run_info
-
-set -eu -o pipefail
 
 SM=$1
 PL=$2
+
+source $(pwd)/$SM/run_info
+
+set -o nounset
+set -o pipefail
 
 IN_VCF=$SM/recal_vcf/$SM.ploidy_$PL.vcf
 OUT_VCF=$SM/recal_vcf/$SM.ploidy_$PL.known_germ_filtered.snvs.vcf.gz
@@ -24,7 +27,7 @@ if [[ ! -f $OUT_VCF.tbi ]]; then
         |$VT normalize -n -r $REF - \
         |$VT uniq - \
         |$BCFTOOLS view -v snps \
-        |$PYTHON3 $UTIL_HOME/germline_filter.py -V $KNOWN_GERM_SNP \
+        |$PYTHON3 $PIPE_HOME/utils/germline_filter.py -V $KNOWN_GERM_SNP \
         |$BGZIP > $OUT_VCF
     $TABIX $OUT_VCF
 else

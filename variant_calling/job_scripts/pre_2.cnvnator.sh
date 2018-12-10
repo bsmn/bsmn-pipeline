@@ -2,17 +2,21 @@
 #$ -cwd
 #$ -pe threaded 4 
 
+trap "exit 100" ERR
+
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [sample name]"
-    exit 1
+    false
 fi
 
-source $(pwd)/run_info
+SM=$1
+
+source $(pwd)/$SM/run_info
 source $ROOTSYS/bin/thisroot.sh
 
-set -eu -o pipefail
+set -o nounset
+set -o pipefail
 
-SM=$1
 BAM=$SM/bam/$SM.bam
 ROOT=$SM/cnv/$SM.root
 CNVCALL=$SM/cnv/$SM.cnvcall

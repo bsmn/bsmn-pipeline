@@ -2,17 +2,20 @@
 #$ -cwd
 #$ -pe threaded 3
 
-set -eu -o pipefail
+trap "exit 100" ERR
 
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [fastq]"
-    exit 1
+    false
 fi
-
-source $(pwd)/run_info
 
 FQ=$1
 SM=$(echo $FQ|cut -d"/" -f1)
+
+source $(pwd)/$SM/run_info
+
+set -o nounset
+set -o pipefail
 
 if [[ $FQ == *.gz ]]; then
     CAT=zcat
@@ -26,8 +29,9 @@ else
     RD=R2
 fi
 
-printf -- "[$(date)] Start split fastq: $FQ\n---\n"
+printf -- "---\n[$(date)] Start split fastq: $FQ\n"
 
+mkdir -p $SM/fastq
 $CAT $FQ |paste - - - - |awk -F"\t" -v SM=$SM -v RD=$RD '{
     h=$1;
     sub(/^@/,"",h);
@@ -40,4 +44,4 @@ $CAT $FQ |paste - - - - |awk -F"\t" -v SM=$SM -v RD=$RD '{
     print "READ N: "NR}'
 rm $FQ
 
-printf -- "---\n[$(date)] Finish split fastq: $FQ\n"
+printf -- "[$(date)] Finish split fastq: $FQ\n---\n"

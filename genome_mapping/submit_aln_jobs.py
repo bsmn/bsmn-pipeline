@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import pathlib
 import glob
 import os
 import sys
@@ -11,6 +10,7 @@ pipe_home = os.path.normpath(cmd_home + "/..")
 job_home = cmd_home + "/job_scripts"
 sys.path.append(pipe_home)
 
+from library.config import log_dir
 from library.job_queue import GridEngineQueue
 
 def main():
@@ -35,21 +35,23 @@ def main():
     jid = q.submit(opt(args.sample, jid), 
         "{job_home}/aln_5.bqsr.sh {sample}".format(job_home=job_home, sample=args.sample))
 
-    q.submit(opt(args.sample, jid), 
-        "{job_home}/aln_6.upload_bam.sh {sample}".format(job_home=job_home, sample=args.sample))
+    if parentid(args.sample) != "None":
+        q.submit(opt(args.sample, jid), 
+            "{job_home}/aln_6.upload_bam.sh {sample}".format(job_home=job_home, sample=args.sample))
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Alignment job submitter')
     parser.add_argument('sample', metavar='sample name')
     return parser.parse_args()
 
-def log_dir(sample):
-    log_dir = sample+"/logs"
-    pathlib.Path(log_dir).mkdir(parents=True, exist_ok=True)
-    return log_dir
+def parentid(sample):
+    with open(sample + "/run_info") as run_info:
+        for line in run_info:
+            if line[:8] == "PARENTID":
+                return line.strip().split("=")[1]
 
 def opt(sample, jid=None):
-    opt = "-j y -o {log_dir} -l h_vmem=2G".format(log_dir=log_dir(sample))
+    opt = "-j y -o {log_dir} -l h_vmem=4G".format(log_dir=log_dir(sample))
     if jid is not None:
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt

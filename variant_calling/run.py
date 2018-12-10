@@ -1,31 +1,33 @@
 #!/usr/bin/env python3
 
 import argparse
-import pandas as pd
-import synapseclient
-import subprocess
-import pathlib
 import os
 import sys
 from collections import defaultdict
 
 cmd_home = os.path.dirname(os.path.realpath(__file__))
 pipe_home = os.path.normpath(cmd_home + "/..")
-util_home = pipe_home + "/analysis_utils"
 job_home = cmd_home + "/job_scripts"
 sys.path.append(pipe_home)
 
+from library.config import run_info, log_dir
+from library.login import synapse_login, nda_login
+from library.parser import sample_list
 from library.job_queue import GridEngineQueue
 q = GridEngineQueue()
 
 def main():
     args = parse_args()
-    samples = parse_sample_file(args.infile)
+
     synapse_login()
-    save_run_info(args.config)
-    
+    nda_login()
+
+    samples = sample_list(args.infile)
     for sample, sdata in samples.items():
         print(sample)
+
+        run_info(sample + "/run_info")
+
         jid_pre = submit_pre_jobs(sample, sdata)
         jid_list = []
         for ploidy in range(2,11):
@@ -44,11 +46,11 @@ def opt(sample, jid=None):
 
 def submit_pre_jobs(sample, sdata):
     jid_list = []
-    for fname, synid in sdata:
+    for fname, loc in sdata:
         jid_list.append(
             q.submit(opt(sample), 
-                "{job_home}/pre_1.download.sh {sample} {fname} {synid}".format(
-                    job_home=job_home, sample=sample, fname=fname, synid=synid)))
+                "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
+                    job_home=job_home, sample=sample, fname=fname, loc=loc)))
     jid = ",".join(jid_list)
     q.submit(opt(sample, jid), 
         "{job_home}/pre_2.cnvnator.sh {sample}".format(
@@ -94,47 +96,16 @@ def submit_post_jobs(sample, jid):
     return jid
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description='Variant Calling Pipeline')
-
-    parser.add_argument(
-        'infile', metavar='sample_list.txt', 
-        help='Sample list file shoud have sample_id, synapse_id, and file_name.')
-
-    parser.add_argument(
-        '-c', '--config', metavar='config file',
-        help='Default: [pipeline home]/pipeline.conf', 
-        default="{pipe_home}/pipeline.conf".format(pipe_home=pipe_home))
-
+    parser = argparse.ArgumentParser(description='Variant Calling Pipeline')
+    parser.add_argument('infile', metavar='sample_list.txt',
+        help='''Sample list file.
+        Each line format is "sample_id\\tfile_name\\tlocation".
+        Lines staring with "#" will omitted.
+        Header line should also start with "#".
+        Trailing columns will be ignored.
+        "location" is Synapse ID, S3Uri of the NDA or a user, or LocalPath.
+        For data download, synapse or aws clients, or symbolic link will be used, respectively.''')
     return parser.parse_args()
-
-def parse_sample_file(sfile):
-    samples = defaultdict(list)
-    for sname, group in pd.read_table(sfile).groupby("sample_id"):
-        for idx, sdata in group.iterrows():
-            key = sname
-            val = (sdata["file"], sdata["synapse_id"])
-            samples[key].append(val)
-    return samples
-    
-def synapse_login():
-    try:
-        synapseclient.login()
-    except:
-        subprocess.run(['synapse', 'login', '--remember-me'])
-
-def save_run_info(config):
-    with open("run_info", "w") as run_file:
-        run_file.write("CMD_HOME={path}\n".format(path=cmd_home))
-        run_file.write("UTIL_HOME={path}\n\n".format(path=util_home))
-        with open(config) as cfg_file:
-            for line in cfg_file:
-                run_file.write(line)
-
-def log_dir(sample):
-    log_dir = sample+"/logs"
-    pathlib.Path(log_dir).mkdir(parents=True, exist_ok=True)
-    return log_dir
 
 if __name__ == "__main__":
     main()

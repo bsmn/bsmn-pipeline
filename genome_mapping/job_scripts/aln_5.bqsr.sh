@@ -1,22 +1,25 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 36 
+#$ -pe threaded 24
 
-set -eu -o pipefail
+trap "exit 100" ERR
 
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [sample name]"
-    exit 1
+    false
 fi
-
-source $(pwd)/run_info
 
 SM=$1
 
-printf -- "[$(date)] Start BQSR recal_table.\n---\n"
+source $(pwd)/$SM/run_info
+
+set -o nounset
+set -o pipefail
+
+printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 
 $JAVA -Xmx58G -jar $GATK \
-    -T BaseRecalibrator -nct 36 \
+    -T BaseRecalibrator -nct $NSLOTS \
     -R $REF -knownSites $DBSNP -knownSites $MILLS -knownSites $INDEL1KG \
     -I $SM/bam/$SM.realigned.bam \
     -o $SM/recal_data.table
@@ -25,11 +28,11 @@ printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 printf -- "---\n[$(date)] Start BQSR PrintReads.\n---\n"
 
 $JAVA -Xmx58G -jar $GATK \
-    -T PrintReads -nct 36 \
+    -T PrintReads -nct $NSLOTS \
     --emit_original_quals \
     -R $REF -BQSR $SM/recal_data.table \
     -I $SM/bam/$SM.realigned.bam \
     -o $SM/bam/$SM.bam
 rm $SM/bam/$SM.realigned.{bam,bai}
 
-printf -- "---\n[$(date)] Finish BQSR PrintReads.\n"
+printf -- "[$(date)] Finish BQSR PrintReads.\n---\n"

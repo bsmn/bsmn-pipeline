@@ -2,21 +2,25 @@
 #$ -cwd
 #$ -pe threaded 1
 
-set -eu -o pipefail
+trap "exit 100" ERR
 
 if [[ $# -lt 2 ]]; then
     echo "Usage: $(basename $0) [host] [sample]"
-    exit 1
+    false
 fi
-
-source $(pwd)/run_info
 
 HOST=$1
 SM=$2
 
-printf -- "[$(date)] Start submit_aln_jobs.\n---\n"
+source $(pwd)/$SM/run_info
+
+set -o nounset
+set -o pipefail
+
+printf -- "---\n[$(date)] Start submit_aln_jobs.\n"
 
 CWD=$(pwd)
-ssh -o StrictHostKeyChecking=No $HOST "cd $CWD; $PYTHON3 $CMD_HOME/submit_aln_jobs.py $SM"
+ssh -o StrictHostKeyChecking=No $HOST \
+    "cd $CWD; $PYTHON3 $PIPE_HOME/genome_mapping/submit_aln_jobs.py $SM"
 
-printf -- "---\n[$(date)] Finish submit_aln_jobs.\n"
+printf -- "[$(date)] Finish submit_aln_jobs.\n---\n"

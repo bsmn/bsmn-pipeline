@@ -2,18 +2,21 @@
 #$ -cwd
 #$ -pe threaded 1
 
-set -eu -o pipefail
+trap "exit 100" ERR
 
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [sample name]"
-    exit 1
+    false
 fi
-
-source $(pwd)/run_info
 
 SM=$1
 
-printf -- "[$(date)] Start flagstat: $SM.bam \n---\n"
+source $(pwd)/$SM/run_info
+
+set -o nounset
+set -o pipefail
+
+printf -- "---\n[$(date)] Start flagstat: $SM.bam\n"
 
 $SAMTOOLS flagstat $SM/bam/$SM.bam > $SM/flagstat.txt
 
@@ -28,4 +31,4 @@ cd ..
 rmdir downloads fastq bam
 touch done
 
-printf -- "---\n[$(date)] Finish upload: $SM.{bam,bai}\n"
+printf -- "[$(date)] Finish upload: $SM.{bam,bai}\n---\n"
