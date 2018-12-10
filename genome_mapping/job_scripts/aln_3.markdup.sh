@@ -1,19 +1,22 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 18 
+#$ -pe threaded 12
 
-set -eu -o pipefail
+trap "exit 100" ERR
 
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [sample name]"
-    exit 1
+    false
 fi
-
-source $(pwd)/run_info
 
 SM=$1
 
-printf -- "[$(date)] Start markdup.\n---\n"
+source $(pwd)/$SM/run_info
+
+set -o nounset
+set -o pipefail
+
+printf -- "---\n[$(date)] Start markdup.\n"
 
 $JAVA -Xmx26G -jar $PICARD MarkDuplicates \
     I=$SM/bam/$SM.merged.bam \
@@ -25,4 +28,4 @@ $JAVA -Xmx26G -jar $PICARD MarkDuplicates \
 
 rm $SM/bam/$SM.merged.bam{,.bai}
 
-printf -- "---\n[$(date)] Finish markdup.\n"
+printf -- "[$(date)] Finish markdup.\n---\n"

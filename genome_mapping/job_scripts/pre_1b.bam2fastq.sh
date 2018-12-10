@@ -2,19 +2,22 @@
 #$ -cwd
 #$ -pe threaded 4
 
-set -eu -o pipefail
+trap "exit 100" ERR
 
 if [[ $# -lt 2 ]]; then
     echo "Usage: $(basename $0) [sample name] [file name]"
-    exit 1
+    false
 fi
-
-source $(pwd)/run_info
 
 SM=$1
 FNAME=$2
 
-printf -- "---\n[$(date)] Start bam2fastq: $FNAME\n---\n"
+source $(pwd)/$SM/run_info
+
+set -o nounset
+set -o pipefail
+
+printf -- "---\n[$(date)] Start bam2fastq: $FNAME\n"
 
 FSIZE=$(stat -c%s $SM/downloads/$FNAME)
 
@@ -27,8 +30,9 @@ else
     exit 1
 fi
     
-$SAMTOOLS collate -uOn $TMP_N $SM/downloads/$FNAME $SM/tmp.collate \
-    |$SAMTOOLS fastq -F 0x900 -1 $SM/fastq/$SM.R1.fastq.gz -2 $SM/fastq/$SM.R2.fastq.gz -
+mkdir -p $SM/fastq
+$SAMTOOLS collate -uOn $TMP_N $SM/downloads/$FNAME $SM/$FNAME.collate \
+    |$SAMTOOLS fastq -F 0x900 -1 $SM/fastq/$FNAME.R1.fastq.gz -2 $SM/fastq/$FNAME.R2.fastq.gz -
 rm $SM/downloads/$FNAME
 
-printf -- "---\n[$(date)] Finish bam2fastq: $FNAME\n"
+printf -- "[$(date)] Finish bam2fastq: $FNAME\n---\n"

@@ -44,13 +44,11 @@ done
 if [ -z $nda_cred_f ]; then
     read_credential
 elif [ ! -e $nda_cred_f ]; then
-    echo "$nda_cred_f file doesn't exist." >$2; exit 1
+    echo "$nda_cred_f file doesn't exist." >&2; exit 1
 else
     source $nda_cred_f
 fi
 
-#username=baetj
-#password=fb0dc634e9179ebc3460d7a2a8c05cc3905fa00f
 server="https://ndar.nih.gov/DataManager/dataManager"
 
 ##############################################################################

@@ -2,22 +2,44 @@
 #$ -cwd
 #$ -pe threaded 1
 
-set -eu -o pipefail
+trap "exit 100" ERR
 
 if [[ $# -lt 3 ]]; then
-    echo "Usage: $(basename $0) [sample name] [file name] [synapse id]"
-    exit 1
+    echo "Usage: $(basename $0) [sample name] [file name] [location]"
+    false
 fi
-
-source $(pwd)/run_info
 
 SM=$1
 FNAME=$2
-SINID=$3
+LOC=$3
 
-printf -- "[$(date)] Start download: $FNAME\n---\n"
+source $(pwd)/$SM/run_info
 
-mkdir -p $SM/downloads $SM/fastq
-$SYNAPSE get $SINID --downloadLocation $SM/downloads/
+set -o nounset
+set -o pipefail
 
-printf -- "---\n[$(date)] Finish downlaod: $FNAME\n"
+printf -- "---\n[$(date)] Start download: $FNAME\n"
+
+mkdir -p $SM/downloads
+
+rc=0
+n=0
+until [[ $n -eq 5 ]]; do
+    if [[ $LOC =~ ^syn[0-9]+ ]]; then
+        $SYNAPSE get $LOC --downloadLocation $SM/downloads/ && { rc=$?; break; } || rc=$?
+    elif [[ $LOC =~ ^s3:.+ ]]; then
+        $AWS s3 ls $LOC || {
+            printf "Set an NDA AWS token\n\n"
+            eval "$($PIPE_HOME/utils/nda_aws_token.sh -r ~/.nda_credential)"
+        }
+        $AWS s3 cp --no-progress $LOC $SM/downloads/ && { rc=$?; break; } || rc=$?
+    else
+        ls -lh $LOC && ln -sf $(readlink -f $LOC) $SM/downloads/ || rc=$?
+        break
+    fi
+    n=$((n+1))
+    printf "Download try $n failed.\n\n"
+done
+[[ $rc -eq 0 ]] || false
+
+printf -- "[$(date)] Finish downlaod: $FNAME\n---\n"

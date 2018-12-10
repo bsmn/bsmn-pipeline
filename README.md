@@ -2,36 +2,74 @@
 BSMN common data processing pipeline
 
 # Setup and installation
+This pipeline can be run in any cluster system using SGE job scheduler. I would recommend set your own cluster in AWS using AWS ParallelCluster.
 
-## cfncluster
+## AWS ParallelCluster
+For installoing and setting up parallelcluster, plase see the [`Getting Started Guide`](https://aws-parallelcluster.readthedocs.io/en/latest/getting_started.html) for AWS ParallelCluster.
 
-This pipeline runs using [`cfncluster`](https://cfncluster.readthedocs.io).
-
-## Installing cfncluster
-
-It's recommended to use a Python virtual environment (https://virtualenv.pypa.io/en/stable/).
-
-To install `cfncluster`:
-
+## Installing pipeline
+Check out bsmn_pipeline where you want it installed in the AWS Parallelcluster you set up or the cluster system you are using.
 ```
-pip install cfncluster
+$ git clone https://github.com/bsmn/bsmn_pipeline
 ```
 
-To get the pipeline software installed on the cluster, a post-install script is run after the cluster starts. You can see this file as a GitHub Gist [here](https://gist.github.com/kdaily/1e0a2d1fcef1c6847f743f637301a3d5).
- 
+Install dependent tools running the following script. For GATK 3.7-0 that this pipeline uses, you should mannually download it and put into the appropriate location following the instruction that the install scipt gives.
+```
+$ cd bsmn_pipeline
+$ ./install_tools.sh
+```
+
+Download requred resource files including the reference sequence. This step require a synapse account that can access to the Syanpse page syn17062535.
+```
+$ ./download_resources.sh
+```
+
+## Extra set up for SGE
+The pipeline require a parallel environment named "threaded" in  your SGE system. If your SGE system doen't have this parallel environment, you should add it into yours.
+```
+$ sudo su
+# qconf -Ap << END
+pe_name            threaded
+slots              99999
+user_lists         NONE
+xuser_lists        NONE
+start_proc_args    NONE
+stop_proc_args     NONE
+allocation_rule    $pe_slots
+control_slaves     FALSE
+job_is_first_task  TRUE
+urgency_slots      min
+accounting_summary TRUE
+qsort_args         NONE
+END
+```
+```
+# qconf -mattr queue pe_list threaded all.q
+```
+
 # Usage
 ## genome_mapping
+Run the pipeline using a wrapper shell script.
 ```bash
-genome_mapping/run.py sample_list.txt
+genome_mapping.sh sample_list.txt
 ```
 
 ### sample_list.txt format
-The first line should be a header line. Eg.
+The lines starting with # will be commented out and ignored. The header line should start with # as well. Eg.
 ```
-sample_id       file    synapse_id
-5154_brain-BSMN_REF_brain-534-U01MH106876       bulk_sorted.bam syn10639574
-5154_fibroblast-BSMN_REF_fibroblasts-534-U01MH106876    fibroblasts_sorted.bam  syn10639575
+#sample_id	file_name	location
+5154_brain-BSMN_REF_brain-534-U01MH106876	bulk_sorted.bam	syn10639574
+5154_fibroblast-BSMN_REF_fibroblasts-534-U01MH106876	fibroblasts_sorted.bam	syn10639575
+5154_NeuN_positive-BSMN_REF_NeuN+_E12-677-U01MH106876	E12_MDA_common_sorted.bam	s3://nda-bsmn/abyzova_1497485007384/data/E12_MDA_common_sorted.bam
+5154_NeuN_positive-BSMN_REF_NeuN+_C12-677-U01MH106876	C12_MDA_common_sorted.bam	/efs/data/C12_MDA_common_sorted.bam
 ```
+The "location" column can be a Synape ID, S3Uri of the NDA or a user, or LocalPath. For Data download, synapse or aws clients, or symbolic lins will be used, respectively.
+
+### options
+```
+--parentid syn123
+```
+With parentid option, you can specify a Synapse ID of project or folder where to upload result bam files. If it is set, the result bam files will be uploaded into Synapse and deleted. Otherwise, they will be locally kept.
 
 # Contributing
 
