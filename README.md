@@ -13,10 +13,23 @@ Check out bsmn_pipeline where you want it installed in the AWS Parallelcluster y
 $ git clone https://github.com/bsmn/bsmn_pipeline
 ```
 
-Install dependent tools running the following script. For GATK 3.7-0 that this pipeline uses, you should mannually download it and put into the appropriate location following the instruction that the install scipt gives.
+Install software dependencies into `bsmn_pipeline/tools` running the following script.
 ```
 $ cd bsmn_pipeline
 $ ./install_tools.sh
+```
+The only dependency not installed by the script is GATK 3.7-0. Therefore GATK 3.7-0 should be manually downloaded into the location `bsmn_pipeline/tools/gatk/3.7-0` using for instance the following command:
+
+```
+# Currently install_tools.sh contains only vague hints on the download.
+# Suggested commands to download and extract GATK 3.7-0;
+# Couldn't these be included in install_tools.sh?
+cd tools/gatk/3.7-0
+url='https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.7-0-gcfedb67'
+wget -O GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2 "$url"
+tar xjf GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2
+cd ../../..
+
 ```
 
 Download requred resource files including the reference sequence. This step require a synapse account that can access to the Syanpse page syn17062535.
