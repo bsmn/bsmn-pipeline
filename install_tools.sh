@@ -137,7 +137,8 @@ cd $WD
 
 # Installing GATK
 mkdir -p tools/gatk/3.7-0
-echo "----"
-echo "Please manually download GATK 3.7-0 and put the jar file in tools/gatk/3.7-0."
-echo "URL: https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.7-0-gcfedb67"
-
+cd tools/gatk/3.7-0
+url='https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.7-0-gcfedb67'
+wget -O GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2 "$url"
+tar xjf GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2 && rm GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2
+cd $WD
