@@ -16,8 +16,8 @@ source $(pwd)/$SM/run_info
 set -o nounset
 set -o pipefail
 
-printf -- "---\n[$(date)] Start MosaicForcast.\n"
+printf -- "---\n[$(date)] Start PON filter.\n"
 
 # Add command
 
-printf -- "[$(date)] Finish MosaicForcast.\n---\n"
+printf -- "[$(date)] Finish PON filter.\n---\n"
