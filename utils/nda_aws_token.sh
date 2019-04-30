@@ -49,7 +49,7 @@ else
     source $nda_cred_f
 fi
 
-server="https://ndar.nih.gov/DataManager/dataManager"
+server="https://nda.nih.gov/DataManager/dataManager"
 
 ##############################################################################
 # Make Request

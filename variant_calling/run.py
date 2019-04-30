@@ -12,7 +12,7 @@ sys.path.append(pipe_home)
 
 from library.config import run_info, log_dir
 from library.login import synapse_login, nda_login
-from library.parser import sample_list
+from library.parser import sample_list2
 from library.job_queue import GridEngineQueue
 q = GridEngineQueue()
 
@@ -22,7 +22,7 @@ def main():
     synapse_login()
     nda_login()
 
-    samples = sample_list(args.infile)
+    samples = sample_list2(args.infile)
     for sample, sdata in samples.items():
         print(sample)
 
