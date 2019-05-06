@@ -8,7 +8,7 @@ cd tools/python/3.6.2/src
 wget -qO- https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tgz \
     |tar xvz --strip-components=1
 ./configure --with-ensurepip=install --prefix=$WD/tools/python/3.6.2
-make 
+make
 make install
 cd $WD
 rm -r tools/python/3.6.2/src
@@ -105,7 +105,7 @@ $WD/tools/cmake/3.11.4/bin/cmake \
     -Dbuiltin_pcre=ON -Dhttp=ON -Dgnuinstall=ON \
     -DCMAKE_INSTALL_PREFIX=$WD/tools/root/6.14.00 \
     root-6.14.00
-$WD/tools/cmake/3.11.4/bin/cmake --build . -- -j 
+$WD/tools/cmake/3.11.4/bin/cmake --build . -- -j
 $WD/tools/cmake/3.11.4/bin/cmake --build . --target install
 cd $WD
 rm -r tools/root/6.14.00/src
@@ -141,4 +141,13 @@ cd tools/gatk/3.7-0
 url='https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.7-0-gcfedb67'
 wget -O GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2 "$url"
 tar xjf GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2 && rm GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2
+cd $WD
+
+# Installing GATK4
+mkdir -p tools/gatk/
+cd tools/gatk/
+url='https://github.com/broadinstitute/gatk/releases/download/4.1.2.0/gatk-4.1.2.0.zip'
+wget -O gatk-4.1.2.0.zip "$url"
+unzip gatk-4.1.2.0.zip && rm gatk-4.1.2.0.zip
+mv gatk-4.1.2.0 4.1-2
 cd $WD
