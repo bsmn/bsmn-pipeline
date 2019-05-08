@@ -18,6 +18,10 @@ tools/python/3.6.2/bin/synapse get syn17062535 -r --downloadLocation resources/
 gunzip resources/*vcf.gz resources/*vcf.idx.gz
 rm resources/SYNAPSE_METADATA_MANIFEST.tsv
 
+## Download GATK gnomAD
+wget -P resources ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/Mutect2/af-only-gnomad.raw.sites.b37.vcf.gz
+wget -P resources ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/Mutect2/af-only-gnomad.raw.sites.b37.vcf.gz.tbi
+
 # Split the ref genome by chromosome
 awk '{ 
     r = match($1, "^>"); 
