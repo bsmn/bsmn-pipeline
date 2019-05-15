@@ -10,10 +10,10 @@ from scipy.stats import fisher_exact
 pipe_home = os.path.dirname(os.path.realpath(__file__)) + "/.."
 sys.path.append(pipe_home)
 from library.misc import coroutine, printer
-from library.pileup import pileup, clean, count
+from library.pileup import base_count
 
 def run(args):
-    s_info = strand_info(pileup(args.bam, args.min_MQ, args.min_BQ, clean(count())))
+    s_info = strand_info(base_count(args.bam, args.min_MQ, args.min_BQ))
     header = ('#chr\tpos\tref\talt\t'
             + 'total\ttotal_fwd\ttotal_rev\ttotal_ratio\t'
             + 'p_poisson\t'

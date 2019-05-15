@@ -8,41 +8,31 @@ from statsmodels.stats.proportion import binom_test
 pipe_home = os.path.dirname(os.path.realpath(__file__)) + "/.."
 sys.path.append(pipe_home)
 from library.misc import coroutine, printer
-from library.pileup import base_count
+from library.pileup import base_qual_tuple
 
 def run(args):
-    v_info = vaf_info(base_count(args.bam, args.min_MQ, args.min_BQ))
-    header = ('#chr\tpos\tref\talt\tvaf\t'
-            + 'depth\tref_n\talt_n\tp_binom')
+    alt_BQ_info = alt_BQ_sum(base_qual_tuple(args.bam, args.min_MQ, args.min_BQ))
+    header = '#chr\tpos\tref\talt\talt_n\talt_BQ_sum'
     printer(header)
     for snv in args.infile:
         if snv[0] == '#':
             continue
         chrom, pos, ref, alt = snv.strip().split()[:4]
-        printer('{chrom}\t{pos}\t{ref}\t{alt}\t{vaf_info}'.format(
+        printer('{chrom}\t{pos}\t{ref}\t{alt}\t{alt_BQ_info}'.format(
             chrom=chrom, pos=pos, ref=ref.upper(), alt=alt.upper(), 
-            vaf_info=v_info.send((chrom, pos, ref, alt))))
+            alt_BQ_info=alt_BQ_info.send((chrom, pos, alt))))
 
 @coroutine
-def vaf_info(target):
+def alt_BQ_sum(target):
     result = None
     while True:
-        chrom, pos, ref, alt = (yield result)
-        base_n = target.send((chrom, pos))
-        depth = sum(base_n.values())
-        ref_n = base_n[ref.upper()] + base_n[ref.lower()]
-        alt_n = base_n[alt.upper()] + base_n[alt.lower()]
-        try:
-            vaf = alt_n/depth
-        except ZeroDivisionError:
-            vaf = 0
-            
-        result = '{vaf:f}\t{depth}\t{ref_n}\t{alt_n}\t{p_binom:e}'.format(
-            vaf=vaf, depth=depth, ref_n=ref_n, alt_n=alt_n, p_binom=binom_test(alt_n, depth, alternative='smaller'))
+        chrom, pos, alt = (yield result)
+        alt_BQ = [q for b, q in target.send((chrom, pos)) if b == alt.upper()]
+        result = '{alt_n}\t{alt_BQ_sum}'.format(alt_n=len(alt_BQ), alt_BQ_sum=sum(alt_BQ))
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Test whether VAF of each SNV is somatic or germline.')
+        description='Sum of base qualities of alt allele of each SNV')
 
     parser.add_argument(
         '-b', '--bam', metavar='FILE',

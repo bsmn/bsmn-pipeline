@@ -11,6 +11,12 @@ SAMTOOLS = config["TOOLS"]["SAMTOOLS"]
 if not os.path.isfile(SAMTOOLS) or not os.access(SAMTOOLS, os.X_OK):
     SAMTOOLS = shutil.which("samtools")
 
+def base_count(bam, min_MQ, min_BQ):
+    return pileup(bam, min_MQ, min_BQ, base_n())
+
+def base_qual_tuple(bam, min_MQ, min_BQ):
+    return pileup(bam, min_MQ, min_BQ, base_qual())
+
 @coroutine
 def pileup(bam, min_MQ, min_BQ, target):
     result = None
@@ -39,29 +45,26 @@ def pileup(bam, min_MQ, min_BQ, target):
                 else:
                     sys.exit("Failed in pileup.")
         try:
-            bases = cmd_out.stdout.split()[4]
+            bases, quals = cmd_out.stdout.split()[4:6]
+            bases = bases_clean(bases)
         except IndexError:
-            bases = ''
-        result = target.send(bases)
+            bases, quals = ('', '')
+        result = target.send((bases, quals))
+
+def bases_clean(bases):
+    bases = re.sub('\^.', '', bases)
+    bases = re.sub('\$', '', bases)
+    for n in set(re.findall('-(\d+)', bases)):
+        bases = re.sub('-{0}[ACGTNacgtn]{{{0}}}'.format(n), '', bases)
+    for n in set(re.findall('\+(\d+)', bases)):
+        bases = re.sub('\+{0}[ACGTNacgtn]{{{0}}}'.format(n), '', bases)
+    return bases
 
 @coroutine
-def clean(target):
+def base_n():
     result = None
     while True:
-        bases = (yield result)
-        bases = re.sub('\^.', '', bases)
-        bases = re.sub('\$', '', bases)
-        for n in set(re.findall('-(\d+)', bases)):
-            bases = re.sub('-{0}[ACGTNacgtn]{{{0}}}'.format(n), '', bases)
-        for n in set(re.findall('\+(\d+)', bases)):
-            bases = re.sub('\+{0}[ACGTNacgtn]{{{0}}}'.format(n), '', bases)
-        result = target.send(bases)
-
-@coroutine
-def count():
-    result = None
-    while True:
-        bases = (yield result)
+        bases, quals = (yield result)
         base_n = {}
         base_n['A'] = bases.count('A') 
         base_n['C'] = bases.count('C')
@@ -73,3 +76,11 @@ def count():
         base_n['t'] = bases.count('t')
         base_n['dels'] = bases.count('*')
         result = base_n
+
+@coroutine
+def base_qual():
+    result = None
+    while True:
+        bases, quals = (yield result)
+        bases = re.sub('\*', '', bases)
+        result = list(map(lambda b, q: (b.upper(), ord(q)-33), bases, quals))
