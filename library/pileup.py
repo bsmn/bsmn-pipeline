@@ -47,7 +47,7 @@ def pileup(bam, min_MQ, min_BQ, target):
         try:
             bases, quals = cmd_out.stdout.split()[4:6]
             bases = bases_clean(bases)
-        except IndexError:
+        except ValueError:
             bases, quals = ('', '')
         result = target.send((bases, quals))
 
