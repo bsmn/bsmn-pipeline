@@ -22,6 +22,7 @@ rm resources/SYNAPSE_METADATA_MANIFEST.tsv
 wget -P resources ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/Mutect2/af-only-gnomad.raw.sites.b37.vcf.gz
 wget -P resources ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/Mutect2/af-only-gnomad.raw.sites.b37.vcf.gz.tbi
 
+
 # Split the ref genome by chromosome
 awk '{ 
     r = match($1, "^>"); 
@@ -34,3 +35,27 @@ awk '{
     }
 }' resources/hs37d5.fa
 rm resources/chrGL* resources/chrhs37d5.fa resources/chrNC_007605.fa
+
+
+# Download UMAP mappability score:
+wget -P resources https://bismap.hoffmanlab.org/raw/hg19.umap.tar.gz  
+tar -zxvf resources/hg19.umap.tar.gz
+tools/fetchChromSizes resources/hg19 > resources/hg19/hg19.chrom.sizes
+tools/wigToBigWig <(zcat resources/hg19/k24.umap.wg.gz) resources/hg19/hg19.chrom.sizes resources/hg19/k24.umap.wg.bw
+
+# Download repeat regions:
+## Segmental Duplication regions (should be removed before calling all kinds of mosaics):  
+wget -P resources http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/genomicSuperDups.txt.gz
+gunzip resources/genomicSuperDups.txt.gz 
+
+## Regions enriched for SNPs with >=3 haplotypes (should be removed before calling all kinds of mosaics):  
+wget -P resources https://raw.githubusercontent.com/parklab/MosaicForecast/master/resources/predictedhap3ormore_cluster.bed
+
+## Simple repeats (should be removed before calling mosaic INDELS):  
+wget -P resources http://hgdownload.soe.ucsc.edu/goldenPath/hg19/database/simpleRepeat.txt.gz  
+gunzip resources/simpleRepeat.txt.gz
+
+
+
+
+
