@@ -170,6 +170,11 @@ wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes
 chmod +x fetchChromSizes
 cd $WD
 
+## Download MosaicForecast:
+cd tools
+git clone https://github.com/parklab/MosaicForecast.git MosaicForecast
+cd $WD
+
 ## Installing miniconda and python/R packages:
 wget -O tools/miniconda.sh -P tools https://repo.continuum.io/miniconda/Miniconda3-latools-Linux-x86_64.sh
 bash tools/miniconda.sh -bfp tools/
