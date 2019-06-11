@@ -151,3 +151,11 @@ wget -O gatk-4.1.2.0.zip "$url"
 unzip gatk-4.1.2.0.zip && rm gatk-4.1.2.0.zip
 mv gatk-4.1.2.0 4.1-2
 cd $WD
+
+#Installing Strelka
+mkdir -p tools/strelka
+cd tools/strelka
+url = 'https://github.com/Illumina/strelka/releases/download/v2.9.2/strelka-2.9.2.centos6_x86_64.tar.bz2'
+wget -O strelka-2.9.2.centos6_x86_64.tar.bz2 "$url"
+tar xjf strelka-2.9.2.centos6_x86_64.tar.bz2 && rm strelka-2.9.2.centos6_x86_64.tar.bz2
+cd $WD
