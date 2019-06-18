@@ -105,17 +105,18 @@ $WD/tools/cmake/3.11.4/bin/cmake \
     -Dbuiltin_pcre=ON -Dhttp=ON -Dgnuinstall=ON \
     -DCMAKE_INSTALL_PREFIX=$WD/tools/root/6.14.00 \
     root-6.14.00
-$WD/tools/cmake/3.11.4/bin/cmake --build . -- -j
+$WD/tools/cmake/3.11.4/bin/cmake --build . --target VDT
+$WD/tools/cmake/3.11.4/bin/cmake --build . -- -j$(nproc)
 $WD/tools/cmake/3.11.4/bin/cmake --build . --target install
 cd $WD
 rm -r tools/root/6.14.00/src
 
 # Installing cnvnator
 source $WD/tools/root/6.14.00/bin/thisroot.sh
-mkdir -p tools/cnvnator/2018-07-09/bin
-mkdir -p tools/cnvnator/2018-07-09/src/samtools
-cd tools/cnvnator/2018-07-09/src
-wget -qO- https://github.com/abyzovlab/CNVnator/archive/de012f2.tar.gz \
+mkdir -p tools/cnvnator/0.4/bin
+mkdir -p tools/cnvnator/0.4/src/samtools
+cd tools/cnvnator/0.4/src
+wget -qO- https://github.com/abyzovlab/CNVnator/archive/v0.4.tar.gz \
     |tar xvz --strip-components=1
 cd samtools
 wget -qO- https://github.com/samtools/samtools/releases/download/1.7/samtools-1.7.tar.bz2 \
@@ -126,8 +127,9 @@ sed -i '2s/$/ -lpthread/' Makefile
 make OMP=no
 mv cnvnator ../bin
 mv cnvnator2VCF.pl ../bin
+mv *.py ../bin
 cd $WD
-rm -r tools/cnvnator/2018-07-09/src
+rm -r tools/cnvnator/0.4/src
 
 # Installing Picard
 mkdir -p tools/picard/2.12.1
