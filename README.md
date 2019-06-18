@@ -5,10 +5,10 @@ BSMN common data processing pipeline
 This pipeline can be run in any cluster system using SGE job scheduler. I would recommend set your own cluster in AWS using AWS ParallelCluster.
 
 ## AWS ParallelCluster
-For installoing and setting up parallelcluster, please see the [`Getting Started Guide`](https://aws-parallelcluster.readthedocs.io/en/latest/getting_started.html) for AWS ParallelCluster.
+For installing and setting up `parallelcluster`, please see the [`Getting Started Guide`](https://aws-parallelcluster.readthedocs.io/en/latest/getting_started.html) for AWS ParallelCluster.
 
 ## Installing pipeline
-Clone bsmn_pipeline where you want it installed in your cluster.  For example, if you work with an m5.large type AWS EC2 instance we recommend the file systems mounted at `/shared` or `/efs`.
+Clone this repository where you want it installed in your cluster. If you work with an m5.large type AWS EC2 instance we recommend the file systems mounted at `/shared` or `/efs`.
 ```
 $ cd /shared
 $ git clone https://github.com/bsmn/bsmn_pipeline
