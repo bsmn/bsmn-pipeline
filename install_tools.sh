@@ -102,10 +102,9 @@ cd tools/root/6.14.00/src
 wget -qO- https://root.cern.ch/download/root_v6.14.00.source.tar.gz \
     |tar xvz
 $WD/tools/cmake/3.11.4/bin/cmake \
-    -Dbuiltin_pcre=ON -Dhttp=ON -Dgnuinstall=ON \
+    -Dbuiltin_pcre=ON -Dbuiltin_vdt=ON -Dhttp=ON -Dgnuinstall=ON \
     -DCMAKE_INSTALL_PREFIX=$WD/tools/root/6.14.00 \
     root-6.14.00
-$WD/tools/cmake/3.11.4/bin/cmake --build . --target VDT
 $WD/tools/cmake/3.11.4/bin/cmake --build . -- -j$(nproc)
 $WD/tools/cmake/3.11.4/bin/cmake --build . --target install
 cd $WD
