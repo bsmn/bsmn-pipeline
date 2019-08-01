@@ -152,3 +152,52 @@ wget -O gatk-4.1.2.0.zip "$url"
 unzip gatk-4.1.2.0.zip && rm gatk-4.1.2.0.zip
 mv gatk-4.1.2.0 4.1-2
 cd $WD
+
+# Installing software: wigToBigWig
+cd tools
+wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/wigToBigWig
+chmod +x wigToBigWig
+cd $WD
+
+## Installing software: bigWigAverageOverBed
+cd tools
+wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/bigWigAverageOverBed
+chmod +x bigWigAverageOverBed
+cd $WD
+
+## Installing software: fetchChromSizes
+cd tools
+wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes
+chmod +x fetchChromSizes
+cd $WD
+
+## Download MosaicForecast:
+cd tools
+git clone https://github.com/parklab/MosaicForecast.git MosaicForecast
+cd $WD
+
+## Installing miniconda and python/R packages:
+wget -O tools/miniconda.sh -P tools https://repo.continuum.io/miniconda/Miniconda3-latools-Linux-x86_64.sh
+bash tools/miniconda.sh -bfp tools/
+conda config --add channels bioconda
+conda install pysam==0.15.2 -y
+conda install numpy==1.16.1 -y
+conda install pandas=0.20.1 -y
+conda install pysamstats==1.1.2 -y
+conda install regex -y
+conda install scipy==1.2.1 -y
+conda install pyfaidx==0.5.3 -y 
+
+conda install -c rdonnellyr r-base 
+conda install -c r r-xml
+conda install -c r r-ggplot2
+conda install -c r r-caret
+conda install -c r r-e1071
+conda install -c r r-glmnet
+conda install -c r r-rcolorbrewer
+conda install -c r r-devtools
+conda install -c r r-nnet
+
+
+
+
