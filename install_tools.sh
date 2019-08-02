@@ -15,7 +15,18 @@ rm -r tools/python/3.6.2/src
 
 # Installing Python modules needed
 tools/python/3.6.2/bin/pip3 install --upgrade pip
-tools/python/3.6.2/bin/pip3 install awscli synapseclient statsmodels scipy rpy2
+tools/python/3.6.2/bin/pip install awscli synapseclient statsmodels scipy rpy2
+
+# Installing R
+mkdir -p tools/r/3.6.1/src
+cd tools/r/3.6.1/src
+wget -qO- https://cran.r-project.org/src/base/R-3/R-3.6.1.tar.gz \
+    |tar xvz --strip-components=1
+./configure --prefix=$WD/tools/r/3.6.1
+make
+make install
+cd $WD
+rm -r tools/r/3.6.1/src
 
 # Installling Java8
 mkdir -p tools/java
@@ -136,7 +147,7 @@ cd tools/picard/2.12.1
 wget -q https://github.com/broadinstitute/picard/releases/download/2.12.1/picard.jar
 cd $WD
 
-# Installing GATK
+# Installing GATK3
 mkdir -p tools/gatk/3.7-0
 cd tools/gatk/3.7-0
 url='https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.7-0-gcfedb67'
@@ -153,51 +164,23 @@ unzip gatk-4.1.2.0.zip && rm gatk-4.1.2.0.zip
 mv gatk-4.1.2.0 4.1-2
 cd $WD
 
-# Installing software: wigToBigWig
-cd tools
-wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/wigToBigWig
-chmod +x wigToBigWig
-cd $WD
-
-## Installing software: bigWigAverageOverBed
-cd tools
-wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/bigWigAverageOverBed
-chmod +x bigWigAverageOverBed
-cd $WD
-
-## Installing software: fetchChromSizes
-cd tools
-wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes
-chmod +x fetchChromSizes
-cd $WD
-
-## Download MosaicForecast:
+# Installing MosaicForecast and depending tools
 cd tools
 git clone https://github.com/parklab/MosaicForecast.git MosaicForecast
 cd $WD
 
-## Installing miniconda and python/R packages:
-wget -O tools/miniconda.sh -P tools https://repo.continuum.io/miniconda/Miniconda3-latools-Linux-x86_64.sh
-bash tools/miniconda.sh -bfp tools/
-conda config --add channels bioconda
-conda install pysam==0.15.2 -y
-conda install numpy==1.16.1 -y
-conda install pandas=0.20.1 -y
-conda install pysamstats==1.1.2 -y
-conda install regex -y
-conda install scipy==1.2.1 -y
-conda install pyfaidx==0.5.3 -y 
+mkdir -p tools/ucsc
+cd tools/ucsc
+wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/wigToBigWig
+wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/bigWigAverageOverBed
+wget http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes
+chmod +x wigToBigWig bigWigAverageOverBed fetchChromSizes
+cd $WD
 
-conda install -c rdonnellyr r-base 
-conda install -c r r-xml
-conda install -c r r-ggplot2
-conda install -c r r-caret
-conda install -c r r-e1071
-conda install -c r r-glmnet
-conda install -c r r-rcolorbrewer
-conda install -c r r-devtools
-conda install -c r r-nnet
+tools/python/3.6.2/bin/pip install pysam numpy pandas pysamstats regex scipy pyfaidx 
 
-
-
-
+tools/r/3.6.1/bin/R --no-save <<'RCODE'
+install.packages(c(
+    "XML", "ggplot2", "caret", "e1071", "glmnet", "RColorBrewer", "devtools", "nnet"),
+    repos="https://cloud.r-project.org")
+RCODE
