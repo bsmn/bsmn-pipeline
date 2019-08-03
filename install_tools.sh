@@ -17,17 +17,6 @@ rm -r tools/python/3.6.2/src
 tools/python/3.6.2/bin/pip3 install --upgrade pip
 tools/python/3.6.2/bin/pip install awscli synapseclient statsmodels scipy rpy2
 
-# Installing R
-mkdir -p tools/r/3.6.1/src
-cd tools/r/3.6.1/src
-wget -qO- https://cran.r-project.org/src/base/R-3/R-3.6.1.tar.gz \
-    |tar xvz --strip-components=1
-./configure --prefix=$WD/tools/r/3.6.1
-make
-make install
-cd $WD
-rm -r tools/r/3.6.1/src
-
 # Installling Java8
 mkdir -p tools/java
 cd tools/java
@@ -164,6 +153,17 @@ unzip gatk-4.1.2.0.zip && rm gatk-4.1.2.0.zip
 mv gatk-4.1.2.0 4.1-2
 cd $WD
 
+# Installing R
+mkdir -p tools/r/3.6.1/src
+cd tools/r/3.6.1/src
+wget -qO- https://cran.r-project.org/src/base/R-3/R-3.6.1.tar.gz \
+    |tar xvz --strip-components=1
+./configure --prefix=$WD/tools/r/3.6.1
+make
+make install
+cd $WD
+rm -r tools/r/3.6.1/src
+
 # Installing MosaicForecast and depending tools
 cd tools
 git clone https://github.com/parklab/MosaicForecast.git MosaicForecast
@@ -180,7 +180,52 @@ cd $WD
 tools/python/3.6.2/bin/pip install pysam numpy pandas pysamstats regex scipy pyfaidx 
 
 tools/r/3.6.1/bin/R --no-save <<'RCODE'
-install.packages(c(
-    "XML", "ggplot2", "caret", "e1071", "glmnet", "RColorBrewer", "devtools", "nnet"),
+install.packages(setdiff(
+    c("XML", "ggplot2", "caret", "e1071", "glmnet", "RColorBrewer", "devtools", "nnet"),
+    installed.packages()[,"Package"]),
     repos="https://cloud.r-project.org")
 RCODE
+
+# Installing Perl
+mkdir -p tools/perl/5.28.1/src
+cd tools/perl/5.28.1/src
+wget -qO- https://www.cpan.org/src/5.0/perl-5.28.1.tar.gz \
+    |tar xvz --strip-components=1
+./Configure -des -Dprefix=$WD/tools/perl/5.28.1
+make
+make test
+make install
+cd $WD
+rm -rf tools/perl/5.28.1/src
+
+# Installing RetroSom and depending tools
+wget -qO- https://cpanmin.us | tools/perl/5.28.1/bin/perl - GD
+wget -qO- https://cpanmin.us | tools/perl/5.28.1/bin/perl - GD::Arrow
+wget -qO- https://cpanmin.us | tools/perl/5.28.1/bin/perl - GD::SVG
+wget -qO- https://cpanmin.us | tools/perl/5.28.1/bin/perl - Parallel::ForkManager
+
+tools/r/3.6.1/bin/R --no-save <<'RCODE'
+install.packages(setdiff(
+    c("randomForest", "glmnet", "e1071", "PRROC"), 
+    installed.packages()[,"Package"]), 
+    repos="https://cloud.r-project.org")
+RCODE
+
+mkdir -p tools/bedtools/2.28.0/src
+cd tools/bedtools/2.28.0/src
+wget -qO- https://github.com/arq5x/bedtools2/releases/download/v2.28.0/bedtools-2.28.0.tar.gz \
+    |tar xvz --strip-components=1
+make
+mv bin ..
+cd $WD
+rm -r tools/bedtools/2.28.0/src
+
+mkdir -p tools/exonerate/2.2.0/src
+cd tools/exonerate/2.2.0/src
+wget -qO- http://ftp.ebi.ac.uk/pub/software/vertebrategenomics/exonerate/exonerate-2.2.0.tar.gz \
+    |tar xvz --strip-components=1
+./configure --prefix=$WD/tools/exonerate/2.2.0
+make
+make install
+cd $WD
+rm -r tools/exonerate/2.2.0/src
