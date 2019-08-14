@@ -17,13 +17,13 @@ source $ROOTSYS/bin/thisroot.sh
 set -o nounset
 set -o pipefail
 
-BAM=$SM/bam/$SM.bam
-ROOT=$SM/cnv/$SM.root
-CNVCALL=$SM/cnv/$SM.cnvcall
+BAM=$SM/alignment/$SM.bam
+ROOT=$SM/cnvnator/$SM.root
+CNVCALL=$SM/cnvnator/$SM.cnvcall
 CHROM="$(seq 1 22) X Y"
 
 printf -- "---\n[$(date)] Start cnvnator.\n"
-mkdir -p $SM/cnv 
+mkdir -p $SM/cnvnator
 
 $CNVNATOR -root $ROOT -chrom $CHROM -tree $BAM -unique
 for BINSIZE in 100 1000; do
