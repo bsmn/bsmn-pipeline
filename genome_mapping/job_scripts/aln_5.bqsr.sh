@@ -21,18 +21,18 @@ printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 $JAVA -Xmx58G -jar $GATK \
     -T BaseRecalibrator -nct $NSLOTS \
     -R $REF -knownSites $DBSNP -knownSites $MILLS -knownSites $INDEL1KG \
-    -I $SM/bam/$SM.realigned.bam \
-    -o $SM/recal_data.table
+    -I $SM/alignment/$SM.realigned.bam \
+    -o $SM/alignment/recal_data.table
 
 printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 printf -- "---\n[$(date)] Start BQSR PrintReads.\n---\n"
 
 $JAVA -Xmx58G -jar $GATK \
     -T PrintReads -nct $NSLOTS \
-    --emit_original_quals \
-    -R $REF -BQSR $SM/recal_data.table \
-    -I $SM/bam/$SM.realigned.bam \
-    -o $SM/bam/$SM.bam
-rm $SM/bam/$SM.realigned.{bam,bai}
+    --disable_indel_quals \
+    -R $REF -BQSR $SM/laignment/recal_data.table \
+    -I $SM/alignment/$SM.realigned.bam \
+    -o $SM/alignment/$SM.bam
+rm $SM/alignment/$SM.realigned.{bam,bai}
 
 printf -- "[$(date)] Finish BQSR PrintReads.\n---\n"

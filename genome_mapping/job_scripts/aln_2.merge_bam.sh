@@ -19,11 +19,11 @@ set -o pipefail
 printf -- "---\n[$(date)] Start merge_bam.\n"
 
 if [[ $(ls $SM/bam/$SM.*.sorted.bam|wc -l) == 1 ]]; then
-    mv $SM/bam/$SM.*.sorted.bam $SM/bam/$SM.merged.bam
-    rm $SM/bam/$SM.*.sorted.bam.bai
+    mv $SM/alignment/$SM.*.sorted.bam $SM/alignment/$SM.merged.bam
+    rm $SM/alignment/$SM.*.sorted.bam.bai
 else
-    $SAMBAMBA merge -t $NSLOTS $SM/bam/$SM.merged.bam $SM/bam/$SM.*.sorted.bam
-    rm $SM/bam/$SM.*.sorted.bam{,.bai}
+    $SAMBAMBA merge -t $NSLOTS $SM/alignment/$SM.merged.bam $SM/alignment/$SM.*.sorted.bam
+    rm $SM/alignment/$SM.*.sorted.bam{,.bai}
 fi
 
 printf -- "[$(date)] Finish merge_bam.\n---\n"

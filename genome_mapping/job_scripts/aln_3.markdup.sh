@@ -19,13 +19,13 @@ set -o pipefail
 printf -- "---\n[$(date)] Start markdup.\n"
 
 $JAVA -Xmx26G -jar $PICARD MarkDuplicates \
-    I=$SM/bam/$SM.merged.bam \
-    O=$SM/bam/$SM.markduped.bam \
-    METRICS_FILE=$SM/markduplicates_metrics.txt \
+    I=$SM/alignment/$SM.merged.bam \
+    O=$SM/alignment/$SM.markduped.bam \
+    METRICS_FILE=$SM/alignment/markduplicates_metrics.txt \
     OPTICAL_DUPLICATE_PIXEL_DISTANCE=2500 \
     CREATE_INDEX=true \
     TMP_DIR=tmp 
 
-rm $SM/bam/$SM.merged.bam{,.bai}
+rm $SM/alignment/$SM.merged.bam{,.bai}
 
 printf -- "[$(date)] Finish markdup.\n---\n"
