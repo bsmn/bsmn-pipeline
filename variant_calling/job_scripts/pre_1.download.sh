@@ -5,7 +5,7 @@
 trap "exit 100" ERR
 
 if [[ $# -lt 3 ]]; then
-    echo "Usage: $(basename $0) [sample name] [file name] [location]"
+    echo "Usage: $(basename $0) <sample name> <file name> <location>"
     false
 fi
 
@@ -20,21 +20,21 @@ set -o pipefail
 
 printf -- "---\n[$(date)] Start download: $FNAME\n"
 
-mkdir -p $SM/bam
+mkdir -p $SM/alignment
 
 rc=0
 n=0
 until [[ $n -eq 5 ]]; do
     if [[ $LOC =~ ^syn[0-9]+ ]]; then
-        $SYNAPSE get $LOC --downloadLocation $SM/bam/ && { rc=$?; break; } || rc=$?
+        $SYNAPSE get $LOC --downloadLocation $SM/alignment/ && { rc=$?; break; } || rc=$?
     elif [[ $LOC =~ ^s3:.+ ]]; then
         $AWS s3 ls $LOC || {
             printf "Set an NDA AWS token\n\n"
             eval "$($PIPE_HOME/utils/nda_aws_token.sh -r ~/.nda_credential)"
         }
-        $AWS s3 cp --no-progress $LOC $SM/bam/ && { rc=$?; break; } || rc=$?
+        $AWS s3 cp --no-progress $LOC $SM/alignment/ && { rc=$?; break; } || rc=$?
     else
-        ls -lh $LOC && ln -sf $(readlink -f $LOC) $SM/bam/ || rc=$?
+        ls -lh $LOC && ln -sf $(readlink -f $LOC) $SM/alignment/ || rc=$?
         break
     fi
     n=$((n+1))

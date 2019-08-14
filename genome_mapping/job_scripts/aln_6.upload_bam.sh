@@ -28,7 +28,7 @@ $SYNAPSE add --parentid $PARENTID $SM.bam
 $SYNAPSE add --parentid $PARENTID $SM.bai
 rm $SM.{bam,bai}
 cd ..
-rmdir downloads fastq bam
+rmdir downloads fastq 
 touch done
 
 printf -- "[$(date)] Finish upload: $SM.{bam,bai}\n---\n"
