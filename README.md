@@ -28,15 +28,14 @@ $ ./download_resources.sh
 ## Extra set up for SGE
 The pipeline require a parallel environment named "threaded" in  your SGE system. If your SGE system doen't have this parallel environment, you should add it into yours.
 ```
-$ sudo su
-# qconf -Ap << END
+$ cat >threaded.conf <<END
 pe_name            threaded
 slots              99999
 user_lists         NONE
 xuser_lists        NONE
 start_proc_args    NONE
 stop_proc_args     NONE
-allocation_rule    $pe_slots
+allocation_rule    \$pe_slots
 control_slaves     FALSE
 job_is_first_task  TRUE
 urgency_slots      min
@@ -45,6 +44,8 @@ qsort_args         NONE
 END
 ```
 ```
+$ sudo su
+# qconf -Ap threaded.conf
 # qconf -mattr queue pe_list threaded all.q
 ```
 
