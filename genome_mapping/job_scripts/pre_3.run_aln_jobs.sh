@@ -21,6 +21,6 @@ printf -- "---\n[$(date)] Start submit_aln_jobs.\n"
 
 CWD=$(pwd)
 ssh -o StrictHostKeyChecking=No $HOST \
-    "cd $CWD; $PYTHON3 $PIPE_HOME/genome_mapping/submit_aln_jobs.py $SM"
+    "cd $CWD; $PYTHON3 $PIPE_HOME/genome_mapping/run_aln_jobs.py $SM"
 
 printf -- "[$(date)] Finish submit_aln_jobs.\n---\n"
