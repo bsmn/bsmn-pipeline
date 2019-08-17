@@ -28,11 +28,21 @@ printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 printf -- "---\n[$(date)] Start BQSR PrintReads.\n---\n"
 
 $JAVA -Xmx58G -jar $GATK \
-    -T PrintReads -nct $NSLOTS \
+    -T PrintReads -nct $((NSLOTS/2)) \
     --disable_indel_quals \
     -R $REF -BQSR $SM/alignment/recal_data.table \
     -I $SM/alignment/$SM.realigned.bam \
-    -o $SM/alignment/$SM.bam
+    |$SAMTOOLS view -@ $((NSLOTS/2)) -C -T $REF -o $SM/alignment/$SM.cram
 rm $SM/alignment/$SM.realigned.{bam,bai}
 
 printf -- "[$(date)] Finish BQSR PrintReads.\n---\n"
+printf -- "---\n[$(date)] Start indexing: $SM.cram\n"
+
+$SAMTOOLS index -@ $SSLOTS $SM/alignment/$SM.cram
+
+printf -- "[$(date)] Finish indexing: $SM.cram\n---\n"
+printf -- "---\n[$(date)] Start flagstat: $SM.cram\n"
+
+$SAMTOOLS flagstat -@ $NSLOTS $SM/alignment/$SM.cram > $SM/alignment/flagstat.txt
+
+printf -- "---\n[$(date)] Finish flagstat: $SM.cram\n"
