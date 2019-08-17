@@ -29,7 +29,9 @@ def main():
 
         f_run_info = sample + "/run_info"
         run_info(f_run_info)
-        run_info_append(f_run_info, "\n#SYNAPSE\nPARENTID={}".format(args.parentid))
+        run_info_append(f_run_info, "\n#RUN_OPTIONS")
+        run_info_append(f_run_info, "\nMASTER_SERVER={}".format(os.getenv("HOSTNAME")))
+        run_info_append(f_run_info, "\nPARENTID={}".format(args.parentid))
 
         jid_list = []
         for sdata in val:
@@ -79,8 +81,8 @@ def submit_pre_jobs_bam(sample, fname, loc):
 
 def submit_aln_jobs(sample, jid):
     q.submit(opt(sample, jid),
-        "{job_home}/pre_3.run_aln_jobs.sh {host} {sample}".format(
-            job_home=job_home, host=os.getenv("HOSTNAME"), sample=sample))
+        "{job_home}/pre_3.run_aln_jobs.sh {sample}".format(
+            job_home=job_home, sample=sample))
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Genome Mapping Pipeline')

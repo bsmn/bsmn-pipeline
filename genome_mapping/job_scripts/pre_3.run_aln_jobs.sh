@@ -4,13 +4,12 @@
 
 trap "exit 100" ERR
 
-if [[ $# -lt 2 ]]; then
-    echo "Usage: $(basename $0) [host] [sample]"
+if [[ $# -lt 1 ]]; then
+    echo "Usage: $(basename $0) <sample>"
     false
 fi
 
-HOST=$1
-SM=$2
+SM=$1
 
 source $(pwd)/$SM/run_info
 
@@ -20,7 +19,7 @@ set -o pipefail
 printf -- "---\n[$(date)] Start submit_aln_jobs.\n"
 
 CWD=$(pwd)
-ssh -o StrictHostKeyChecking=No $HOST \
+ssh -o StrictHostKeyChecking=No $MASTER_SERVER \
     "cd $CWD; $PYTHON3 $PIPE_HOME/genome_mapping/run_aln_jobs.py $SM"
 
 printf -- "[$(date)] Finish submit_aln_jobs.\n---\n"
