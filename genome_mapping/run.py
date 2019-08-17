@@ -79,7 +79,7 @@ def submit_pre_jobs_bam(sample, fname, loc):
 
 def submit_aln_jobs(sample, jid):
     q.submit(opt(sample, jid),
-        "{job_home}/pre_3.submit_aln_jobs.sh {host} {sample}".format(
+        "{job_home}/pre_3.run_aln_jobs.sh {host} {sample}".format(
             job_home=job_home, host=os.getenv("HOSTNAME"), sample=sample))
 
 def parse_args():
