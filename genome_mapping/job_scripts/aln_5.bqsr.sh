@@ -30,7 +30,7 @@ printf -- "---\n[$(date)] Start BQSR PrintReads.\n---\n"
 $JAVA -Xmx58G -jar $GATK \
     -T PrintReads -nct $NSLOTS \
     --disable_indel_quals \
-    -R $REF -BQSR $SM/laignment/recal_data.table \
+    -R $REF -BQSR $SM/alignment/recal_data.table \
     -I $SM/alignment/$SM.realigned.bam \
     -o $SM/alignment/$SM.bam
 rm $SM/alignment/$SM.realigned.{bam,bai}
