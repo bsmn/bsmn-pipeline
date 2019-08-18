@@ -16,10 +16,10 @@ source $(pwd)/$SM/run_info
 set -o nounset
 set -o pipefail
 
-printf -- "---\n[$(date)] Start submit_aln_jobs.\n"
+printf -- "---\n[$(date)] Start submit aln jobs.\n"
 
 CWD=$(pwd)
-ssh -o StrictHostKeyChecking=No $MASTER_SERVER \
+ssh -o StrictHostKeyChecking=No $SGE_O_HOST \
     "cd $CWD; $PYTHON3 $PIPE_HOME/genome_mapping/run_aln_jobs.py $SM"
 
-printf -- "[$(date)] Finish submit_aln_jobs.\n---\n"
+printf -- "[$(date)] Finish submit aln jobs.\n---\n"
