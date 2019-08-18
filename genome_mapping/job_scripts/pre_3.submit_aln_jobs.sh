@@ -18,8 +18,7 @@ set -o pipefail
 
 printf -- "---\n[$(date)] Start submit aln jobs.\n"
 
-CWD=$(pwd)
 ssh -o StrictHostKeyChecking=No $SGE_O_HOST \
-    "cd $CWD; $PYTHON3 $PIPE_HOME/genome_mapping/run_aln_jobs.py $SM"
+    "cd $SGE_O_WORKDIR; $PYTHON3 $PIPE_HOME/genome_mapping/submit_aln_jobs.py $SM"
 
 printf -- "[$(date)] Finish submit aln jobs.\n---\n"
