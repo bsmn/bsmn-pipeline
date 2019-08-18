@@ -35,7 +35,7 @@ def main():
         run_info_append(f_run_info, "\nRUN_MUTECT_SINGLE={}".format(args.run_mutect_single))
         if args.run_gatk_hc:
             ploidy = " ".join(str(i) for i in args.run_gatk_hc)
-            run_info_append(f_run_info, "\nRUN_GATK_HC=True\nPLOIDY=\"{}\"".format(ploidy)
+            run_info_append(f_run_info, "\nRUN_GATK_HC=True\nPLOIDY=\"{}\"".format(ploidy))
         else:
             run_info_append(f_run_info, "\nRUN_GATK_HC={}".format(args.run_gatk_hc))
 
