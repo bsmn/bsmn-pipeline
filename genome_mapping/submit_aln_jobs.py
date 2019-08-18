@@ -35,26 +35,31 @@ def main():
     jid = q.submit(opt(args.sample, jid), 
         "{job_home}/aln_5.bqsr.sh {sample}".format(job_home=job_home, sample=args.sample))
 
-    if parentid(args.sample) != "None":
-        q.submit(opt(args.sample, jid), 
-            "{job_home}/aln_6.upload_bam.sh {sample}".format(job_home=job_home, sample=args.sample))
+    jid = q.submit(opt(args.sample, jid), 
+        "{job_home}/post_1.unmapped_reads.sh {sample}".format(job_home=job_home, sample=args.sample))
+
+    save_hold_jid("{sample}/alignment/hold_jid".format(sample=args.sample), jid)
+
+    jid = q.submit(opt(args.sample, jid), 
+        "{job_home}/post_2.upload_cram.sh {sample}".format(job_home=job_home, sample=args.sample))
+
+    q.submit(opt(args.sample, jid), 
+        "{job_home}/post_3.run_variant_calling.sh {sample}".format(job_home=job_home, sample=args.sample))
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Alignment job submitter')
     parser.add_argument('sample', metavar='sample name')
     return parser.parse_args()
 
-def parentid(sample):
-    with open(sample + "/run_info") as run_info:
-        for line in run_info:
-            if line[:8] == "PARENTID":
-                return line.strip().split("=")[1]
-
 def opt(sample, jid=None):
     opt = "-j y -o {log_dir} -l h_vmem=4G".format(log_dir=log_dir(sample))
     if jid is not None:
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt
-  
+
+def save_hold_jid(fname, jid):
+    with open(fname, 'w') as f:
+        print(jid, file=f)
+    
 if __name__ == "__main__":
     main()

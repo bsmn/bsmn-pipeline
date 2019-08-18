@@ -3,7 +3,7 @@
 #$ -pe threaded 16
 
 if [[ $# -lt 2 ]]; then
-    echo "Usage: $(basename $0) [sample name] [ploidy]"
+    echo "Usage: $(basename $0) <sample name> <ploidy>"
     exit 1
 fi
 

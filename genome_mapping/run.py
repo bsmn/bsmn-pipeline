@@ -30,8 +30,14 @@ def main():
         f_run_info = sample + "/run_info"
         run_info(f_run_info)
         run_info_append(f_run_info, "\n#RUN_OPTIONS")
-        run_info_append(f_run_info, "\nMASTER_SERVER={}".format(os.getenv("HOSTNAME")))
-        run_info_append(f_run_info, "\nPARENTID={}".format(args.parentid))
+        run_info_append(f_run_info, "\nUPLOAD={}".format(args.upload))
+        run_info_append(f_run_info, "\nRUN_CNVNATOR={}".format(args.run_cnvnator))
+        run_info_append(f_run_info, "\nRUN_MUTECT_SINGLE={}".format(args.run_mutect_single))
+        if args.run_gatk_hc:
+            ploidy = " ".join(str(i) for i in args.run_gatk_hc)
+            run_info_append(f_run_info, "\nRUN_GATK_HC=True\nPLOIDY=\"{}\"".format(ploidy)
+        else:
+            run_info_append(f_run_info, "\nRUN_GATK_HC={}".format(args.run_gatk_hc))
 
         jid_list = []
         for sdata in val:
@@ -81,7 +87,7 @@ def submit_pre_jobs_bam(sample, fname, loc):
 
 def submit_aln_jobs(sample, jid):
     q.submit(opt(sample, jid),
-        "{job_home}/pre_3.run_aln_jobs.sh {sample}".format(
+        "{job_home}/pre_3.submit_aln_jobs.sh {sample}".format(
             job_home=job_home, sample=sample))
 
 def parse_args():
@@ -94,10 +100,13 @@ def parse_args():
         Trailing columns will be ignored.
         "location" is Synapse ID, S3Uri of the NDA or a user, or LocalPath.
         For data download, synapse or aws clients, or symbolic link will be used, respectively.''')
-    parser.add_argument('--parentid', metavar='syn123', 
-        help='''Synapse ID of project or folder where to upload result bam files. 
-        If it is not set, the result bam files will be locally saved.
+    parser.add_argument('--upload', metavar='syn123', 
+        help='''Synapse ID of project or folder where to upload result cram files. 
+        If it is not set, the result cram files will be locally saved.
         [ Default: None ]''', default=None)
+    parser.add_argument('--run-gatk-hc', metavar='ploidy', type=int, nargs='+', default=False)
+    parser.add_argument('--run-mutect-single', action='store_true')
+    parser.add_argument('--run-cnvnator', action='store_true')
     return parser.parse_args()
 
 if __name__ == "__main__":
