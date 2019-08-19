@@ -20,7 +20,7 @@ printf -- "---\n[$(date)] Start merge_bam.\n"
 
 rmdir $SM/downloads $SM/fastq
 
-if [[ $(ls $SM/bam/$SM.*.sorted.bam|wc -l) == 1 ]]; then
+if [[ $(ls $SM/alignment/$SM.*.sorted.bam|wc -l) == 1 ]]; then
     mv $SM/alignment/$SM.*.sorted.bam $SM/alignment/$SM.merged.bam
     rm $SM/alignment/$SM.*.sorted.bam.bai
 else
