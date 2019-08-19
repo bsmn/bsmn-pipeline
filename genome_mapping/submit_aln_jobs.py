@@ -58,6 +58,7 @@ def opt(sample, jid=None):
     return opt
 
 def save_hold_jid(fname, jid):
+    os.makedirs(os.path.dirname(fname), exist_ok=True)
     with open(fname, 'w') as f:
         print(jid, file=f)
     
