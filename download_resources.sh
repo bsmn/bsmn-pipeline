@@ -10,7 +10,7 @@ tools/python/3.6.2/bin/synapse get syn10347383 --downloadLocation resources/
 gunzip resources/hs37d5.fa.gz
 tools/bwa/0.7.16a/bin/bwa index resources/hs37d5.fa
 tools/samtools/1.7/bin/samtools faidx resources/hs37d5.fa
-tools/java/jdk1.8.0_191/bin/java -jar tools/picard/2.12.1/picard.jar \
+tools/java/jdk1.8.0_222/bin/java -jar tools/picard/2.12.1/picard.jar \
     CreateSequenceDictionary R=resources/hs37d5.fa O=resources/hs37d5.dict
 
 # Download mapping resources
