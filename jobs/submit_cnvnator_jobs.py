@@ -17,7 +17,7 @@ q = GridEngineQueue()
 def main():
     args = parse_args()
     jid = q.submit(opt(args.sample_name, args.hold_jid),
-        "{job_home}/cnvnator.sh {sample}".format(job_home=job_home, sample=sample))
+        "{job_home}/cnvnator.sh {sample}".format(job_home=job_home, sample=args.sample_name))
     save_hold_jid("{sample}/cnvnator/hold_jid".format(sample=args.sample_name), jid)
     
 def parse_args():
