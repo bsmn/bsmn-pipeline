@@ -30,14 +30,14 @@ def main():
         f_run_info = sample + "/run_info"
         run_info(f_run_info)
         run_info_append(f_run_info, "\n#RUN_OPTIONS")
-        run_info_append(f_run_info, "\nUPLOAD={}".format(args.upload))
-        run_info_append(f_run_info, "\nRUN_CNVNATOR={}".format(args.run_cnvnator))
-        run_info_append(f_run_info, "\nRUN_MUTECT_SINGLE={}".format(args.run_mutect_single))
+        run_info_append(f_run_info, "UPLOAD={}".format(args.upload))
+        run_info_append(f_run_info, "RUN_CNVNATOR={}".format(args.run_cnvnator))
+        run_info_append(f_run_info, "RUN_MUTECT_SINGLE={}".format(args.run_mutect_single))
         if args.run_gatk_hc:
             ploidy = " ".join(str(i) for i in args.run_gatk_hc)
-            run_info_append(f_run_info, "\nRUN_GATK_HC=True\nPLOIDY=\"{}\"".format(ploidy))
+            run_info_append(f_run_info, "RUN_GATK_HC=True\nPLOIDY=\"{}\"".format(ploidy))
         else:
-            run_info_append(f_run_info, "\nRUN_GATK_HC={}".format(args.run_gatk_hc))
+            run_info_append(f_run_info, "RUN_GATK_HC={}".format(args.run_gatk_hc))
 
         jid_list = []
         for sdata in val:
