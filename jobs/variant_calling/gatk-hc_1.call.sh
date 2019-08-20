@@ -22,11 +22,11 @@ elif [[ ${SGE_TASK_ID} -eq 24 ]]; then
     CHR=Y
 fi
 
-BAM=$(ls -1 data.bam_cram/$SM.*am|sed "s/^/-I /")
+CRAM=$SM/alignment/$SM.cram
 CHR_GVCF=$SM/gatk-hc/$SM.ploidy_$PL.$CHR.g.vcf
 CHR_RAW_VCF=$SM/gatk-hc//$SM.ploidy_$PL.$CHR.vcf
 RAW_VCF=$SM/gatk-hc/$SM.ploidy_$PL.raw.vcf
-RECAL_VCF=$SM/gatk-hc//$SM.ploidy_$PL.vcf
+RECAL_VCF=$SM/gatk-hc/$SM.ploidy_$PL.vcf
 
 printf -- "---\n[$(date)] Start HC_GVCF.\n"
 if [[ ! -f $CHR_GVCF.idx && ! -f $CHR_RAW_VCF.idx && ! -f $RAW_VCF.idx && ! -f $RECAL_VCF.idx ]]; then
@@ -35,7 +35,7 @@ if [[ ! -f $CHR_GVCF.idx && ! -f $CHR_RAW_VCF.idx && ! -f $RAW_VCF.idx && ! -f $
         HaplotypeCaller \
         --native-pair-hmm-threads $NSLOTS \
         -R $REF \
-        $BAM \
+        -I $CRAM \
         -ERC GVCF \
         -ploidy $PL \
         -L $CHR \
@@ -48,7 +48,7 @@ printf -- "[$(date)] Finish HC_GVCF.\n---\n"
 
 printf -- "---\n[$(date)] Start Joint GT.\n"
 
-if [[ ! -f $CHR_RAW_VCF.idx && ! -f $RAW_VCF.idx && ! -f $RECAL_CVCF.idx ]]; then
+if [[ ! -f $CHR_RAW_VCF.idx && ! -f $RAW_VCF.idx && ! -f $RECAL_VCF.idx ]]; then
     mkdir -p raw_vcf
     $GATK4 --java-options "-Xmx52G -Djava.io.tmpdir=tmp -XX:-UseParallelGC" \
         GenotypeGVCFs \
