@@ -34,3 +34,8 @@ def log_dir(sample):
     log_dir = sample+"/logs"
     pathlib.Path(log_dir).mkdir(parents=True, exist_ok=True)
     return log_dir
+
+def save_hold_jid(fname, jid):
+    os.makedirs(os.path.dirname(fname), exist_ok=True)
+    with open(fname, 'w') as f:
+        print(jid, file=f)
