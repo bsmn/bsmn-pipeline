@@ -16,7 +16,7 @@ source $(pwd)/$SM/run_info
 set -o nounset
 set -o pipefail
 
-printf -- "[$(date)] Start delete: $SM.cram{,.crai} \n---\n"
+printf -- "---\n[$(date)] Start delete: $SM.cram{,.crai}\n"
 
 rm $SM/alignment/$SM.cram{,.crai}
 

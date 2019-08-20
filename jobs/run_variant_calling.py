@@ -7,7 +7,7 @@ from collections import defaultdict
 
 cmd_home = os.path.dirname(os.path.realpath(__file__))
 pipe_home = os.path.normpath(cmd_home + "/..")
-job_home = cmd_home + "/job_scripts"
+job_home = cmd_home + "/variant_calling"
 sys.path.append(pipe_home)
 
 from library.config import run_info, log_dir
@@ -22,7 +22,7 @@ def main():
     synapse_login()
     nda_login()
 
-    samples = sample_list2(args.infile)
+    samples = sample_list2(args.sample_list)
     for sample, sdata in samples.items():
         print(sample)
 
@@ -97,7 +97,7 @@ def submit_post_jobs(sample, jid):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Variant Calling Pipeline')
-    parser.add_argument('infile', metavar='sample_list.txt',
+    parser.add_argument('--sample-list', metavar='sample_list.txt', required=True,
         help='''Sample list file.
         Each line format is "sample_id\\tfile_name\\tlocation".
         Lines staring with "#" will omitted.

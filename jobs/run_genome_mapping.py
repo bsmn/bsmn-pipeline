@@ -7,7 +7,7 @@ from collections import defaultdict
 
 cmd_home = os.path.dirname(os.path.realpath(__file__))
 pipe_home = os.path.normpath(cmd_home + "/..")
-job_home = cmd_home + "/job_scripts"
+job_home = cmd_home + "/genome_mapping"
 sys.path.append(pipe_home)
 
 from library.config import run_info, run_info_append, log_dir
@@ -22,7 +22,7 @@ def main():
     synapse_login()
     nda_login()
 
-    samples = sample_list(args.infile)
+    samples = sample_list(args.sample_list)
     for key, val in samples.items():
         sample, filetype = key
         print(sample)
@@ -92,14 +92,6 @@ def submit_aln_jobs(sample, jid):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Genome Mapping Pipeline')
-    parser.add_argument('infile', metavar='sample_list.txt',
-        help='''Sample list file.
-        Each line format is "sample_id\\tfile_name\\tlocation".
-        Lines staring with "#" will omitted.
-        Header line should also start with "#".
-        Trailing columns will be ignored.
-        "location" is Synapse ID, S3Uri of the NDA or a user, or LocalPath.
-        For data download, synapse or aws clients, or symbolic link will be used, respectively.''')
     parser.add_argument('--upload', metavar='syn123', 
         help='''Synapse ID of project or folder where to upload result cram files. 
         If it is not set, the result cram files will be locally saved.
@@ -107,6 +99,14 @@ def parse_args():
     parser.add_argument('--run-gatk-hc', metavar='ploidy', type=int, nargs='+', default=False)
     parser.add_argument('--run-mutect-single', action='store_true')
     parser.add_argument('--run-cnvnator', action='store_true')
+    parser.add_argument('--sample-list', metavar='sample_list.txt', required=True,
+        help='''Sample list file.
+        Each line format is "sample_id\\tfile_name\\tlocation".
+        Lines staring with "#" will omitted.
+        Header line should also start with "#".
+        Trailing columns will be ignored.
+        "location" is Synapse ID, S3Uri of the NDA or a user, or LocalPath.
+        For data download, synapse or aws clients, or symbolic link will be used, respectively.''')
     return parser.parse_args()
 
 if __name__ == "__main__":

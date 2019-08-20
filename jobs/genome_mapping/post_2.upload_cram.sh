@@ -16,7 +16,7 @@ source $(pwd)/$SM/run_info
 set -o nounset
 set -o pipefail
 
-printf -- "[$(date)] Start upload: $SM.cram{,.crai} \n---\n"
+printf -- "---\n[$(date)] Start upload: $SM.cram{,.crai}\n"
 
 if [[ $UPLOAD = "None" ]]; then
     echo "Skip this step"
@@ -28,7 +28,7 @@ else
 
     JID=$(cat $SM/*/hold_jid|xargs|sed 's/ /,/g')
     ssh -o StrictHostKeyChecking=No $SGE_O_HOST \
-        "cd $SGE_O_WORKDIR; qsub -hold_jid $JID $PIPE_HOME/genome_mapping/post_4.delete_cram.sh $SM"
+        "cd $SGE_O_WORKDIR; qsub -hold_jid $JID $PIPE_HOME/jobs/genome_mapping/post_4.delete_cram.sh $SM"
 fi
 
 printf -- "[$(date)] Finish upload: $SM.cram{,.crai}\n---\n"

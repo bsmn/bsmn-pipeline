@@ -18,6 +18,7 @@ set -o pipefail
 
 printf -- "---\n[$(date)] Start BQSR recal_table.\n"
 
+: <<'COMMENT'
 $JAVA -Xmx58G -jar $GATK \
     -T BaseRecalibrator -nct $NSLOTS \
     -R $REF -knownSites $DBSNP -knownSites $MILLS -knownSites $INDEL1KG \
@@ -34,15 +35,16 @@ $JAVA -Xmx58G -jar $GATK \
     -I $SM/alignment/$SM.realigned.bam \
     |$SAMTOOLS view -@ $((NSLOTS/2)) -C -T $REF -o $SM/alignment/$SM.cram
 rm $SM/alignment/$SM.realigned.{bam,bai}
+COMMENT
 
 printf -- "[$(date)] Finish BQSR PrintReads.\n---\n"
 printf -- "---\n[$(date)] Start indexing: $SM.cram\n"
 
-$SAMTOOLS index -@ $SSLOTS $SM/alignment/$SM.cram
+$SAMTOOLS index -@ $NSLOTS $SM/alignment/$SM.cram
 
 printf -- "[$(date)] Finish indexing: $SM.cram\n---\n"
 printf -- "---\n[$(date)] Start flagstat: $SM.cram\n"
 
 $SAMTOOLS flagstat -@ $NSLOTS $SM/alignment/$SM.cram > $SM/alignment/flagstat.txt
 
-printf -- "---\n[$(date)] Finish flagstat: $SM.cram\n"
+printf -- "[$(date)] Finish flagstat: $SM.cram\n---\n"

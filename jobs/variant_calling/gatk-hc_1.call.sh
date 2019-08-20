@@ -7,12 +7,12 @@ if [[ $# -lt 2 ]]; then
     exit 1
 fi
 
-source $(pwd)/run_info
-
-set -eu -o pipefail
-
 SM=$1
 PL=$2
+
+source $(pwd)/$SM/run_info
+
+set -eu -o pipefail
 
 if [[ ${SGE_TASK_ID} -le 22 ]]; then
     CHR=${SGE_TASK_ID}

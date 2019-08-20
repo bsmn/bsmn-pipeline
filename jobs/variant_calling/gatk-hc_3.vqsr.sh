@@ -7,12 +7,12 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-source $(pwd)/run_info
-
-set -eu -o pipefail
-
 SM=$1
 PL=$2
+
+source $(pwd)/$SM/run_info
+
+set -eu -o pipefail
 
 RAW_VCF=raw_vcf/$SM.ploidy_$PL.raw.vcf
 RECAL_CVCF_SNP=recal_vcf/$SM.ploidy_$PL.snps.vcf
