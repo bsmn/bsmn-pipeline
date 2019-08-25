@@ -11,12 +11,13 @@ SM=$1
 PL=$2
 
 source $(pwd)/$SM/run_info
+export PATH=$(dirname $JAVA):$PATH
 
 set -eu -o pipefail
 
-RAW_VCF=$SM/gatk-hc/$SM.ploidy_$PL.raw.vcf
-RECAL_VCF_SNP=$SM/gatk-hc/$SM.ploidy_$PL.snps.vcf
-RECAL_VCF=$SM/gatk-hc/$SM.ploidy_$PL.vcf
+RAW_VCF=$SM/gatk-hc/$SM.ploidy_$PL.raw.vcf.gz
+RECAL_VCF_SNP=$SM/gatk-hc/$SM.ploidy_$PL.snps.vcf.gz
+RECAL_VCF=$SM/gatk-hc/$SM.ploidy_$PL.vcf.gz
 RECAL_SNP=$SM/gatk-hc/$SM.recalibrate_SNP.ploidy_$PL.recal
 RECAL_INDEL=$SM/gatk-hc/$SM.recalibrate_INDEL.ploidy_$PL.recal
 TRANCHES_SNP=$SM/gatk-hc/$SM.recalibrate_SNP.ploidy_$PL.tranches
@@ -26,9 +27,7 @@ TRANCHES_INDEL=$SM/gatk-hc/$SM.recalibrate_INDEL.ploidy_$PL.tranches
 
 printf -- "---\n[$(date)] Start VQSR.\n" 
 
-if [[ ! -f $CVCF_ALL.idx ]]; then
-    mkdir -p vqsr recal_vcf
-
+if [[ ! -f $RECAL_VCF.tbi ]]; then
     $GATK4 --java-options "-Xmx24G -XX:-UseParallelGC" \
         VariantRecalibrator \
         -R $REF \
@@ -90,10 +89,10 @@ if [[ ! -f $CVCF_ALL.idx ]]; then
         --tranches-file $TRANCHES_INDEL \
         -O $RECAL_VCF
 
-    rm  $RAW_VCF $RAW_VCF.idx \
-        $RECAL_VCF_SNP $RECAL_VCF_SNP.idx \
-        $RECAL_SNP $RECAL_INDEL \
-        $TRANCHES_SNP $TRANCHES_INDEL
+    rm  $RAW_VCF $RAW_VCF.tbi \
+        $RECAL_VCF_SNP $RECAL_VCF_SNP.tbi \
+        $RECAL_SNP $RECAL_SNP.idx $TRANCHES_SNP \
+        $RECAL_INDEL $RECAL_INDEL.idx $TRANCHES_INDEL
 else
     echo "Skip this step."
 fi
