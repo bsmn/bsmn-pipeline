@@ -16,8 +16,9 @@ source $(pwd)/$SM/run_info
 set -o nounset
 set -o pipefail
 
+CHRS="$(seq 1 22) X Y"
 CHR_VCFS=""
-for CHR in $(seq 1 22) X Y; do
+for CHR in $CHRS; do
     CHR_VCFS="$CHR_VCFS -I $SM/mutect2-single/$SM.$CHR.vcf"
 done
 VCF=$SM/mutect2-single/$SM.vcf
@@ -30,7 +31,7 @@ if [[ ! -f $VCF.idx ]]; then
         $CHR_VCFS \
         -O $VCF \
 
-    for CHR in $(seq 1 22) X Y; do
+    for CHR in $CHRS; do
         rm $SM/mutect2-single/$SM.$CHR.vcf
         rm $SM/mutect2-single/$SM.$CHR.vcf.idx
     done

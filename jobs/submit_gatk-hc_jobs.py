@@ -41,8 +41,7 @@ def submit_jobs(sample, ploidy, jid):
         "-t 1-24 {opt}".format(opt=opt(sample, jid)),
         "{job_home}/gatk-hc_1.call.sh {sample} {ploidy}".format(
             job_home=job_home, sample=sample, ploidy=ploidy))
-    jid = q.submit(
-        "-t 1-24 {opt}".format(opt=opt(sample, jid)),
+    jid = q.submit(opt(sample, jid),
         "{job_home}/gatk-hc_2.concat_vcf.sh {sample} {ploidy}".format(
             job_home=job_home, sample=sample, ploidy=ploidy))
     jid = q.submit(opt(sample, jid),
