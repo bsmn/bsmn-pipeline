@@ -22,11 +22,11 @@ if [[ $UPLOAD = "None" ]]; then
     echo "Skip this step"
 else
     cd $SM/alignment
-    $SYNAPSE add --parentid $UPLOAD $SM.cram
-    $SYNAPSE add --parentid $UPLOAD $SM.cram.crai
+    $SYNAPSE add --parentid $UPLOAD $SM.cram  || false
+    $SYNAPSE add --parentid $UPLOAD $SM.cram.crai  || false
     touch upload_done
 
-    JID=$(cat $SM/*/hold_jid|xargs|sed 's/ /,/g')
+    JID=$(cat ../*/hold_jid|xargs|sed 's/ /,/g')
     ssh -o StrictHostKeyChecking=No $SGE_O_HOST \
         "cd $SGE_O_WORKDIR; qsub -hold_jid $JID $PIPE_HOME/jobs/genome_mapping/post_4.delete_cram.sh $SM"
 fi

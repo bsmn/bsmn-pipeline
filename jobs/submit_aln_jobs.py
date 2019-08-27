@@ -34,12 +34,12 @@ def main():
     jid = q.submit(opt(args.sample_name, jid), 
         "{job_home}/aln_5.bqsr.sh {sample}".format(job_home=job_home, sample=args.sample_name))
 
-    jid = q.submit(opt(args.sample_name, jid), 
+    hold_jid = q.submit(opt(args.sample_name, jid), 
         "{job_home}/post_1.unmapped_reads.sh {sample}".format(job_home=job_home, sample=args.sample_name))
 
-    save_hold_jid("{sample}/alignment/hold_jid".format(sample=args.sample_name), jid)
+    save_hold_jid("{sample}/alignment/hold_jid".format(sample=args.sample_name), hold_jid)
 
-    jid = q.submit(opt(args.sample_name), 
+    jid = q.submit(opt(args.sample_name, jid), 
         "{job_home}/post_2.run_variant_calling.sh {sample}".format(job_home=job_home, sample=args.sample_name))
 
     q.submit(opt(args.sample_name, jid), 
