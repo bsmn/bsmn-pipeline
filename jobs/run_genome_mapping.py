@@ -39,6 +39,9 @@ def main():
         else:
             run_info_append(f_run_info, "RUN_GATK_HC={}".format(args.run_gatk_hc))
 
+        f_run_jid = sample + "/run_jid"
+        q.set_run_jid(f_run_jid, new=True)
+
         jid_list = []
         for sdata in val:
             fname, loc = sdata
