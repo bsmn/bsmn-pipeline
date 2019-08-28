@@ -16,6 +16,8 @@ q = GridEngineQueue()
 
 def main():
     args = parse_args()
+    q.set_run_jid(args.sample_name + "/run_jid")
+
     jid = submit_jobs(args.sample_name, args.hold_jid)
     save_hold_jid("{sample}/mutect-single/hold_jid".format(sample=args.sample_name), jid)
     

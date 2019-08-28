@@ -16,7 +16,8 @@ q = GridEngineQueue()
 
 def main():
     args = parse_args()
-    print(args)
+    q.set_run_jid(args.sample_name + "/run_jid")
+
     jid_list = []
     for ploidy in args.ploidy:
         jid_list.append(submit_jobs(args.sample_name, ploidy, args.hold_jid))

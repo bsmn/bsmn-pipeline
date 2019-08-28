@@ -16,6 +16,7 @@ from library.job_queue import GridEngineQueue
 def main():
     args = parse_args()
     q = GridEngineQueue()
+    q.set_run_jid(args.sample_name + "/run_jid")
 
     jid_list = []
     for pu in [fastq.split(".")[1] for fastq in glob.glob("{sample}/fastq/{sample}.*.R1.fastq.gz".format(sample=args.sample_name))]:
@@ -31,15 +32,17 @@ def main():
 
     jid = q.submit(opt(args.sample_name, jid),
         "{job_home}/aln_4.indel_realign.sh {sample}".format(job_home=job_home, sample=args.sample_name))
+
     jid = q.submit(opt(args.sample_name, jid), 
         "{job_home}/aln_5.bqsr.sh {sample}".format(job_home=job_home, sample=args.sample_name))
+    aln_jid = jid
 
-    hold_jid = q.submit(opt(args.sample_name, jid), 
+    jid = q.submit(opt(args.sample_name, aln_jid), 
         "{job_home}/post_1.unmapped_reads.sh {sample}".format(job_home=job_home, sample=args.sample_name))
 
-    save_hold_jid("{sample}/alignment/hold_jid".format(sample=args.sample_name), hold_jid)
+    save_hold_jid("{sample}/alignment/hold_jid".format(sample=args.sample_name), jid)
 
-    jid = q.submit(opt(args.sample_name, jid), 
+    jid = q.submit(opt(args.sample_name, aln_jid), 
         "{job_home}/post_2.run_variant_calling.sh {sample}".format(job_home=job_home, sample=args.sample_name))
 
     q.submit(opt(args.sample_name, jid), 

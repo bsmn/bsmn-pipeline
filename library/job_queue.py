@@ -2,6 +2,7 @@ import subprocess
 import xml.etree.ElementTree as ET
 import time
 import re
+import os
 from collections import defaultdict
 
 
@@ -11,6 +12,7 @@ class GridEngineQueue:
 
     def __init__(self, q_max=2000):
         self.q_max = q_max
+        self.run_jid = None
 
     @property
     def j_total(self):
@@ -77,6 +79,17 @@ class GridEngineQueue:
             self._print_summary()
             time.sleep(5)
 
+    def set_run_jid(self, fname, new=False):
+        if new:
+            os.makedirs(os.path.dirname(fname), exist_ok=True)
+            open(fname, 'w').close()
+        self.run_jid = fname
+
+    def _append_run_jid(self, jid):
+        if self.run_jid is not None:
+            with open(self.run_jid, "a") as f:
+                print(jid, file=f)
+
     def submit(self, q_opt_str, cmd_str):
         self._wait()
         qsub_cmd_list = ["qsub"] + q_opt_str.split() + cmd_str.split()
@@ -89,6 +102,7 @@ class GridEngineQueue:
 
         print("Your job {jid} (\"{jname}\") has been submitted".format(jid=jid, jname=jname))
 
+        self._append_run_jid(jid)
         self.__class__.jstate[jid] = []
         self._update()
         return jid
