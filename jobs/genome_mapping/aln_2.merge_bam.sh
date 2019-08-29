@@ -16,16 +16,23 @@ source $(pwd)/$SM/run_info
 set -o nounset
 set -o pipefail
 
+DONE=$SM/run_status/aln_2.merge_bam.done
+
 printf -- "---\n[$(date)] Start merge_bam.\n"
 
-rmdir $SM/downloads $SM/fastq
-
-if [[ $(ls $SM/alignment/$SM.*.sorted.bam|wc -l) == 1 ]]; then
-    mv $SM/alignment/$SM.*.sorted.bam $SM/alignment/$SM.merged.bam
-    rm $SM/alignment/$SM.*.sorted.bam.bai
+if [[ -f $DONE ]]; then
+    echo "Skip this step."
 else
-    $SAMBAMBA merge -t $NSLOTS $SM/alignment/$SM.merged.bam $SM/alignment/$SM.*.sorted.bam
-    rm $SM/alignment/$SM.*.sorted.bam{,.bai}
+    rmdir $SM/downloads $SM/fastq
+
+    if [[ $(ls $SM/alignment/$SM.*.sorted.bam|wc -l) == 1 ]]; then
+        mv $SM/alignment/$SM.*.sorted.bam $SM/alignment/$SM.merged.bam
+        rm $SM/alignment/$SM.*.sorted.bam.bai
+    else
+        $SAMBAMBA merge -t $NSLOTS $SM/alignment/$SM.merged.bam $SM/alignment/$SM.*.sorted.bam
+        rm $SM/alignment/$SM.*.sorted.bam{,.bai}
+    fi
+    touch $DONE
 fi
 
 printf -- "[$(date)] Finish merge_bam.\n---\n"

@@ -16,15 +16,17 @@ source $(pwd)/$SM/run_info
 set -o nounset
 set -o pipefail
 
+DONE=$SM/run_status/post_3.upload_cram.done
+
 printf -- "---\n[$(date)] Start upload: $SM.cram{,.crai}\n"
 
-if [[ $UPLOAD = "None" ]]; then
+if [[ -f $DONE ]] || [[ $UPLOAD = "None" ]]; then
     echo "Skip this step"
 else
     cd $SM/alignment
     $SYNAPSE add --parentid $UPLOAD $SM.cram  || false
     $SYNAPSE add --parentid $UPLOAD $SM.cram.crai  || false
-    touch upload_done
+    touch $DONE
 
     JID=$(cat ../*/hold_jid|xargs|sed 's/ /,/g')
     ssh -o StrictHostKeyChecking=No $SGE_O_HOST \
