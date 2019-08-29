@@ -15,6 +15,8 @@ export PATH=$(dirname $JAVA):$PATH
 
 set -eu -o pipefail
 
+DONE=$SM/run_status/gatk-hc_3.vqsr.done
+
 RAW_VCF=$SM/gatk-hc/$SM.ploidy_$PL.raw.vcf.gz
 RECAL_VCF_SNP=$SM/gatk-hc/$SM.ploidy_$PL.snps.vcf.gz
 RECAL_VCF=$SM/gatk-hc/$SM.ploidy_$PL.vcf.gz
@@ -27,7 +29,9 @@ TRANCHES_INDEL=$SM/gatk-hc/$SM.recalibrate_INDEL.ploidy_$PL.tranches
 
 printf -- "---\n[$(date)] Start VQSR.\n" 
 
-if [[ ! -f $RECAL_VCF.tbi ]]; then
+if [[ -f $DONE ]]; then
+    echo "Skip this step."
+else
     $GATK4 --java-options "-Xmx24G -XX:-UseParallelGC" \
         VariantRecalibrator \
         -R $REF \
@@ -93,8 +97,7 @@ if [[ ! -f $RECAL_VCF.tbi ]]; then
         $RECAL_VCF_SNP $RECAL_VCF_SNP.tbi \
         $RECAL_SNP $RECAL_SNP.idx $TRANCHES_SNP \
         $RECAL_INDEL $RECAL_INDEL.idx $TRANCHES_INDEL
-else
-    echo "Skip this step."
+    touch $DONE
 fi
 
 printf -- "[$(date)] Finish VQSR.\n---\n"

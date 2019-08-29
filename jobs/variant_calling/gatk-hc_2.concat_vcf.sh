@@ -15,18 +15,20 @@ export PATH=$(dirname $JAVA):$PATH
 
 set -eu -o pipefail
 
-# CHRS="$(seq 1 22) X Y"
-CHRS="22 X Y"
+DONE=$SM/run_status/gatk-hc_2.concat_vcf.done
+
+CHRS="$(seq 1 22) X Y"
 CHR_RAW_VCFS=""
 for CHR in $CHRS; do
     CHR_RAW_VCFS="$CHR_RAW_VCFS -I $SM/gatk-hc/$SM.ploidy_$PL.$CHR.vcf.gz"
 done
 RAW_VCF=$SM/gatk-hc/$SM.ploidy_$PL.raw.vcf.gz
-RECAL_VCF=$SM/gatk-hc/$SM.ploidy_$PL.vcf.gz
 
 printf -- "---\n[$(date)] Start concat vcfs.\n"
 
-if [[ ! -f $RAW_VCF.tbi && ! -f $RECAL_VCF.tbi ]]; then
+if [[ -f $DONE ]]; then
+    echo "Skip this step."
+else
     $GATK4 --java-options "-Xmx4G"  GatherVcfs \
         -R $REF \
         $CHR_RAW_VCFS \
@@ -38,8 +40,7 @@ if [[ ! -f $RAW_VCF.tbi && ! -f $RECAL_VCF.tbi ]]; then
     done
 
     $BCFTOOLS index --threads $((NSLOTS-1)) -t $RAW_VCF
-else
-    echo "Skip this step."
+    touch $DONE
 fi
 
 printf -- "[$(date)] Finish concat vcfs.\n---\n"

@@ -23,14 +23,16 @@ elif [[ ${SGE_TASK_ID} -eq 24 ]]; then
     CHR=Y
 fi
 
+DONE=$SM/run_status/gatk-hc_1.call.ploidy_$PL.$CHR.done
+
 CRAM=$SM/alignment/$SM.cram
 CHR_GVCF=$SM/gatk-hc/$SM.ploidy_$PL.$CHR.g.vcf.gz
 CHR_RAW_VCF=$SM/gatk-hc//$SM.ploidy_$PL.$CHR.vcf.gz
-RAW_VCF=$SM/gatk-hc/$SM.ploidy_$PL.raw.vcf.gz
-RECAL_VCF=$SM/gatk-hc/$SM.ploidy_$PL.vcf.gz
 
-printf -- "---\n[$(date)] Start HC_GVCF.\n"
-if [[ ! -f $CHR_GVCF.tbi && ! -f $CHR_RAW_VCF.tbi && ! -f $RAW_VCF.tbi && ! -f $RECAL_VCF.tbi ]]; then
+printf -- "---\n[$(date)] Start HC_GVCF: ploidy_$PL, chr$CHR\n"
+if [[ -f $DONE ]]; then
+    echo "Skip this step."
+else
     mkdir -p $SM/gatk-hc
     $GATK4 --java-options "-Xmx52G -Djava.io.tmpdir=tmp -XX:-UseParallelGC" \
         HaplotypeCaller \
@@ -42,14 +44,10 @@ if [[ ! -f $CHR_GVCF.tbi && ! -f $CHR_RAW_VCF.tbi && ! -f $RAW_VCF.tbi && ! -f $
         -L $CHR \
         -A StrandBiasBySample \
         -O $CHR_GVCF
-else
-    echo "Skip this step."
-fi
-printf -- "[$(date)] Finish HC_GVCF.\n---\n"
 
-printf -- "---\n[$(date)] Start Joint GT.\n"
+    printf -- "[$(date)] Finish HC_GVCF: ploidy_$PL, chr$CHR\n---\n"
+    printf -- "---\n[$(date)] Start Joint GT: ploidy_$PL, chr$CHR\n"
 
-if [[ ! -f $CHR_RAW_VCF.tbi && ! -f $RAW_VCF.tbi && ! -f $RECAL_VCF.tbi ]]; then
     $GATK4 --java-options "-Xmx52G -Djava.io.tmpdir=tmp -XX:-UseParallelGC" \
         GenotypeGVCFs \
         -R $REF \
@@ -58,8 +56,6 @@ if [[ ! -f $CHR_RAW_VCF.tbi && ! -f $RAW_VCF.tbi && ! -f $RECAL_VCF.tbi ]]; then
         -V $CHR_GVCF \
         -O $CHR_RAW_VCF
     rm $CHR_GVCF $CHR_GVCF.tbi
-else
-    echo "Skip this step."
+    touch $DONE
 fi
-
-printf -- "[$(date)] Finish Joint GT.\n---\n"
+printf -- "[$(date)] Finish Joint GT: ploidy_$PL, chr$CHR\n---\n"
