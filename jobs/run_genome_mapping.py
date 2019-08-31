@@ -29,7 +29,7 @@ def main():
 
         f_run_jid = sample + "/run_jid"
         if q.num_run_jid_in_queue(f_run_jid) > 0:
-            print("There are running jobs for this sample.")
+            print("There are submitted jobs for this sample.")
             print("Skip to submit jobs.\n")
             continue
         q.set_run_jid(f_run_jid, new=True)
