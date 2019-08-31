@@ -79,6 +79,16 @@ class GridEngineQueue:
             self._print_summary()
             time.sleep(5)
 
+    def num_run_jid_in_queue(self, fname):
+        if os.path.exists(fname):
+            jid = ",".join([line.strip() for line in open(fname)])
+            n = int(subprocess.run("qstat -j {jid}|grep -c job_number".format(jid=jid), 
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                   shell=True, encoding='utf-8').stdout)
+        else:
+            n = 0
+        return n
+
     def set_run_jid(self, fname, new=False):
         if new:
             os.makedirs(os.path.dirname(fname), exist_ok=True)

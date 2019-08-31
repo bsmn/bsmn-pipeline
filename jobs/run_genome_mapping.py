@@ -25,7 +25,14 @@ def main():
     samples = sample_list(args.sample_list)
     for key, val in samples.items():
         sample, filetype = key
-        print(sample)
+        print("- Sample: " + sample)
+
+        f_run_jid = sample + "/run_jid"
+        if q.num_run_jid_in_queue(f_run_jid) > 0:
+            print("There are running jobs for this sample.")
+            print("Skip to submit jobs.\n")
+            continue
+        q.set_run_jid(f_run_jid, new=True)
 
         f_run_info = sample + "/run_info"
         run_info(f_run_info)
@@ -38,9 +45,6 @@ def main():
             run_info_append(f_run_info, "RUN_GATK_HC=True\nPLOIDY=\"{}\"".format(ploidy))
         else:
             run_info_append(f_run_info, "RUN_GATK_HC={}".format(args.run_gatk_hc))
-
-        f_run_jid = sample + "/run_jid"
-        q.set_run_jid(f_run_jid, new=True)
 
         jid_list = []
         for sdata in val:
