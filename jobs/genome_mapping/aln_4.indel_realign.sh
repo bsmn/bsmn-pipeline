@@ -21,6 +21,8 @@ DONE=$SM/run_status/aln_4.indel_realign.done
 printf -- "---\n[$(date)] Start RealignerTargetCreator.\n"
 
 if [[ -f $DONE ]]; then
+    echo "Skip this step."
+else
     $JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
         -T RealignerTargetCreator -nt $NSLOTS \
         -R $REF -known $MILLS -known $INDEL1KG \

@@ -19,7 +19,12 @@ def main():
     q.set_run_jid(args.sample_name + "/run_jid")
 
     jid_list = []
-    for pu in [fastq.split(".")[1] for fastq in glob.glob("{sample}/fastq/{sample}.*.R1.fastq.gz".format(sample=args.sample_name))]:
+
+    fastq_path = "{sample}/fastq/{sample}.*.R1.fastq.gz".format(sample=args.sample_name)
+    done_path = "{sample}/run_status/aln_1.align_sort.*.done".format(sample=args.sample_name)
+    pu_list = set([fastq.replace(".R1.fastq.gz","").split(".")[-1] for fastq in glob.glob(fastq_path)] +
+                  [done.split(".")[-2] for done in glob.glob(done_path)])
+    for pu in pu_list: 
         jid_list.append(q.submit(opt(args.sample_name), 
             "{job_home}/aln_1.align_sort.sh {sample} {pu}".format(job_home=job_home, sample=args.sample_name, pu=pu)))
     jid = ",".join(jid_list)
