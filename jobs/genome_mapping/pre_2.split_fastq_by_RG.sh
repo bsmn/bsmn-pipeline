@@ -29,19 +29,26 @@ else
     RD=R2
 fi
 
+DONE=$SM/run_status/pre_2.split_fastq_by_RG.$(basename $FQ).done
+
 printf -- "---\n[$(date)] Start split fastq: $FQ\n"
 
-mkdir -p $SM/fastq
-$CAT $FQ |paste - - - - |awk -F"\t" -v SM=$SM -v RD=$RD '{
-    h=$1;
-    sub(/^@/,"",h);
-    sub(/ .+$/,"",h);
-    l=split(h,arr,":");
-    FCX=arr[l-4];
-    LN=arr[l-3];
-    print $1"\n"$2"\n+\n"$4|"gzip >"SM"/fastq/"SM"."FCX"_L"LN"."RD".fastq.gz"}
-    END {
-    print "READ N: "NR}'
-rm $FQ
+if [[ -f $DONE ]]; then
+    echo "Skip this step."
+else
+    mkdir -p $SM/fastq
+    $CAT $FQ |paste - - - - |awk -F"\t" -v SM=$SM -v RD=$RD '{
+        h=$1;
+        sub(/^@/,"",h);
+        sub(/ .+$/,"",h);
+        l=split(h,arr,":");
+        FCX=arr[l-4];
+        LN=arr[l-3];
+        print $1"\n"$2"\n+\n"$4|"gzip >"SM"/fastq/"SM"."FCX"_L"LN"."RD".fastq.gz"}
+        END {
+        print "READ N: "NR}'
+    rm $FQ
+    touch $DONE
+fi
 
 printf -- "[$(date)] Finish split fastq: $FQ\n---\n"

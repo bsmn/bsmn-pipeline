@@ -26,11 +26,13 @@ else
     cd $SM/alignment
     $SYNAPSE add --parentid $UPLOAD $SM.cram  || false
     $SYNAPSE add --parentid $UPLOAD $SM.cram.crai  || false
-    touch $DONE
+    cd $SGE_O_WORKDIR
 
-    JID=$(cat ../*/hold_jid|xargs|sed 's/ /,/g')
+    JID=$(cat $SM/*/hold_jid|xargs|sed 's/ /,/g')
     ssh -o StrictHostKeyChecking=No $SGE_O_HOST \
-        "cd $SGE_O_WORKDIR; qsub -hold_jid $JID $PIPE_HOME/jobs/genome_mapping/post_4.delete_cram.sh $SM"
+        "cd $SGE_O_WORKDIR; qsub -hold_jid $JID -o $SM/logs -j yes $PIPE_HOME/jobs/genome_mapping/post_4.delete_cram.sh $SM"
+
+    touch $DONE
 fi
 
 printf -- "[$(date)] Finish upload: $SM.cram{,.crai}\n---\n"
