@@ -22,8 +22,11 @@ def main():
     synapse_login()
     nda_login()
 
+    global down_jid
+    down_jid = None
+
     samples = sample_list(args.sample_list)
-    for key, val in samples.items():
+    for i, (key, val) in enumerate(samples.items()):
         sample, filetype = key
         print("- Sample: " + sample)
 
@@ -46,13 +49,14 @@ def main():
         else:
             run_info_append(f_run_info, "RUN_GATK_HC={}".format(args.run_gatk_hc))
 
+        if i < args.con_down_limit: down_jid = None
         jid_list = []
         for sdata in val:
             fname, loc = sdata
             if filetype == "bam":
-                jid_list.append(submit_pre_jobs_bam(sample, fname, loc))
+                jid_list.append(submit_pre_jobs_bam(sample, fname, loc, down_jid))
             else:
-                jid_list.append(submit_pre_jobs_fastq(sample, fname, loc))
+                jid_list.append(submit_pre_jobs_fastq(sample, fname, loc, down_jid))
             jid = ",".join(jid_list)
         submit_aln_jobs(sample, jid)
         print()
@@ -63,10 +67,12 @@ def opt(sample, jid=None):
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt
 
-def submit_pre_jobs_fastq(sample, fname, loc):
-    jid = q.submit(opt(sample), 
+def submit_pre_jobs_fastq(sample, fname, loc, jid=None):
+    jid = q.submit(opt(sample, jid), 
         "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
             job_home=job_home, sample=sample, fname=fname, loc=loc))
+    global down_jid
+    down_jid = jid
     
     jid = q.submit(opt(sample, jid),
         "{job_home}/pre_2.split_fastq_by_RG.sh {sample}/downloads/{fname}".format(
@@ -74,10 +80,12 @@ def submit_pre_jobs_fastq(sample, fname, loc):
 
     return jid
 
-def submit_pre_jobs_bam(sample, fname, loc):
-    jid = q.submit(opt(sample), 
+def submit_pre_jobs_bam(sample, fname, loc, jid=None):
+    jid = q.submit(opt(sample, jid), 
         "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
             job_home=job_home, sample=sample, fname=fname, loc=loc))
+    global down_jid
+    down_jid = jid
 
     jid = q.submit(opt(sample, jid), 
         "{job_home}/pre_1b.bam2fastq.sh {sample} {fname}".format(
@@ -99,6 +107,9 @@ def submit_aln_jobs(sample, jid):
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Genome Mapping Pipeline')
+    parser.add_argument('--con-down-limit', metavar='int', type=int,
+        help='''The maximum allowded number of concurrent downloads
+        [ Default: None ]''', default=5)
     parser.add_argument('--upload', metavar='syn123', 
         help='''Synapse ID of project or folder where to upload result cram files. 
         If it is not set, the result cram files will be locally saved.
