@@ -3,7 +3,7 @@
 import argparse
 import os
 import sys
-from collections import defaultdict
+from collections import defaultdict, deque
 
 cmd_home = os.path.dirname(os.path.realpath(__file__))
 pipe_home = os.path.normpath(cmd_home + "/..")
@@ -22,8 +22,8 @@ def main():
     synapse_login()
     nda_login()
 
-    global down_jid
-    down_jid = None
+    global down_jid_queue
+    down_jid_queue = deque([None] * args.con_down_limit)
 
     samples = sample_list(args.sample_list)
     for i, (key, val) in enumerate(samples.items()):
@@ -49,10 +49,10 @@ def main():
         else:
             run_info_append(f_run_info, "RUN_GATK_HC={}".format(args.run_gatk_hc))
 
-        if i < args.con_down_limit: down_jid = None
         jid_list = []
         for sdata in val:
             fname, loc = sdata
+            down_jid = down_jid_queue.popleft()
             if filetype == "bam":
                 jid_list.append(submit_pre_jobs_bam(sample, fname, loc, down_jid))
             else:
@@ -71,8 +71,8 @@ def submit_pre_jobs_fastq(sample, fname, loc, jid=None):
     jid = q.submit(opt(sample, jid), 
         "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
             job_home=job_home, sample=sample, fname=fname, loc=loc))
-    global down_jid
-    down_jid = jid
+    global down_jid_queue
+    down_jid_queue.append(jid)
     
     jid = q.submit(opt(sample, jid),
         "{job_home}/pre_2.split_fastq_by_RG.sh {sample}/downloads/{fname}".format(
@@ -84,8 +84,8 @@ def submit_pre_jobs_bam(sample, fname, loc, jid=None):
     jid = q.submit(opt(sample, jid), 
         "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
             job_home=job_home, sample=sample, fname=fname, loc=loc))
-    global down_jid
-    down_jid = jid
+    global down_jid_queue
+    down_jid_queue.append(jid)
 
     jid = q.submit(opt(sample, jid), 
         "{job_home}/pre_1b.bam2fastq.sh {sample} {fname}".format(
@@ -109,7 +109,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Genome Mapping Pipeline')
     parser.add_argument('--con-down-limit', metavar='int', type=int,
         help='''The maximum allowded number of concurrent downloads
-        [ Default: None ]''', default=5)
+        [ Default: 5 ]''', default=5)
     parser.add_argument('--upload', metavar='syn123', 
         help='''Synapse ID of project or folder where to upload result cram files. 
         If it is not set, the result cram files will be locally saved.
