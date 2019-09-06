@@ -15,7 +15,7 @@ export PATH=$(dirname $JAVA):$PATH
 
 set -eu -o pipefail
 
-DONE=$SM/run_status/gatk-hc_2.concat_vcf.done
+DONE=$SM/run_status/gatk-hc_2.concat_vcf.ploidy_$PL.done
 
 CHRS="$(seq 1 22) X Y"
 CHR_RAW_VCFS=""
