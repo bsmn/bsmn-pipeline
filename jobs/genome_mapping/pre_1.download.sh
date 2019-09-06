@@ -41,7 +41,7 @@ else
             }
             $AWS s3 cp --no-progress $LOC $SM/downloads/ && { rc=$?; break; } || rc=$?
         else
-            ls -lh $LOC && ln -sf $(readlink -f $LOC) $SM/downloads/ || rc=$?
+            ls -lh $LOC && ln -sf $(readlink -f $LOC) $SM/downloads/$FNAME || rc=$?
             break
         fi
         n=$((n+1))
