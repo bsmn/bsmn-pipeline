@@ -15,7 +15,7 @@ export PATH=$(dirname $JAVA):$PATH
 
 set -eu -o pipefail
 
-DONE=$SM/run_status/gatk-hc_3.vqsr.done
+DONE=$SM/run_status/gatk-hc_3.vqsr.ploidy_$PL.done
 
 RAW_VCF=$SM/gatk-hc/$SM.ploidy_$PL.raw.vcf.gz
 RECAL_VCF_SNP=$SM/gatk-hc/$SM.ploidy_$PL.snps.vcf.gz
