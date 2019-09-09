@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 1
+#$ -pe threaded 12
 
 trap "exit 100" ERR
 
