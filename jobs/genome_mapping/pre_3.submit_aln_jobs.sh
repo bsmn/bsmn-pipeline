@@ -18,7 +18,7 @@ set -o pipefail
 
 printf -- "---\n[$(date)] Start submit aln jobs.\n"
 
-ssh -o StrictHostKeyChecking=No $SGE_O_HOST \
+ssh -o StrictHostKeyChecking=no $SGE_O_HOST \
     "cd $SGE_O_WORKDIR; $PYTHON3 $PIPE_HOME/jobs/submit_aln_jobs.py --sample-name $SM"
 
 printf -- "[$(date)] Finish submit aln jobs.\n---\n"
