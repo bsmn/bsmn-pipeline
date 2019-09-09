@@ -30,7 +30,7 @@ else
 
     JID=$(cat $SM/*/hold_jid|xargs|sed 's/ /,/g')
     ssh -o StrictHostKeyChecking=no $SGE_O_HOST \
-        "cd $SGE_O_WORKDIR; qsub -hold_jid $JID -o $SM/logs -j yes $PIPE_HOME/jobs/genome_mapping/post_4.delete_cram.sh $SM"
+        "bash --login -c 'cd $SGE_O_WORKDIR; qsub -hold_jid $JID -o $SM/logs -j yes $PIPE_HOME/jobs/genome_mapping/post_4.delete_cram.sh $SM'"
 
     touch $DONE
 fi
