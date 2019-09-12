@@ -23,7 +23,8 @@ printf -- "---\n[$(date)] Start merge_bam.\n"
 if [[ -f $DONE ]]; then
     echo "Skip this step."
 else
-    rmdir $SM/downloads $SM/fastq
+    [[ -d $SM/downloads ]] && rmdir $SM/downloads
+    [[ -d $SM/fastq ]] && rmdir $SM/fastq
 
     if [[ $(ls $SM/alignment/$SM.*.sorted.bam|wc -l) == 1 ]]; then
         mv $SM/alignment/$SM.*.sorted.bam $SM/alignment/$SM.merged.bam
