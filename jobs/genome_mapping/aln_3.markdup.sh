@@ -23,7 +23,7 @@ printf -- "---\n[$(date)] Start markdup.\n"
 if [[ -f $DONE ]]; then
     echo "Skip this step."
 else
-    $JAVA -Xmx26G -jar $PICARD MarkDuplicates \
+    $JAVA -Xmx30G -jar $PICARD MarkDuplicates \
         I=$SM/alignment/$SM.merged.bam \
         O=$SM/alignment/$SM.markduped.bam \
         METRICS_FILE=$SM/alignment/markduplicates_metrics.txt \
