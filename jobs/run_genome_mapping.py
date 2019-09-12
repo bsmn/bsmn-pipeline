@@ -109,7 +109,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Genome Mapping Pipeline')
     parser.add_argument('--con-down-limit', metavar='int', type=int,
         help='''The maximum allowded number of concurrent downloads
-        [ Default: 5 ]''', default=5)
+        [ Default: 6 ]''', default=6)
     parser.add_argument('--upload', metavar='syn123', 
         help='''Synapse ID of project or folder where to upload result cram files. 
         If it is not set, the result cram files will be locally saved.
