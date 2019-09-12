@@ -48,6 +48,7 @@ else
         printf "[$(date)] Download try $n failed.\n\n"
     done
     [[ $rc -eq 0 ]] || false
+    rm -f $SM/downloads/$FNAME.*
     touch $DONE
 fi
 
