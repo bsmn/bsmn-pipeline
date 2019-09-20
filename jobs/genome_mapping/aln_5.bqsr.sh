@@ -29,7 +29,7 @@ else
         -I $SM/alignment/$SM.realigned.bam \
         -o $SM/alignment/recal_data.table
 
-    printf -- "---\n[$(date)] Start BQSR recal_table.\n"
+    printf -- "---\n[$(date)] Finish BQSR recal_table.\n"
     printf -- "---\n[$(date)] Start BQSR PrintReads.\n---\n"
 
     $JAVA -Xmx58G -jar $GATK \
