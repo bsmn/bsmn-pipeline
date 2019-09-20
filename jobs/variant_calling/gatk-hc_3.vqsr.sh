@@ -2,6 +2,8 @@
 #$ -cwd
 #$ -pe threaded 8
 
+trap "exit 100" ERR
+
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) <sample name> <ploidy>"
     exit 1
