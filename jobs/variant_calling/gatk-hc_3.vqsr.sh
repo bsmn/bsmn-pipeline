@@ -51,6 +51,7 @@ else
         -an ReadPosRankSum \
         --mode SNP \
         --max-gaussians 4 \
+        --maximum-training-variants 5000000 \
         -tranche 100.0 -tranche 99.9 -tranche 99.0 -tranche 90.0 \
         -O $RECAL_SNP \
         --tranches-file $TRANCHES_SNP \
