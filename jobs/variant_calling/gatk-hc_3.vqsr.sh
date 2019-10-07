@@ -17,7 +17,10 @@ export PATH=$(dirname $JAVA):$PATH
 
 set -eu -o pipefail
 
-DONE=$SM/run_status/gatk-hc_3.vqsr.ploidy_$PL.done
+DONE1=$SM/run_status/gatk-hc_3.vqsr.ploidy_$PL.1-recal_snp.done
+DONE2=$SM/run_status/gatk-hc_3.vqsr.ploidy_$PL.2-apply_snp.done
+DONE3=$SM/run_status/gatk-hc_3.vqsr.ploidy_$PL.3-recal_indel.done
+DONE4=$SM/run_status/gatk-hc_3.vqsr.ploidy_$PL.4-apply_indel.done
 
 RAW_VCF=$SM/gatk-hc/$SM.ploidy_$PL.raw.vcf.gz
 RECAL_VCF_SNP=$SM/gatk-hc/$SM.ploidy_$PL.snps.vcf.gz
@@ -31,8 +34,8 @@ TRANCHES_INDEL=$SM/gatk-hc/$SM.recalibrate_INDEL.ploidy_$PL.tranches
 
 printf -- "---\n[$(date)] Start VQSR.\n" 
 
-if [[ -f $DONE ]]; then
-    echo "Skip this step."
+if [[ -f $DONE1 ]]; then
+    echo "Skip the recal_snp step."
 else
     $GATK4 --java-options "-Xmx24G -XX:-UseParallelGC" \
         VariantRecalibrator \
@@ -56,7 +59,11 @@ else
         -O $RECAL_SNP \
         --tranches-file $TRANCHES_SNP \
 #        --rscript-file $RSCRIPT_SNP
-
+    touch $DONE1
+fi
+if [[ -f $DONE2 ]]; then
+    echo "Skip the apply_snp step."
+else
     $GATK4 --java-options "-Xmx24G -XX:-UseParallelGC" \
         ApplyVQSR \
         -R $REF \
@@ -66,7 +73,11 @@ else
         --recal-file $RECAL_SNP \
         --tranches-file $TRANCHES_SNP \
         -O $RECAL_VCF_SNP
-
+    touch $DONE2
+fi
+if [[ -f $DONE3 ]]; then
+    echo "Skip the recal_indel step."
+else
     $GATK4 --java-options "-Xmx24G -XX:-UseParallelGC" \
         VariantRecalibrator \
         -R $REF \
@@ -85,7 +96,11 @@ else
         -O $RECAL_INDEL \
         --tranches-file $TRANCHES_INDEL \
 #        --rscript-file $RSCRIPT_INDEL
-
+    touch $DONE3
+fi
+if [[ -f $DONE4 ]]; then
+    echo "Skip the apply_indel step."
+else
     $GATK4 --java-options "-Xmx24G -XX:-UseParallelGC" \
         ApplyVQSR \
         -R $REF \
@@ -100,7 +115,7 @@ else
         $RECAL_VCF_SNP $RECAL_VCF_SNP.tbi \
         $RECAL_SNP $RECAL_SNP.idx $TRANCHES_SNP \
         $RECAL_INDEL $RECAL_INDEL.idx $TRANCHES_INDEL
-    touch $DONE
+    touch $DONE4
 fi
 
 printf -- "[$(date)] Finish VQSR.\n---\n"
