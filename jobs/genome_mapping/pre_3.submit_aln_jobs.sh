@@ -18,6 +18,10 @@ set -o pipefail
 
 printf -- "---\n[$(date)] Start submit aln jobs.\n"
 
+for jid in $(awk -v job_id=$JOB_ID '$1 > job_id' $SM/run_jid);do
+    qdel $jid
+done
+
 ssh -o StrictHostKeyChecking=no $SGE_O_HOST \
     "bash --login -c 'cd $SGE_O_WORKDIR; $PYTHON3 $PIPE_HOME/jobs/submit_aln_jobs.py --sample-name $SM'"
 
