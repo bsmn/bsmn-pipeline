@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 16
+#$ -pe threaded 8
 
 trap "exit 100" ERR
 
@@ -16,18 +16,39 @@ source $(pwd)/$SM/run_info
 set -o nounset
 set -o pipefail
 
+DONE1=$SM/run_status/pre_2.bam2cram.1-sam.done
+DONE2=$SM/run_status/pre_2.bam2cram.2-cram.done
+DONE3=$SM/run_status/pre_2.bam2cram.3-index.done
+
 BAM=$SM/alignment/$SM.bam
+SAM=$SM/alignment/$SM.sam
 CRAM=$SM/alignment/$SM.cram
 
 printf -- "---\n[$(date)] Start bam2cram: $BAM\n"
-if [[ -f $CRAM.crai ]]; then
-    echo "Skip this step."
+
+if [[ -f $DONE1 ]]; then
+    echo "Skip the sam generation step."
 else
-    $SAMTOOLS view -@7 -h $BAM \
-        |sed "s/\tB[ID]\:Z\:[^\t]*//g;s/\tOQ\:Z\:[^\t]*//" \
-        |$SAMTOOLS view -@7 -C -T $REF -o $CRAM
-#        |parallel -j5 --pipe 'sed "s/\tB[ID]\:Z\:[^\t]*//g;s/\tOQ\:Z\:[^\t]*//"' \
-#        |$SAMTOOLS view -@5 -C -T $REF -o $CRAM
-    $SAMTOOLS index $CRAM
+    $SAMBAMBA view -t $NSLOTS -h $BAM > $SAM1
+    rm $SM/alignment/$SM.ba*
+    touch $DONE1
 fi
+
+if [[ -f $DONE2 ]]; then
+    echo "Skip the cram generation step."
+else
+    parallel -a $SAM1 -j $((NSLOTS-2)) -k --pipepart \
+        'sed "s/\tB[ID]\:Z\:[^\t]*//g;s/\tOQ\:Z\:[^\t]*//"' \
+        |$SAMTOOLS view -@ $((NSLOTS-6)) -C -T $REF -o $CRAM
+    rm $SAM
+    touch $DONE2
+fi
+
+if [[ -f $DONE3 ]]; then
+    echo "Skip the cram indexing step."
+else
+    $SAMTOOLS index $CRAM
+    touch $DONE3
+fi
+
 printf -- "[$(date)] Finish bam2cram: $BAM\n---\n"

@@ -5,7 +5,7 @@
 trap "exit 100" ERR
 
 if [[ $# -lt 3 ]]; then
-    echo "Usage: $(basename $0) [sample name] [file name] [location]"
+    echo "Usage: $(basename $0) <sample name> <file name> <location>"
     false
 fi
 
