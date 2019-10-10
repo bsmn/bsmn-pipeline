@@ -55,10 +55,10 @@ def main():
         jid_list = []
         for fname, loc in sdata:
             down_jid = down_jid_queue.popleft()
-            jid_list.append(
-                q.submit(opt(sample, down_jid), 
+            jid = q.submit(opt(sample, down_jid), 
                     "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
-                        job_home=job_home, sample=sample, fname=fname, loc=loc)))
+                        job_home=job_home, sample=sample, fname=fname, loc=loc))
+            jid_list.append(jid)
             down_jid_queue.append(jid)
         jid = ",".join(jid_list)
 
