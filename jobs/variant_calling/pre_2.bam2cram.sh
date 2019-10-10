@@ -29,7 +29,7 @@ printf -- "---\n[$(date)] Start bam2cram: $BAM\n"
 if [[ -f $DONE1 ]]; then
     echo "Skip the sam generation step."
 else
-    $SAMBAMBA view -t $NSLOTS -h $BAM > $SAM1
+    $SAMBAMBA view -t $NSLOTS -h $BAM > $SAM
     rm $SM/alignment/$SM.ba*
     touch $DONE1
 fi
@@ -37,7 +37,7 @@ fi
 if [[ -f $DONE2 ]]; then
     echo "Skip the cram generation step."
 else
-    parallel -a $SAM1 -j $((NSLOTS-2)) -k --pipepart \
+    parallel -a $SAM -j $((NSLOTS-2)) -k --pipepart \
         'sed "s/\tB[ID]\:Z\:[^\t]*//g;s/\tOQ\:Z\:[^\t]*//"' \
         |$SAMTOOLS view -@ $((NSLOTS-6)) -C -T $REF -o $CRAM
     rm $SAM
