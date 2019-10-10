@@ -26,8 +26,7 @@ def main():
     down_jid_queue = deque([None] * args.con_down_limit)
 
     samples = sample_list(args.sample_list)
-    for i, (key, val) in enumerate(samples.items()):
-        sample, filetype = key
+    for (sample, filetype), sdata in samples.items():
         print("- Sample: " + sample)
 
         f_run_jid = sample + "/run_jid"
@@ -49,15 +48,11 @@ def main():
         else:
             run_info_append(f_run_info, "RUN_GATK_HC={}".format(args.run_gatk_hc))
 
-        jid_list = []
-        for sdata in val:
-            fname, loc = sdata
-            down_jid = down_jid_queue.popleft()
-            if filetype == "bam":
-                jid_list.append(submit_pre_jobs_bam(sample, fname, loc, down_jid))
-            else:
-                jid_list.append(submit_pre_jobs_fastq(sample, fname, loc, down_jid))
-            jid = ",".join(jid_list)
+        if filetype == "bam":
+            jid = submit_pre_jobs_bam(sample, sdata)
+        else:
+            jid = submit_pre_jobs_fastq(sample, sdata)
+
         submit_aln_jobs(sample, jid)
         print()
 
@@ -67,24 +62,34 @@ def opt(sample, jid=None):
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt
 
-def submit_pre_jobs_fastq(sample, fname, loc, jid=None):
-    jid = q.submit(opt(sample, jid), 
-        "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
-            job_home=job_home, sample=sample, fname=fname, loc=loc))
+def submit_pre_jobs_fastq(sample, sdata):
     global down_jid_queue
-    down_jid_queue.append(jid)
-    
-    jid = q.submit(opt(sample, jid),
-        "{job_home}/pre_2.split_fastq_by_RG.sh {sample}/downloads/{fname}".format(
-            job_home=job_home, sample=sample, fname=fname))
+
+    jid_list = []
+    for fname, loc in sdata:
+        down_jid = down_jid_queue.popleft()
+        jid = q.submit(opt(sample, down_jid), 
+            "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
+                job_home=job_home, sample=sample, fname=fname, loc=loc))
+        down_jid_queue.append(jid)
+
+        jid = q.submit(opt(sample, jid),
+            "{job_home}/pre_2.split_fastq_by_RG.sh {sample}/downloads/{fname}".format(
+                job_home=job_home, sample=sample, fname=fname))
+        jid_list.append(jid)
+
+    jid = ",".join(jid_list)
 
     return jid
 
-def submit_pre_jobs_bam(sample, fname, loc, jid=None):
-    jid = q.submit(opt(sample, jid), 
+def submit_pre_jobs_bam(sample, sdata):
+    global down_jid_queue
+    down_jid = down_jid_queue.popleft()
+
+    jid = q.submit(opt(sample, down_jid), 
         "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
             job_home=job_home, sample=sample, fname=fname, loc=loc))
-    global down_jid_queue
+
     down_jid_queue.append(jid)
 
     jid = q.submit(opt(sample, jid), 
