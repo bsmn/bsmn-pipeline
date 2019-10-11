@@ -37,10 +37,11 @@ fi
 if [[ -f $DONE2 ]]; then
     echo "Skip the cram generation step."
 else
-    parallel -a $SAM -j $((NSLOTS-2)) -k --pipepart \
+    mkdir -p $SM/tmp
+    parallel --tmpdir $SM/tmp -a $SAM -j $((NSLOTS-2)) -k --pipepart \
         'sed "s/\tB[ID]\:Z\:[^\t]*//g;s/\tOQ\:Z\:[^\t]*//"' \
         |$SAMTOOLS view -@ $((NSLOTS-6)) -C -T $REF -o $CRAM
-    rm $SAM
+    rm -r $SAM $SM/tmp
     touch $DONE2
 fi
 
