@@ -29,6 +29,7 @@ printf -- "---\n[$(date)] Start bam2cram: $BAM\n"
 if [[ -f $DONE1 ]]; then
     echo "Skip the sam generation step."
 else
+    [[ -f $SAM ]] && rm $SAM
     $SAMBAMBA view -t $NSLOTS -h $BAM > $SAM
     rm $SM/alignment/$SM.ba*
     touch $DONE1
