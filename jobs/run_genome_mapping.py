@@ -2,8 +2,9 @@
 
 import argparse
 import os
+import re
 import sys
-from collections import defaultdict, deque
+from collections import deque
 
 cmd_home = os.path.dirname(os.path.realpath(__file__))
 pipe_home = os.path.normpath(cmd_home + "/..")
@@ -65,24 +66,34 @@ def opt(sample, jid=None):
 def submit_pre_jobs_fastq(sample, sdata):
     global down_jid_queue
 
-    jid_list = []
+    jid_per_read = {"R1":[], "R2":[]}
+    fq_per_read = {"R1":[], "R2":[]}
     for fname, loc in sdata:
+        read = "R1" if re.search("(.R1|_R1|_r1|_1)(|_001).f(|ast)q(|.gz)", fname) else "R2"
+
         down_jid = down_jid_queue.popleft()
         jid = q.submit(opt(sample, down_jid), 
             "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
                 job_home=job_home, sample=sample, fname=fname, loc=loc))
         down_jid_queue.append(jid)
 
-        jid = q.submit(opt(sample, jid),
-            "{job_home}/pre_2.split_fastq_by_RG.sh {sample}/downloads/{fname}".format(
-                job_home=job_home, sample=sample, fname=fname))
-        jid_list.append(jid)
+        jid_per_read[read].append(jid)
+        fq_per_read[read].append("{}/downloads/{}".format(sample, fname))
 
+    jid_list = []
+    for read in ["R1", "R2"]:
+        fq_files = " ".join(sorted(fq_per_read[read]))
+        jid = ",".join(jid_per_read[read])
+        jid_list.append(q.submit(opt(sample, jid),
+            "{job_home}/pre_2.split_fastq_by_RG.sh {fq_files}".format(
+                job_home=job_home, fq_files=fq_files)))
     jid = ",".join(jid_list)
 
     return jid
 
 def submit_pre_jobs_bam(sample, sdata):
+    fname, loc = sdata
+
     global down_jid_queue
     down_jid = down_jid_queue.popleft()
 
