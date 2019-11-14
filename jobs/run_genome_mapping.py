@@ -92,7 +92,7 @@ def submit_pre_jobs_fastq(sample, sdata):
     return jid
 
 def submit_pre_jobs_bam(sample, sdata):
-    fname, loc = sdata
+    fname, loc = sdata[0]
 
     global down_jid_queue
     down_jid = down_jid_queue.popleft()
