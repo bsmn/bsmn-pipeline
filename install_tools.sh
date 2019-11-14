@@ -189,8 +189,8 @@ fi
 unset DIR URL SAMURL ROOTSYS
 
 # Installing Picard
-DIR=$WD/tools/picard/2.12.1
-URL="https://github.com/broadinstitute/picard/releases/download/2.12.1/picard.jar"
+DIR=$WD/tools/picard/2.17.4
+URL="https://github.com/broadinstitute/picard/releases/download/2.17.4/picard.jar"
 if [[ ! -f $DIR/installed ]]; then
     mkdir -p $DIR
     cd $DIR
