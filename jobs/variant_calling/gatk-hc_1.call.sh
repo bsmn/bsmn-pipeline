@@ -37,7 +37,7 @@ printf -- "---\n[$(date)] Start HC_GVCF: ploidy_$PL, chr$CHR\n"
 if [[ -f $DONE1 ]]; then
     echo "Skip the gvcf step."
 else
-    mkdir -p $SM/gatk-hc
+    mkdir -p $SM/gatk-hc tmp
     $GATK4 --java-options "-Xmx52G -Djava.io.tmpdir=tmp -XX:-UseParallelGC" \
         HaplotypeCaller \
         --native-pair-hmm-threads $NSLOTS \

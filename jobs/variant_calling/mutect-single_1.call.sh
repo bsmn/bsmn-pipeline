@@ -30,7 +30,7 @@ CHR_VCF=$SM/mutect-single/$SM.$CHR.vcf
 printf -- "---\n[$(date)] Starting Mutect2 single sample calling.\n".
 
 if [[ ! -f $VCF ]]; then
-    mkdir -p $SM/mutect-single
+    mkdir -p $SM/mutect-single tmp
     $GATK4 --java-options "-Xmx26G -Djava.io.tmpdir=tmp -XX:-UseParallelGC" \
         Mutect2 \
         -R $REF \
