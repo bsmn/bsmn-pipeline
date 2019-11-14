@@ -28,7 +28,7 @@ else
 
     if [[ $(ls $SM/alignment/$SM.*.sorted.bam|wc -l) == 1 ]]; then
         mv $SM/alignment/$SM.*.sorted.bam $SM/alignment/$SM.merged.bam
-        rm $SM/alignment/$SM.*.sorted.bam.bai
+        mv $SM/alignment/$SM.*.sorted.bam.bai $SM/alignment/$SM.merged.bam.bai
     else
         $SAMBAMBA merge -t $NSLOTS $SM/alignment/$SM.merged.bam $SM/alignment/$SM.*.sorted.bam
         rm $SM/alignment/$SM.*.sorted.bam{,.bai}
