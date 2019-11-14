@@ -21,7 +21,7 @@ DONE2=$SM/run_status/aln_5.bqsr.2-print_reads.done
 DONE3=$SM/run_status/aln_5.bqsr.3-indexing.done
 DONE4=$SM/run_status/aln_5.bqsr.4-flagstat.done
 
-printf -- "---\n[$(date)] Start BQSR recal_table.\n"
+printf -- "---\n[$(date)] Start BQSR recal_table.\n---\n"
 
 if [[ -f $DONE1 ]]; then
     echo "Skip the recal_table step."
