@@ -67,6 +67,8 @@ printf -- "[$(date)] Finish indexing: $SM.cram\n---\n"
 printf -- "---\n[$(date)] Start flagstat: $SM.cram\n"
 
 if [[ -f $DONE4 ]]; then
+    echo "Skip the flagstat step."
+else
     $SAMTOOLS flagstat -@ $NSLOTS $SM/alignment/$SM.cram > $SM/alignment/flagstat.txt
     touch $DONE4
 fi
