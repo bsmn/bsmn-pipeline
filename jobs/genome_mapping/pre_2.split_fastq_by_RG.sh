@@ -17,7 +17,7 @@ source $(pwd)/$SM/run_info
 set -o nounset
 set -o pipefail
 
-if [[ ${FQ_L[0]} =~ (.R1|_R1|_r1|_1)(|_001).f(|ast)q(|.gz) ]]; then
+if [[ ${FQ_L[0]} =~ (\.R1|_R1|_r1|_1)(|_001)\.f(|ast)q(|\.gz) ]]; then
     RD=R1
 else
     RD=R2
