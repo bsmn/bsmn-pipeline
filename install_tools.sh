@@ -21,7 +21,10 @@ fi
 
 # Installing Python modules needed
 $DIR/bin/pip3 install -Uq pip
-$DIR/bin/pip install -Uq awscli synapseclient statsmodels scipy rpy2 # for bsmn_pipeline itself
+$DIR/bin/pip install -Uq awscli synapseclient statsmodels scipy # for bsmn_pipeline itself
+if false; then
+$DIR/bin/pip install -Uq rpy2 # for bsmn_pipeline itself 
+fi
 $DIR/bin/pip install -Uq pysam numpy pandas pysamstats regex scipy pyfaidx # for MosaicForecast
 $DIR/bin/pip install -Uq cutadapt # for RetroSom
 
@@ -200,9 +203,11 @@ if [[ ! -f $DIR/installed ]]; then
 fi
 unset DIR URL
 
+if false; then
 # Installing GATK3
 DIR=$WD/tools/gatk/3.7-0
-URL="https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.7-0-gcfedb67"
+URL="https://storage.cloud.google.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2"
+#URL="https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.7-0-gcfedb67"
 if [[ ! -f $DIR/installed ]]; then
     mkdir -p $DIR
     cd $DIR
@@ -211,6 +216,7 @@ if [[ ! -f $DIR/installed ]]; then
     touch $DIR/installed
 fi
 unset DIR URL
+fi
 
 # Installing GATK4
 DIR=$WD/tools/gatk/4.1-2
@@ -272,6 +278,8 @@ for CMD in wigToBigWig bigWigAverageOverBed fetchChromSizes; do
 done
 cd $WD
 
+if false; then
+
 # Installing Perl and modules needed
 DIR=$WD/tools/perl/5.28.1
 URL="https://www.cpan.org/src/5.0/perl-5.28.1.tar.gz"
@@ -293,6 +301,8 @@ for MD in GD GD::Arrow GD::SVG Parallel::ForkManager; do
     wget -qO- https://cpanmin.us |$DIR/bin/perl - $MD
 done
 unset DIR URL
+
+fi
 
 # Installing RetroSom and depending tools
 DIR=$WD/tools/bedtools/2.28.0

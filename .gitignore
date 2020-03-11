@@ -3,7 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.swq
+*.swp
 
 # tools / resources directories
 /tools/
 /resources/
+/downloads/
