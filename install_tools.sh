@@ -4,40 +4,45 @@ set -o errexit -o nounset -o pipefail -o xtrace
 
 WD=$(pwd)
 
-# Installing Python3
-DIR=$WD/tools/python/3.6.2
+# Installing Python3 is ommited because linux distributions like Amazon linux come with Python3.
+# Amazon linux has pyenv installed but to make Python3 accessible from the PATH the PYENV_VERSION
+# environmental variable must be set to the Python3 version installed by pyenv and then exported.
+# To do so add the following line (after checking the installed Python3 version with `pyenv
+# versions`) to ~/.bashrc:
+#
+# export PYENV_VERSION=3.6.9
+#
+# Note that pip/pip3 need not be installed either because it also comes with linuxes.
+#
 
-# BEGINNING OF SKIP
-if false; then
-
-URL="https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tgz"
-if [[ ! -f $DIR/installed ]]; then
-    mkdir -p $DIR/src
-    cd $DIR/src
-    wget -qO- $URL |tar xvz --strip-components=1
-    ./configure --with-ensurepip=install --prefix=$DIR 
-    make
-    make install
-    cd $WD
-    rm -r $DIR/src
-    touch $DIR/installed
-fi
-
-# END OF SKIP
-fi
+#DIR=$WD/tools/python/3.6.2
+#
+#URL="https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tgz"
+#if [[ ! -f $DIR/installed ]]; then
+#    mkdir -p $DIR/src
+#    cd $DIR/src
+#    wget -qO- $URL |tar xvz --strip-components=1
+#    ./configure --with-ensurepip=install --prefix=$DIR 
+#    make
+#    make install
+#    cd $WD
+#    rm -r $DIR/src
+#    touch $DIR/installed
+#fi
 
 # Installing Python modules needed
-$DIR/bin/pip3 install -Uq pip
-exit
+#$DIR/bin/pip3 install -Uq pip
 
-$DIR/bin/pip install -Uq awscli synapseclient statsmodels scipy # for bsmn_pipeline itself
-if false; then
-$DIR/bin/pip install -Uq rpy2 # for bsmn_pipeline itself 
-fi
-$DIR/bin/pip install -Uq pysam numpy pandas pysamstats regex scipy pyfaidx # for MosaicForecast
-$DIR/bin/pip install -Uq cutadapt # for RetroSom
+# for bsmn_pipeline itself
+python3 -m pip install -U --user awscli synapseclient statsmodels scipy awscli synapseclient statsmodels scipy 
+# rpy2 fails to install with "gcc: error: libgomp.spec: No such file or directory"
+#python3 -m pip install -U --user rpy2 
 
-unset DIR URL
+# for MosaicForecast
+python3 -m pip install -U --user pysam numpy pandas pysamstats regex scipy pyfaidx 
+
+# for RetroSom
+python3 -m pip install -U --user cutadapt 
 
 # Installling Java8
 DIR=$WD/tools/java/jdk1.8.0_222
@@ -55,6 +60,7 @@ if [[ ! -f $DIR/installed ]]; then
 fi
 unset DIR URL
 
+exit
 # Installing bwa
 DIR=$WD/tools/bwa/0.7.16a
 URL="https://github.com/lh3/bwa/releases/download/v0.7.16/bwa-0.7.16a.tar.bz2"
