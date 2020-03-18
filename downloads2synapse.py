@@ -28,6 +28,7 @@ def files2synapse(subd, maind, downloadsFolder, syn):
     description = 'Used by the BSMN pipeline'
     flist = list()
     for s in glob.glob(fullsubd + os.sep + '*'):
+        print('Checking', s)
         flist.append(s)
         f = synapseclient.File(s, description=description, parent=folder)
         syn.store(f)
