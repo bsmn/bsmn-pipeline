@@ -6,6 +6,10 @@ WD=$(pwd)
 
 # Installing Python3
 DIR=$WD/tools/python/3.6.2
+
+# BEGINNING OF SKIP
+if false; then
+
 URL="https://www.python.org/ftp/python/3.6.2/Python-3.6.2.tgz"
 if [[ ! -f $DIR/installed ]]; then
     mkdir -p $DIR/src
@@ -19,8 +23,13 @@ if [[ ! -f $DIR/installed ]]; then
     touch $DIR/installed
 fi
 
+# END OF SKIP
+fi
+
 # Installing Python modules needed
 $DIR/bin/pip3 install -Uq pip
+exit
+
 $DIR/bin/pip install -Uq awscli synapseclient statsmodels scipy # for bsmn_pipeline itself
 if false; then
 $DIR/bin/pip install -Uq rpy2 # for bsmn_pipeline itself 
