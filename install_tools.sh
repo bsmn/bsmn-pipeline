@@ -80,6 +80,24 @@ if [[ ! -f $DIR/installed ]]; then
 fi
 unset DIR
 
+# Installing zlib
+DIR=$WD/tools/zlib/1.2.11
+synID=syn21785275
+#URL=https://zlib.net/zlib-1.2.11.tar.gz
+if [[ ! -f $DIR/installed ]]; then
+    mkdir -p $DIR/src
+    cd $DIR/src
+    synapse get $synID
+    tar xvzf $(realpath *) --strip-components=1
+    ./configure --prefix=$DIR
+    make
+    make install
+    cd $WD
+    rm -r $DIR/src
+    touch $DIR/installed
+fi
+unset DIR
+
 # Installing htslib
 DIR=$WD/tools/htslib/1.7
 synID=syn21783517
