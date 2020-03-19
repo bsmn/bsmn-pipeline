@@ -225,7 +225,7 @@ unset DIR
 
 # Installing GATK3
 DIR=$WD/tools/gatk/3.7-0
-synID=syn21782355
+synID=syn21785087
 #URL="https://storage.cloud.google.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2"
 # The URL below is now defunct
 #URL="https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.7-0-gcfedb67"
@@ -258,15 +258,21 @@ if [[ ! -f $DIR/installed ]]; then
     touch $DIR/installed
 fi
 unset DIR
-exit
 
 # Installing R
+# This step is skipped because the following error occurred:
+#collect2: error: ld returned 1 exit status
+#Makefile:145: recipe for target 'R.bin' failed
+if false; then
 DIR=$WD/tools/r/3.6.1
-URL="https://cran.r-project.org/src/base/R-3/R-3.6.1.tar.gz"
+synID=syn21782263
+#URL="https://cran.r-project.org/src/base/R-3/R-3.6.1.tar.gz"
 if [[ ! -f $DIR/installed ]]; then
     mkdir -p $DIR/src
     cd $DIR/src
-    wget -qO- $URL |tar xvz --strip-components=1
+    synapse get $synID
+    tar xvzf $(realpath *) --strip-components=1
+    #wget -qO- $URL |tar xvz --strip-components=1
     ./configure --prefix=$DIR
     make
     make install
@@ -275,7 +281,7 @@ if [[ ! -f $DIR/installed ]]; then
     touch $DIR/installed
 fi
 
-# Insatlling R packages needed
+# Installing R packages needed
 $DIR/bin/R --no-save <<'RCODE'
 # for MosaicForecast
 install.packages(setdiff(
@@ -287,7 +293,7 @@ install.packages(setdiff(
     c("randomForest", "glmnet", "e1071", "PRROC"), 
     installed.packages()[,"Package"]), repos="https://cloud.r-project.org")
 RCODE
-unset DIR URL
+unset DIR
 
 # Installing MosaicForecast and depending tools
 cd tools
@@ -303,10 +309,10 @@ for CMD in wigToBigWig bigWigAverageOverBed fetchChromSizes; do
     fi
 done
 cd $WD
-
-if false; then
+fi
 
 # Installing Perl and modules needed
+if false; then
 DIR=$WD/tools/perl/5.28.1
 URL="https://www.cpan.org/src/5.0/perl-5.28.1.tar.gz"
 if [[ ! -f $DIR/installed ]]; then
@@ -322,35 +328,45 @@ if [[ ! -f $DIR/installed ]]; then
     touch $DIR/installed
 fi
 
+
 # Installing Perl modules needed
 for MD in GD GD::Arrow GD::SVG Parallel::ForkManager; do
-    wget -qO- https://cpanmin.us |$DIR/bin/perl - $MD
+    wget -qO- https://cpanmin.us | perl - $MD
+    #wget -qO- https://cpanmin.us |$DIR/bin/perl - $MD
 done
-unset DIR URL
-
+unset DIR
 fi
 
 # Installing RetroSom and depending tools
 DIR=$WD/tools/bedtools/2.28.0
-URL="https://github.com/arq5x/bedtools2/releases/download/v2.28.0/bedtools-2.28.0.tar.gz"
+synID=syn21783519
+#URL="https://github.com/arq5x/bedtools2/releases/download/v2.28.0/bedtools-2.28.0.tar.gz"
 if [[ ! -f $DIR/installed ]]; then
     mkdir -p $DIR/src
     cd $DIR/src
-    wget -qO- $URL |tar xvz --strip-components=1
+    synapse get $synID
+    tar xvzf $(realpath *) --strip-components=1
+    #wget -qO- $URL |tar xvz --strip-components=1
     make
     mv bin ..
     cd $WD
     rm -r $DIR/src
     touch $DIR/installed
 fi
-unset DIR URL
+unset DIR
 
+# Exonerate could not be compiled
+# Makefile:126: recipe for target 'all-recursive' failed
+if false; then
 DIR=$WD/tools/exonerate/2.2.0
-URL="http://ftp.ebi.ac.uk/pub/software/vertebrategenomics/exonerate/exonerate-2.2.0.tar.gz"
+synID=syn21783514
+#URL="http://ftp.ebi.ac.uk/pub/software/vertebrategenomics/exonerate/exonerate-2.2.0.tar.gz"
 if [[ ! -f $DIR/installed ]]; then
     mkdir -p $DIR/src
     cd $DIR/src
-    wget -qO- $URL |tar xvz --strip-components=1
+    synapse get $synID
+    tar xvzf $(realpath *) --strip-components=1
+    #wget -qO- $URL |tar xvz --strip-components=1
     ./configure --prefix=$DIR
     make
     make install
@@ -358,40 +374,46 @@ if [[ ! -f $DIR/installed ]]; then
     rm -r $DIR/src
     touch $DIR/installed
 fi
-unset DIR URL
+unset DIR
+fi
 
 DIR=$WD/tools/bwakit/0.7.15
+synID=syn21783511
 URL="https://sourceforge.net/projects/bio-bwa/files/bwakit/bwakit-0.7.15_x64-linux.tar.bz2/download"
 if [[ ! -f $DIR/installed ]]; then
     mkdir -p $DIR
     cd $DIR
-    wget -qO- $URL |tar xvj --strip-components=1
+    synapse get $synID
+    tar xvjf $(realpath *) --strip-components=1
     cd $WD
     touch $DIR/installed
 fi
-unset DIR URL
+unset DIR
 
 DIR=$WD/tools/fastqc/0.11.8
-URL="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.8.zip"
+synID=syn21782377
+#URL="http://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.8.zip"
 if [[ ! -f $DIR/installed ]]; then
     mkdir -p $DIR/src
     cd $DIR/src
-    wget $URL
+    synapse get $synID
     unzip fastqc*.zip
     mv FastQC/* $DIR
     cd $WD
     rm -r $DIR/src
     touch $DIR/installed
 fi
-unset DIR URL
+unset DIR
 
 DIR=$WD/tools/blast/2.9.0
-URL="ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.9.0/ncbi-blast-2.9.0+-x64-linux.tar.gz"
+synID=syn21783585
+#URL="ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.9.0/ncbi-blast-2.9.0+-x64-linux.tar.gz"
 if [[ ! -f $DIR/installed ]]; then
     mkdir -p $DIR
     cd $DIR
-    wget -qO- $URL |tar xvz --strip-components=1
+    synapse get $synID
+    tar xvzf $(realpath *) --strip-components=1
     cd $WD
     touch $DIR/installed
 fi
-unset DIR URL
+unset DIR
