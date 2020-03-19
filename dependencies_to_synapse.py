@@ -14,7 +14,7 @@ def files2synapse(subd, maind, downloadsFolder, syn):
     Parameters
     subd: (basename of) subdirectory
     maind: path to main directory
-    downloadsFolder: the object of "bsmn-pipeline-downloads" Synapse folder
+    downloadsFolder: the object of "bsmn-pipeline-dependencies" Synapse folder
     syn: a synapseclient.Synapse object with logged in state
 
     Value: subd and list of file paths
@@ -40,18 +40,18 @@ def main(maind, mainFolderID, syn):
 
     Parameters
     maind: path to main directory
-    mainFolderID: the ID of the Synapse folder or project to contain the "bsmn-pipeline-downloads" folder
+    mainFolderID: the ID of the Synapse folder or project to contain the "bsmn-pipeline-dependencies" folder
     syn: a synapseclient.Synapse object with logged in state
 
     Value: the list of file lists; each file list corresponds to a subdirectory under maind
 
     Details
     The source is all the files in all subdirectories under "maind".  The
-    target is the "bsmn-pipeline-downloads" Synapse folder to be created or
+    target is the "bsmn-pipeline-dependencies" Synapse folder to be created or
     updated under "mainFolderID"
     '''
     # create or update synapse folder named subd
-    downloadsFolder = synapseclient.Folder('bsmn-pipeline-downloads', parent=mainFolderID)
+    downloadsFolder = synapseclient.Folder('bsmn-pipeline-dependencies', parent=mainFolderID)
     downloadsFolder = syn.store(downloadsFolder)
     # get the name of subdirectories in maindir
     paths = glob.glob(maind + os.sep + '*')
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     parser.add_argument('maindir', help='path to "downloads" directory to be \
             uploaded to Synapse')
     parser.add_argument('synapseParentID', help='ID of Synapse Folder where \
-            the "bsmn-pipeline-downloads" folder should be created or \
+            the "bsmn-pipeline-dependencies" folder should be created or \
             updated')
     args = parser.parse_args()
     main(maind=args.maindir, mainFolderID=args.synapseParentID, syn=syn)
