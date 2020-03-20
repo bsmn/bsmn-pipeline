@@ -80,3 +80,14 @@ The `master` branch is protected. To make introduce changes:
 1. Fork this repository
 2. Open a branch with your github username and a short descriptive statement (like `kdaily-update-readme`). If there is an open issue on this repository, name your branch after the issue (like `kdaily-issue-7`).
 3. Open a pull request and request a review.
+
+# Versions
+
+## v1.10 (installfix)
+
+
+## v1.00
+
+This version was used by Taejeong Bae to produce the first batch of AWS cloud based results for the entire BSMN consortium.  Its two main functionalities are:
+* alignment of reads to the hs37d5 reference genome to produce BAM and/or CRAM files
+* calling somatic variants with GATK HaplotypeCaller in its polyploid mode

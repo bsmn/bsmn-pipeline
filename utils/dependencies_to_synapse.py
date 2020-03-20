@@ -7,6 +7,33 @@ import synapseclient
 import synapseutils
 import argparse
 
+# Upload bsmn-pipeline's dependencies (tools and resources) to Synapse
+
+# This script was created as a utility supporting the "installfix" branch of
+# development of the bsmn-pipeline project.  This fix was necessary because
+# some of the URLs of the pipeline's dependencies changed from their earlier
+# values that the install_tools.sh and download_resources.sh used previously.
+
+# To deal with the impermanence of the impermanence of URLs to some of the
+# resources the current fix gathered all resources and stored them on Synapse
+# in a single folder called bsmn-pipeline-dependencies (syn21782058).  Under
+# this main folder, actually, resources and tools are stored in their
+# corresponding subfolders (resources: syn21782062, tools: syn21782261).
+
+# The present script was used for that operation.  Its usage is as follows:
+#
+# > dependencies_to_synapse.py maindir synapseParentID
+#
+# "maindir" is the path to a local directory with its resources and tools
+# subdirectories, each containing dependencies packaged in file archives.
+# "synapseParentID" is the Synapse project or folder where the
+# bsmn-pipeline-dependencies Synapse folder will be created with its own
+# resources and tools Synapse subfolders.
+#
+# maindir
+# |--resources
+# |--tools
+
 def files2synapse(subd, maind, downloadsFolder, syn):
     '''
     Upload all files in subdirectory to Synapse
