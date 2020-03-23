@@ -107,19 +107,23 @@ The `install_tools.sh` and `download_resources.sh` scripts have been successfull
 
 
 
-# The present script was used for that operation.  Its usage is as follows:
-#
-# > dependencies_to_synapse.py maindir synapseParentID
-#
-# "maindir" is the path to a local directory with its resources and tools
-# subdirectories, each containing dependencies packaged in file archives.
-# "synapseParentID" is the Synapse project or folder where the
-# bsmn-pipeline-dependencies Synapse folder will be created with its own
-# resources and tools Synapse subfolders.
-#
-# maindir
-# |--resources
-# |--tools
+The present script was used for that operation.  Its usage is as follows:
+
+```
+> dependencies_to_synapse.py maindir synapseParentID
+```
+
+"maindir" is the path to a local directory with its resources and tools
+subdirectories, each containing dependencies packaged in file archives.
+"synapseParentID" is the Synapse project or folder where the
+bsmn-pipeline-dependencies Synapse folder will be created with its own
+resources and tools Synapse subfolders.
+
+```
+maindir
+|--resources
+|--tools
+```
 
 ## v1.00
 
