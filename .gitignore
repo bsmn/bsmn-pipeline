@@ -10,3 +10,4 @@ __pycache__/
 /resources/
 /downloads/
 /dependencies/
+/tests/
