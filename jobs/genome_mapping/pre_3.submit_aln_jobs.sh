@@ -15,6 +15,7 @@ source $(pwd)/$SM/run_info
 
 set -o nounset
 set -o pipefail
+set > $(pwd)/$SM/bash_set_output # for testing
 
 printf -- "---\n[$(date)] Start submit aln jobs.\n"
 

@@ -118,9 +118,9 @@ def submit_pre_jobs_bam(sample, sdata):
     return jid
 
 def submit_aln_jobs(sample, jid):
-    q.submit(opt(sample, jid),
-        "{job_home}/pre_3.submit_aln_jobs.sh {sample}".format(
-            job_home=job_home, sample=sample))
+    cmd = "{job_home}/pre_3.submit_aln_jobs.sh {sample}".format(job_home=job_home, sample=sample)
+    q_opt_str = opt(sample, jid)
+    q.submit(q_opt_str, cmd)
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Genome Mapping Pipeline')
