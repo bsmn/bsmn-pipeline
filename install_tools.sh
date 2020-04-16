@@ -16,6 +16,7 @@ WD=$(pwd)
 #
 
 # for bsmn_pipeline itself
+python3 -m pip install -U --user pip
 python3 -m pip install -U --user cython
 python3 -m pip install -U --user awscli synapseclient statsmodels scipy awscli
 # rpy2 fails to install with "gcc: error: libgomp.spec: No such file or directory"
