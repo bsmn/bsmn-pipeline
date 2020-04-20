@@ -9,9 +9,12 @@ def read_config():
     config["PATH"] = {"pipe_home": pipe_home}
 
     config.read(pipe_home + "/config.ini")
+    # these tools are not installed under pipe_home (i.e the bsmn-pipeline directory)
+    global_tools = ['python3', 'synapse', 'aws']
     for section in ["TOOLS", "RESOURCES"]:
         for key in config[section]:
-            config[section][key] = pipe_home + "/" + config[section][key]
+            if key not in global_tools:
+                config[section][key] = pipe_home + "/" + config[section][key]
 
     return config
 

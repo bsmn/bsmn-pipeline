@@ -72,9 +72,10 @@ def submit_pre_jobs_fastq(sample, sdata):
         read = "R1" if re.search("(.R1|_R1|_r1|_1)(|_001).f(|ast)q(|.gz)", fname) else "R2"
 
         down_jid = down_jid_queue.popleft()
-        jid = q.submit(opt(sample, down_jid), 
-            "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
-                job_home=job_home, sample=sample, fname=fname, loc=loc))
+        cmd = "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(job_home=job_home, sample=sample, fname=fname, loc=loc)
+        q_opt_str = opt(sample, down_jid)
+        jid = q.submit(q_opt_str, cmd)
+
         down_jid_queue.append(jid)
 
         jid_per_read[read].append(jid)
@@ -97,9 +98,9 @@ def submit_pre_jobs_bam(sample, sdata):
     global down_jid_queue
     down_jid = down_jid_queue.popleft()
 
-    jid = q.submit(opt(sample, down_jid), 
-        "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
-            job_home=job_home, sample=sample, fname=fname, loc=loc))
+    cmd = "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(job_home=job_home, sample=sample, fname=fname, loc=loc)
+    q_opt_str = opt(sample, down_jid)
+    jid = q.submit(q_opt_str, cmd)
 
     down_jid_queue.append(jid)
 
@@ -117,9 +118,9 @@ def submit_pre_jobs_bam(sample, sdata):
     return jid
 
 def submit_aln_jobs(sample, jid):
-    q.submit(opt(sample, jid),
-        "{job_home}/pre_3.submit_aln_jobs.sh {sample}".format(
-            job_home=job_home, sample=sample))
+    cmd = "{job_home}/pre_3.submit_aln_jobs.sh {sample}".format(job_home=job_home, sample=sample)
+    q_opt_str = opt(sample, jid)
+    q.submit(q_opt_str, cmd)
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Genome Mapping Pipeline')

@@ -35,6 +35,7 @@ else
         if [[ $LOC =~ ^syn[0-9]+ ]]; then
             $SYNAPSE get $LOC --downloadLocation $SM/downloads/ && { rc=$?; break; } || rc=$?
         elif [[ $LOC =~ ^s3:.+ ]]; then
+	# TODO: comment out the following bloc when not using NDAR
             $AWS s3 ls $LOC || {
                 printf "[$(date)] Set an NDA AWS token\n\n"
                 eval "$($PIPE_HOME/utils/nda_aws_token.sh -r ~/.nda_credential)"

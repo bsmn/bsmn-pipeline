@@ -80,3 +80,53 @@ The `master` branch is protected. To make introduce changes:
 1. Fork this repository
 2. Open a branch with your github username and a short descriptive statement (like `kdaily-update-readme`). If there is an open issue on this repository, name your branch after the issue (like `kdaily-issue-7`).
 3. Open a pull request and request a review.
+
+# Versions
+
+## v1.10 (installfix)
+
+This version fixes broken URLs in the previous versions of `install_tools.sh` and `download_resources.sh` that prevented installing or fetching the dependencies of the pipeline.
+
+To deal with the impermanence of URLs pointing to some of the dependencies the "installfix" branch of development gathered all resources and stored them on Synapse in a single folder called [bsmn-pipeline-dependencies](https://www.synapse.org/#!Synapse:syn21782058) (syn21782058).  Under this main folder, actually, resources and tools have been stored in their corresponding subfolders (resources: syn21782062, tools: syn21782261).  `install_tools.sh` and `download_resources.sh` now needs to refer only to the bsmn-pipeline-dependencies Synapse folder and its two subfolders instead of many volatile URLs pointing to individual tools/resources.
+
+The `install_tools.sh` and `download_resources.sh` scripts have been successfully tested under Amazon Linux AMI 2018.03 and Ubuntu 18.04.4 LTS (both for the desktop and server edition).  It was also tested under Debian GNU/Linux 10 (buster) but some of the tools failed to build from source when invoking `install_tools.sh`.
+
+### TODOs
+
+* The following tools are currently omitted from `install_tools.sh` due to issues with building from source (mostly under Ubuntu 18.04.4 LTS)
+    1. [cnvnator](https://github.com/abyzovlab/CNVnator) is currently excluded because its dependency [root](https://root.cern.ch/) framework failed to build from source
+    1. R and MosaicForecast
+    1. Perl
+    1. exonerate
+* Some resources for MosaicForecast are currently missing from `download_resources.sh`.
+* Test alignment and variant calling with GATK HaplotypeCaller and update documentation
+* Implement variant calling with MuTect2.  This will likely use Sentieon Tools' TNhapoltyper, which the faster reimplementation of GATK's original MuTect2 implementation
+* Implement filtering the raw callsets of HaplotypeCaller MuTect2 by either or both of the following alternatives
+    1. the BSMN best practices heuristic filters
+    1. MosaicForecast
+
+
+
+The present script was used for that operation.  Its usage is as follows:
+
+```
+> dependencies_to_synapse.py maindir synapseParentID
+```
+
+"maindir" is the path to a local directory with its resources and tools
+subdirectories, each containing dependencies packaged in file archives.
+"synapseParentID" is the Synapse project or folder where the
+bsmn-pipeline-dependencies Synapse folder will be created with its own
+resources and tools Synapse subfolders.
+
+```
+maindir
+|--resources
+|--tools
+```
+
+## v1.00
+
+This version was used by Taejeong Bae to produce the first batch of AWS cloud based results for the entire BSMN consortium.  Its two main functionalities are:
+* alignment of reads to the hs37d5 reference genome to produce BAM and/or CRAM files
+* calling somatic variants with GATK HaplotypeCaller in its polyploid mode
