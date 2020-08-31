@@ -22,6 +22,9 @@ def main():
     for ploidy in args.ploidy:
         jid_list.append(submit_jobs(args.sample_name, ploidy, args.hold_jid))
     jid = ",".join(jid_list)
+    jid = q.submit(opt(args.sample_name, jid),
+        "{job_home}/start_variant_filtering.sh {sample}".format(
+            job_home = cmd_home + "/variant_filtering/prep", sample=args.sample_name))
     save_hold_jid("{sample}/gatk-hc/hold_jid".format(sample=args.sample_name), jid)
     
 def parse_args():
@@ -32,7 +35,7 @@ def parse_args():
     return parser.parse_args()
 
 def opt(sample, jid=None):
-    opt = "-r y -j y -o {log_dir} -l h_vmem=4G".format(log_dir=log_dir(sample))
+    opt = "-V -q 4-day -r y -j y -o {log_dir} -l h_vmem=11G".format(log_dir=log_dir(sample))
     if jid is not None:
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt

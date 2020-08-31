@@ -16,16 +16,21 @@ source $(pwd)/$SM/run_info
 set -o nounset
 set -o pipefail
 
-DONE=$SM/run_status/post_3.upload_cram.done
+DONE=$SM/run_status/post_3.upload_$ALIGNFMT.done
+if [[ $ALIGNFMT == "cram" ]]; then
+    INDEX_SUFFIX="crai"
+else
+    INDEX_SUFFIX="bai"
+fi
 
-printf -- "---\n[$(date)] Start upload: $SM.cram{,.crai}\n"
+printf -- "---\n[$(date)] Start upload: $SM.$ALIGNFMT{,.$INDEX_SUFFIX}\n"
 
 if [[ -f $DONE ]] || [[ $UPLOAD = "None" ]]; then
     echo "Skip this step"
 else
     cd $SM/alignment
-    $SYNAPSE add --parentid $UPLOAD $SM.cram  || false
-    $SYNAPSE add --parentid $UPLOAD $SM.cram.crai  || false
+    $SYNAPSE add --parentid $UPLOAD $SM.$ALIGNFMT  || false
+    $SYNAPSE add --parentid $UPLOAD $SM.$ALIGNFMT.$INDEX_SUFFIX  || false
     cd $SGE_O_WORKDIR
 
     JID=$(cat $SM/*/hold_jid|xargs|sed 's/ /,/g')
@@ -35,4 +40,4 @@ else
     touch $DONE
 fi
 
-printf -- "[$(date)] Finish upload: $SM.cram{,.crai}\n---\n"
+printf -- "[$(date)] Finish upload: $SM.$ALIGNFMT{,.$INDEX_SUFFIX}\n---\n"

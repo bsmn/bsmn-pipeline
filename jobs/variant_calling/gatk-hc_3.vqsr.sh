@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 8
+#$ -pe threaded 6
 
 trap "exit 100" ERR
 
@@ -117,5 +117,7 @@ else
         $RECAL_INDEL $RECAL_INDEL.idx $TRANCHES_INDEL
     touch $DONE4
 fi
+
+rm -rf $SM/tmp
 
 printf -- "[$(date)] Finish VQSR.\n---\n"

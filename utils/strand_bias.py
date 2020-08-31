@@ -28,6 +28,7 @@ def run(args):
         printer('{chrom}\t{pos}\t{ref}\t{alt}\t{strand_info}'.format(
             chrom=chrom, pos=pos, ref=ref.upper(), alt=alt.upper(), 
             strand_info=s_info.send((chrom, pos, ref, alt))))
+    sys.stdout.flush()
 
 @coroutine
 def strand_info(target):

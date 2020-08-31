@@ -4,6 +4,7 @@ import sys
 import argparse
 import functools
 import gzip
+import re
 
 print = functools.partial(print, flush=True)
 
@@ -25,6 +26,8 @@ for line in args.infile:
         continue
     chrom, pos, _, ref, alts = line.split()[:5]
     for alt in alts.split(','):
-        var = "{chrom}:{pos}:{ref}:{alt}".format(chrom=chrom, pos=pos, ref=ref, alt=alt)
+        var = "{chrom}:{pos}:{ref}:{alt}".format(chrom=re.sub('^chr', '', chrom), pos=pos, ref=ref, alt=alt)
         if var not in known_germ:
             print(line, end='')
+sys.stdout.flush()
+

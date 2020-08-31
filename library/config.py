@@ -2,21 +2,21 @@ import configparser
 import pathlib
 import os
 
-def read_config():
+def read_config(reference = "b37"):
     lib_home = os.path.dirname(os.path.realpath(__file__))
     pipe_home = os.path.normpath(lib_home + "/..")
     config = configparser.ConfigParser()
     config["PATH"] = {"pipe_home": pipe_home}
 
-    config.read(pipe_home + "/config.ini")
+    config.read(pipe_home + ("/config.hg19.ini" if reference == "hg19" else "/config.hg38.ini" if reference == "hg38" else "/config.ini"))
     for section in ["TOOLS", "RESOURCES"]:
         for key in config[section]:
             config[section][key] = pipe_home + "/" + config[section][key]
 
     return config
 
-def run_info(fname):
-    config = read_config()
+def run_info(fname, reference):
+    config = read_config(reference)
     pathlib.Path(os.path.dirname(fname)).mkdir(parents=True, exist_ok=True)
     with open(fname, "w") as run_file:
         run_file.write("#PATH\nPIPE_HOME={}\n".format(config["PATH"]["pipe_home"]))

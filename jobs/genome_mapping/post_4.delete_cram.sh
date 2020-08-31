@@ -16,8 +16,14 @@ source $(pwd)/$SM/run_info
 set -o nounset
 set -o pipefail
 
-printf -- "---\n[$(date)] Start delete: $SM.cram{,.crai}\n"
+if [[ $ALIGNFMT == "cram" ]]; then
+    INDEX_SUFFIX="crai"
+else
+    INDEX_SUFFIX="bai"
+fi
 
-rm $SM/alignment/$SM.cram{,.crai}
+printf -- "---\n[$(date)] Start delete: $SM.$ALIGNFMT{,.$INDEX_SUFFIX}\n"
 
-printf -- "[$(date)] Finish delete: $SM.cram{,.crai}\n---\n"
+rm $SM/alignment/$SM.$ALIGNFMT{,.$INDEX_SUFFIX}
+
+printf -- "[$(date)] Finish delete: $SM.$ALIGNFMT{,.$INDEX_SUFFIX}\n---\n"

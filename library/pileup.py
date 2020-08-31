@@ -24,7 +24,7 @@ def pileup(bam, min_MQ, min_BQ, target):
         chrom, pos = (yield result)
         cmd = [SAMTOOLS, 'mpileup', '-d', '8000',
                '-q', str(min_MQ), '-Q', str(min_BQ),
-               '-r', '{}:{}-{}'.format(chrom, pos, pos), bam]
+               '-r', '{}:{}-{}'.format(chrom, pos, pos)] + bam.split()
         
         max_retries = 5
         n_retries = 0
@@ -45,8 +45,13 @@ def pileup(bam, min_MQ, min_BQ, target):
                 else:
                     sys.exit("Failed in pileup.")
         try:
-            bases, quals = cmd_out.stdout.split()[4:6]
-            bases = bases_clean(bases)
+            pileup_outs = cmd_out.stdout.split()
+            bases = ''
+            quals = ''
+            for i in range(4, len(pileup_outs), 3):
+                _bases, _quals = pileup_outs[i:i+2]
+                bases += bases_clean(_bases)
+                quals += _quals
         except ValueError:
             bases, quals = ('', '')
         result = target.send((bases, quals))

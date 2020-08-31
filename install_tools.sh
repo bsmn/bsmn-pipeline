@@ -109,12 +109,22 @@ fi
 unset DIR URL
 
 # Installing sambamba
-DIR=$WD/tools/sambamba/0.6.7
-URL="https://github.com/biod/sambamba/releases/download/v0.6.7/sambamba_v0.6.7_linux.tar.bz2"
+#DIR=$WD/tools/sambamba/0.6.7
+#URL="https://github.com/biod/sambamba/releases/download/v0.6.7/sambamba_v0.6.7_linux.tar.bz2"
+#if [[ ! -f $DIR/installed ]]; then
+#    mkdir -p $DIR/bin
+#    cd $DIR/bin
+#    wget -qO- $URL |tar xvj
+#    cd $WD
+#    touch $DIR/installed
+#fi
+DIR=$WD/tools/sambamba/0.7.0
+URL="https://github.com/biod/sambamba/releases/download/v0.7.0/sambamba-0.7.0-linux-static.gz"
 if [[ ! -f $DIR/installed ]]; then
     mkdir -p $DIR/bin
     cd $DIR/bin
-    wget -qO- $URL |tar xvj
+    wget -qO- $URL |gzip -d
+    ln -s sambamba-0.7.0-linux-static sambamba
     cd $WD
     touch $DIR/installed
 fi
@@ -145,48 +155,49 @@ if [[ ! -f $DIR/installed ]]; then
     touch $DIR/installed
 fi
 
-# build root
-ROOTSYS=$WD/tools/root/6.14.00
-ROOTURL="https://root.cern.ch/download/root_v6.14.00.source.tar.gz"
-if [[ ! -f $ROOTSYS/installed ]]; then
-    mkdir -p $ROOTSYS/src/root
-    cd $ROOTSYS/src
-    wget -qO- $ROOTURL |tar xvz --strip-components=1 -C root
-    $DIR/bin/cmake -Dbuiltin_pcre=ON -Dbuiltin_vdt=ON -Dhttp=ON -Dgnuinstall=ON \
-        -DCMAKE_INSTALL_PREFIX=$ROOTSYS root
-    $DIR/bin/cmake --build . -- -j$(nproc)
-    $DIR/bin/cmake --build . --target install
-    cd $WD
-    rm -r $ROOTSYS/src
-    touch $ROOTSYS/installed
-fi
-unset DIR URL ROOTURL
-
-# Installing cnvnator
-DIR=$WD/tools/cnvnator/0.4
-URL="https://github.com/abyzovlab/CNVnator/archive/v0.4.tar.gz"
-SAMURL="https://github.com/samtools/samtools/releases/download/1.7/samtools-1.7.tar.bz2"
-set +o nounset
-source $ROOTSYS/bin/thisroot.sh
-set -o nounset
-if [[ ! -f $DIR/installed ]]; then
-    mkdir -p $DIR/bin $DIR/src/samtools
-    cd $DIR/src
-    wget -qO- $URL |tar xvz --strip-components=1
-    cd samtools
-    wget -qO- $SAMURL |tar xvj --strip-components=1
-    make
-    cd ..
-    sed -i '2s/$/ -lpthread/' Makefile
-    make OMP=no
-    mv cnvnator ../bin
-    mv cnvnator2VCF.pl ../bin
-    mv *.py ../bin
-    cd $WD
-    rm -r $DIR/src
-    touch $DIR/installed
-fi
-unset DIR URL SAMURL ROOTSYS
+## build root
+#ROOTSYS=$WD/tools/root/6.14.00
+#ROOTURL="https://root.cern.ch/download/root_v6.14.00.source.tar.gz"
+#if [[ ! -f $ROOTSYS/installed ]]; then
+#    mkdir -p $ROOTSYS/src/root
+#    cd $ROOTSYS/src
+#    wget -qO- $ROOTURL |tar xvz --strip-components=1 -C root
+#    $DIR/bin/cmake -Dbuiltin_pcre=ON -Dbuiltin_vdt=ON -Dhttp=ON -Dgnuinstall=ON \
+#        -DCMAKE_CXX_COMPILER=/research/bsi/tools/biotools/gcc/4.9.4/bin/g++ -DCMAKE_C_COMPILER=/research/bsi/tools/biotools/gcc/4.9.4/bin/gcc \
+#        -DCMAKE_INSTALL_PREFIX=$ROOTSYS root
+#    $DIR/bin/cmake --build . -- -j$(nproc)
+#    $DIR/bin/cmake --build . --target install
+#    cd $WD
+#    rm -r $ROOTSYS/src
+#    touch $ROOTSYS/installed
+#fi
+#unset DIR URL ROOTURL
+#
+## Installing cnvnator
+#DIR=$WD/tools/cnvnator/0.4
+#URL="https://github.com/abyzovlab/CNVnator/archive/v0.4.tar.gz"
+#SAMURL="https://github.com/samtools/samtools/releases/download/1.7/samtools-1.7.tar.bz2"
+#set +o nounset
+#source $ROOTSYS/bin/thisroot.sh
+#set -o nounset
+#if [[ ! -f $DIR/installed ]]; then
+#    mkdir -p $DIR/bin $DIR/src/samtools
+#    cd $DIR/src
+#    wget -qO- $URL |tar xvz --strip-components=1
+#    cd samtools
+#    wget -qO- $SAMURL |tar xvj --strip-components=1
+#    make
+#    cd ..
+#    sed -i '2s/$/ -lpthread/' Makefile
+#    make OMP=no
+#    mv cnvnator ../bin
+#    mv cnvnator2VCF.pl ../bin
+#    mv *.py ../bin
+#    cd $WD
+#    rm -r $DIR/src
+#    touch $DIR/installed
+#fi
+#unset DIR URL SAMURL ROOTSYS
 
 # Installing Picard
 DIR=$WD/tools/picard/2.17.4
@@ -236,7 +247,7 @@ if [[ ! -f $DIR/installed ]]; then
     cd $DIR/src
     wget -qO- $URL |tar xvz --strip-components=1
     ./configure --prefix=$DIR
-    make
+    make -j `nproc`
     make install
     cd $WD
     rm -r $DIR/src
@@ -280,7 +291,7 @@ if [[ ! -f $DIR/installed ]]; then
     cd $DIR/src
     wget -qO- $URL |tar xvz --strip-components=1
     ./Configure -des -Dprefix=$DIR
-    make
+    make -j `nproc`
     make test
     make install
     cd $WD
@@ -301,7 +312,8 @@ if [[ ! -f $DIR/installed ]]; then
     mkdir -p $DIR/src
     cd $DIR/src
     wget -qO- $URL |tar xvz --strip-components=1
-    make
+    sed -i 's/CXXFLAGS = /CXXFLAGS = -D__STDC_FORMAT_MACROS=1 /' Makefile
+    make -j `nproc`
     mv bin ..
     cd $WD
     rm -r $DIR/src

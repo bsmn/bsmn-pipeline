@@ -1,14 +1,5 @@
 #!/bin/bash
 
-#CWD=$(dirname `realpath $(basename $0)`)
-
-#for F in $(find $CWD -name 'run_jid'); do
-#    for JID in $(cat $F); do
-#        s_dir=${F%/*}
-#        echo "${s_dir##*/} : $JID"
-#    done
-#done
-
 while :; do
     for N in $(dead-nodes); do
         echo "=== [$(date)] Node $N is dead. ==="

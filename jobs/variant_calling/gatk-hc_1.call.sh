@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 16
+#$ -pe threaded 6
 
 trap "exit 100" ERR
 
@@ -18,21 +18,26 @@ export PATH=$(dirname $JAVA):$PATH
 set -eu -o pipefail
 
 if [[ ${SGE_TASK_ID} -le 22 ]]; then
-    CHR=${SGE_TASK_ID}
+    if [ $REFVER == "hg19" -o  $REFVER == "hg38" ]; then CHR="chr${SGE_TASK_ID}"; else CHR=${SGE_TASK_ID}; fi
 elif [[ ${SGE_TASK_ID} -eq 23 ]]; then
-    CHR=X
+    if [ $REFVER == "hg19" -o  $REFVER == "hg38" ]; then CHR=chrX; else CHR=X; fi
 elif [[ ${SGE_TASK_ID} -eq 24 ]]; then
-    CHR=Y
+    if [ $REFVER == "hg19" -o  $REFVER == "hg38" ]; then CHR=chrY; else CHR=Y; fi
 fi
 
 DONE1=$SM/run_status/gatk-hc_1.call.ploidy_$PL.$CHR.1-gvcf.done
 DONE2=$SM/run_status/gatk-hc_1.call.ploidy_$PL.$CHR.2-joint_gt.done
 
-CRAM=$SM/alignment/$SM.cram
+#CRAM=$SM/alignment/$SM.cram
+if [[ $ALIGNFMT == "cram" ]]; then
+    CRAM=$SM/alignment/$SM.cram
+else
+    CRAM=$SM/alignment/$SM.bam
+fi
 CHR_GVCF=$SM/gatk-hc/$SM.ploidy_$PL.$CHR.g.vcf.gz
 CHR_RAW_VCF=$SM/gatk-hc//$SM.ploidy_$PL.$CHR.vcf.gz
 
-printf -- "---\n[$(date)] Start HC_GVCF: ploidy_$PL, chr$CHR\n"
+printf -- "---\n[$(date)] Start HC_GVCF: ploidy_$PL, $CHR\n"
 
 if [[ -f $DONE1 ]]; then
     echo "Skip the gvcf step."
@@ -51,9 +56,9 @@ else
     touch $DONE1
 fi
 
-printf -- "[$(date)] Finish HC_GVCF: ploidy_$PL, chr$CHR\n---\n"
+printf -- "[$(date)] Finish HC_GVCF: ploidy_$PL, $CHR\n---\n"
 
-printf -- "---\n[$(date)] Start Joint GT: ploidy_$PL, chr$CHR\n"
+printf -- "---\n[$(date)] Start Joint GT: ploidy_$PL, $CHR\n"
 
 if [[ -f $DONE2 ]]; then
     echo "Skip the joint gt step."
@@ -69,4 +74,4 @@ else
     touch $DONE2
 fi
 
-printf -- "[$(date)] Finish Joint GT: ploidy_$PL, chr$CHR\n---\n"
+printf -- "[$(date)] Finish Joint GT: ploidy_$PL, $CHR\n---\n"

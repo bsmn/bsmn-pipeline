@@ -32,14 +32,15 @@ def main():
     jid = q.submit(opt(args.sample_name, jid), 
         "{job_home}/aln_2.merge_bam.sh {sample}".format(job_home=job_home, sample=args.sample_name))
 
-    jid = q.submit(opt(args.sample_name, jid),
-        "{job_home}/aln_3.markdup.sh {sample}".format(job_home=job_home, sample=args.sample_name))
+    if not args.target_seq:
+        jid = q.submit(opt(args.sample_name, jid),
+            "{job_home}/aln_3.markdup.sh {sample}".format(job_home=job_home, sample=args.sample_name))
 
-    jid = q.submit(opt(args.sample_name, jid),
-        "{job_home}/aln_4.indel_realign.sh {sample}".format(job_home=job_home, sample=args.sample_name))
+        jid = q.submit(opt(args.sample_name, jid),
+            "{job_home}/aln_4.indel_realign.sh {sample}".format(job_home=job_home, sample=args.sample_name))
 
-    jid = q.submit(opt(args.sample_name, jid), 
-        "{job_home}/aln_5.bqsr.sh {sample}".format(job_home=job_home, sample=args.sample_name))
+        jid = q.submit(opt(args.sample_name, jid), 
+            "{job_home}/aln_5.bqsr.sh {sample}".format(job_home=job_home, sample=args.sample_name))
     aln_jid = jid
 
     jid = q.submit(opt(args.sample_name, aln_jid), 
@@ -55,11 +56,12 @@ def main():
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Alignment job submitter')
+    parser.add_argument('-t', '--target-seq', action='store_true', default=False)
     parser.add_argument('--sample-name', metavar='sample name', required=True)
     return parser.parse_args()
 
 def opt(sample, jid=None):
-    opt = "-r y -j y -o {log_dir} -l h_vmem=4G".format(log_dir=log_dir(sample))
+    opt = "-V -q 4-day -r y -j y -o {log_dir} -l h_vmem=11G".format(log_dir=log_dir(sample))
     if jid is not None:
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt

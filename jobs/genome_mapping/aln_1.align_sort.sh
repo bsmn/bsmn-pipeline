@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 24 
+#$ -pe threaded 12 
 
 trap "exit 100" ERR
 
@@ -16,6 +16,7 @@ source $(pwd)/$SM/run_info
 
 set -o nounset 
 set -o pipefail
+#set -x
 
 DONE=$SM/run_status/aln_1.align_sort.$PU.done
 

@@ -12,7 +12,7 @@ job_home = cmd_home + "/genome_mapping"
 sys.path.append(pipe_home)
 
 from library.config import run_info, run_info_append, log_dir
-from library.login import synapse_login, nda_login
+#from library.login import synapse_login, nda_login
 from library.parser import sample_list
 from library.job_queue import GridEngineQueue
 q = GridEngineQueue()
@@ -20,8 +20,8 @@ q = GridEngineQueue()
 def main():
     args = parse_args()
 
-    synapse_login()
-    nda_login()
+    #synapse_login()
+    #nda_login()
 
     global down_jid_queue
     down_jid_queue = deque([None] * args.con_down_limit)
@@ -38,11 +38,17 @@ def main():
         q.set_run_jid(f_run_jid, new=True)
 
         f_run_info = sample + "/run_info"
-        run_info(f_run_info)
+        run_info(f_run_info, args.reference)
         run_info_append(f_run_info, "\n#RUN_OPTIONS")
+        run_info_append(f_run_info, "SAMPLE_LIST={}".format(args.sample_list))
+        run_info_append(f_run_info, "ALIGNFMT={}".format(args.align_fmt))
+        run_info_append(f_run_info, "REFVER={}".format(args.reference))
         run_info_append(f_run_info, "UPLOAD={}".format(args.upload))
-        run_info_append(f_run_info, "RUN_CNVNATOR={}".format(args.run_cnvnator))
+        run_info_append(f_run_info, "SKIP_CNVNATOR={}".format(args.skip_cnvnator))
         run_info_append(f_run_info, "RUN_MUTECT_SINGLE={}".format(args.run_mutect_single))
+        run_info_append(f_run_info, "RUN_FILTERS={}".format(args.run_filters))
+        run_info_append(f_run_info, "MULTI_ALIGNS={}".format(args.multiple_alignments))
+        run_info_append(f_run_info, "TARGET_SEQ={}".format(args.target_seq))
         if args.run_gatk_hc:
             ploidy = " ".join(str(i) for i in args.run_gatk_hc)
             run_info_append(f_run_info, "RUN_GATK_HC=True\nPLOIDY=\"{}\"".format(ploidy))
@@ -58,7 +64,7 @@ def main():
         print()
 
 def opt(sample, jid=None):
-    opt = "-r y -j y -o {log_dir} -l h_vmem=4G".format(log_dir=log_dir(sample))
+    opt = "-V -q 4-day -r y -j y -o {log_dir} -l h_vmem=11G".format(log_dir=log_dir(sample))
     if jid is not None:
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt
@@ -130,9 +136,16 @@ def parse_args():
         help='''Synapse ID of project or folder where to upload result cram files. 
         If it is not set, the result cram files will be locally saved.
         [ Default: None ]''', default=None)
-    parser.add_argument('--run-gatk-hc', metavar='ploidy', type=int, nargs='+', default=False)
+    parser.add_argument('-t', '--target-seq', action='store_true', default=False)
+    parser.add_argument('-p', '--run-gatk-hc', metavar='ploidy', type=int, nargs='+', default=False)
     parser.add_argument('--run-mutect-single', action='store_true')
-    parser.add_argument('--run-cnvnator', action='store_true')
+    parser.add_argument('--run-filters', action='store_true', default=False)
+    parser.add_argument('-m', '--multiple-alignments', action='store_true', default=False)
+    parser.add_argument('--skip-cnvnator', action='store_true', default=False)
+    parser.add_argument('-f', '--align-fmt', metavar='fmt',
+        help='''Alignment format [cram (default) or bam]''', default="cram")
+    parser.add_argument('-r', '--reference', metavar='ref',
+        help='''Reference version [b37 (default) or hg19 or hg38]''', default="b37")
     parser.add_argument('--sample-list', metavar='sample_list.txt', required=True,
         help='''Sample list file.
         Each line format is "sample_id\\tfile_name\\tlocation".

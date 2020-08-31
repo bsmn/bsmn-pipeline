@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 24
+#$ -pe threaded 16
 
 trap "exit 100" ERR
 
@@ -41,36 +41,46 @@ printf -- "---\n[$(date)] Start BQSR PrintReads.\n---\n"
 if [[ -f $DONE2 ]]; then
     echo "Skip the print_reads step."
 else
-    $JAVA -Xmx58G -jar $GATK \
-        -T PrintReads -nct $((NSLOTS/2)) \
-        --disable_indel_quals \
-        -R $REF -BQSR $SM/alignment/recal_data.table \
-        -I $SM/alignment/$SM.realigned.bam \
-        |$SAMTOOLS view -@ $((NSLOTS/2)) -C -T $REF -o $SM/alignment/$SM.cram
+    if [[ $ALIGNFMT == "cram" ]]; then
+        $JAVA -Xmx58G -jar $GATK \
+            -T PrintReads -nct $((NSLOTS/2)) \
+            --disable_indel_quals \
+            -R $REF -BQSR $SM/alignment/recal_data.table \
+            -I $SM/alignment/$SM.realigned.bam \
+            |$SAMTOOLS view -@ $((NSLOTS/2)) -C -T $REF -o $SM/alignment/$SM.cram
+    else
+        $JAVA -Xmx58G -jar $GATK \
+            -T PrintReads -nct $((NSLOTS/2)) \
+            --disable_indel_quals \
+            --disable_bam_indexing \
+            -R $REF -BQSR $SM/alignment/recal_data.table \
+            -I $SM/alignment/$SM.realigned.bam \
+            -o $SM/alignment/$SM.bam
+    fi
     rm $SM/alignment/$SM.realigned.{bam,bai}
     touch $DONE2
 fi
 
 printf -- "[$(date)] Finish BQSR PrintReads.\n---\n"
 
-printf -- "---\n[$(date)] Start indexing: $SM.cram\n"
+printf -- "---\n[$(date)] Start indexing: $SM.$ALIGNFMT\n"
 
 if [[ -f $DONE3 ]]; then
     echo "Skip the indexing step."
 else
-    $SAMTOOLS index -@ $NSLOTS $SM/alignment/$SM.cram
+    $SAMTOOLS index -@ $NSLOTS $SM/alignment/$SM.$ALIGNFMT
     touch $DONE3
 fi
 
-printf -- "[$(date)] Finish indexing: $SM.cram\n---\n"
+printf -- "[$(date)] Finish indexing: $SM.$ALIGNFMT\n---\n"
 
-printf -- "---\n[$(date)] Start flagstat: $SM.cram\n"
-
-if [[ -f $DONE4 ]]; then
-    echo "Skip the flagstat step."
-else
-    $SAMTOOLS flagstat -@ $NSLOTS $SM/alignment/$SM.cram > $SM/alignment/flagstat.txt
-    touch $DONE4
-fi
-
-printf -- "[$(date)] Finish flagstat: $SM.cram\n---\n"
+# printf -- "---\n[$(date)] Start flagstat: $SM.$ALIGNFMT\n"
+# 
+# if [[ -f $DONE4 ]]; then
+#     echo "Skip the flagstat step."
+# else
+#     $SAMTOOLS flagstat -@ $NSLOTS $SM/alignment/$SM.$ALIGNFMT > $SM/alignment/flagstat.txt
+#     touch $DONE4
+# fi
+# 
+# printf -- "[$(date)] Finish flagstat: $SM.$ALIGNFMT\n---\n"

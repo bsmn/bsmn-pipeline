@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 3
+#$ -pe threaded 2
 
 trap "exit 100" ERR
 
@@ -19,7 +19,11 @@ set -eu -o pipefail
 
 DONE=$SM/run_status/gatk-hc_2.concat_vcf.ploidy_$PL.done
 
-CHRS="$(seq 1 22) X Y"
+if [ $REFVER == "hg19" -o $REFVER == "hg38" ]; then
+    CHRS="$(seq -f 'chr%g' 22) chrX chrY"
+else
+    CHRS="$(seq 1 22) X Y"
+fi
 CHR_RAW_VCFS=""
 for CHR in $CHRS; do
     CHR_RAW_VCFS="$CHR_RAW_VCFS -I $SM/gatk-hc/$SM.ploidy_$PL.$CHR.vcf.gz"

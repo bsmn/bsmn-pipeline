@@ -11,7 +11,7 @@ job_home = cmd_home + "/variant_calling"
 sys.path.append(pipe_home)
 
 from library.config import run_info, run_info_append, log_dir
-from library.login import synapse_login, nda_login
+#from library.login import synapse_login, nda_login
 from library.parser import sample_list
 from library.job_queue import GridEngineQueue
 q = GridEngineQueue()
@@ -19,8 +19,8 @@ q = GridEngineQueue()
 def main():
     args = parse_args()
 
-    synapse_login()
-    nda_login()
+    #synapse_login()
+    #nda_login()
 
     global down_jid_queue
     down_jid_queue = deque([None] * args.con_down_limit)
@@ -37,10 +37,15 @@ def main():
         q.set_run_jid(f_run_jid, new=True)
 
         f_run_info = sample + "/run_info"
-        run_info(f_run_info)
+        run_info(f_run_info, args.reference)
         run_info_append(f_run_info, "\n#RUN_OPTIONS")
+        run_info_append(f_run_info, "SAMPLE_LIST={}".format(args.sample_list))
+        run_info_append(f_run_info, "ALIGNFMT={}".format(args.align_fmt))
+        run_info_append(f_run_info, "REFVER={}".format(args.reference))
+        run_info_append(f_run_info, "RUN_FILTERS={}".format(args.run_filters))
+        run_info_append(f_run_info, "MULTI_ALIGNS={}".format(args.multiple_alignments))
         run_info_append(f_run_info, "UPLOAD={}".format(args.upload))
-        run_info_append(f_run_info, "RUN_CNVNATOR={}".format(args.run_cnvnator))
+        run_info_append(f_run_info, "SKIP_CNVNATOR={}".format(args.skip_cnvnator))
         run_info_append(f_run_info, "RUN_MUTECT_SINGLE={}".format(args.run_mutect_single))
         if args.run_gatk_hc:
             ploidy = " ".join(str(i) for i in args.run_gatk_hc)
@@ -51,18 +56,18 @@ def main():
         if filetype == "fastq":
             raise Exception("The input filetype should be bam or cram.")
 
-        global down_jid
-        jid_list = []
-        for fname, loc in sdata:
-            down_jid = down_jid_queue.popleft()
-            jid = q.submit(opt(sample, down_jid), 
-                    "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
-                        job_home=job_home, sample=sample, fname=fname, loc=loc))
-            jid_list.append(jid)
-            down_jid_queue.append(jid)
-        jid = ",".join(jid_list)
+        #global down_jid
+        #jid_list = []
+        #for fname, loc in sdata:
+        #    down_jid = down_jid_queue.popleft()
+        #    jid = q.submit(opt(sample, down_jid), 
+        #            "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
+        #                job_home=job_home, sample=sample, fname=fname, loc=loc))
+        #    jid_list.append(jid)
+        #    down_jid_queue.append(jid)
+        #jid = ",".join(jid_list)
 
-        if filetype == "bam":
+        if args.align_fmt == "cram" and filetype == "bam":
             jid = q.submit(opt(sample, jid),
                 "{job_home}/pre_2.bam2cram.sh {sample}".format(
                     job_home=job_home, sample=sample))
@@ -70,7 +75,8 @@ def main():
                 "{job_home}/pre_2b.unmapped_reads.sh {sample}".format(
                     job_home=job_home, sample=sample))
 
-        jid = q.submit(opt(sample, jid),
+        #jid = q.submit(opt(sample, jid),
+        jid = q.submit(opt(sample),
             "{job_home}/pre_3.run_variant_calling.sh {sample}".format(
                 job_home=job_home, sample=sample))
         q.submit(opt(sample, jid),
@@ -80,7 +86,7 @@ def main():
         print()
 
 def opt(sample, jid=None):
-    opt = "-r y -j y -o {log_dir} -l h_vmem=4G".format(log_dir=log_dir(sample))
+    opt = "-V -r y -j y -o {log_dir} -l h_vmem=11G".format(log_dir=log_dir(sample))
     if jid is not None:
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt
@@ -94,9 +100,15 @@ def parse_args():
         help='''Synapse ID of project or folder where to upload result cram files. 
         If it is not set, the result cram files will be locally saved.
         [ Default: None ]''', default=None)
-    parser.add_argument('--run-gatk-hc', metavar='ploidy', type=int, nargs='+', default=False)
+    parser.add_argument('-p', '--run-gatk-hc', metavar='ploidy', type=int, nargs='+', default=False)
     parser.add_argument('--run-mutect-single', action='store_true')
-    parser.add_argument('--run-cnvnator', action='store_true')
+    parser.add_argument('--skip-cnvnator', action='store_true', default=False)
+    parser.add_argument('--run-filters', action='store_true', default=False)
+    parser.add_argument('-m', '--multiple-alignments', action='store_true', default=False)
+    parser.add_argument('-f', '--align-fmt', metavar='fmt',
+        help='''Alignment format [cram (default) or bam]''', default="cram")
+    parser.add_argument('-r', '--reference', metavar='ref',
+        help='''Reference version [b37 (default) or hg19]''', default="b37")
     parser.add_argument('--sample-list', metavar='sample_list.txt', required=True,
         help='''Sample list file.
         Each line format is "sample_id\\tfile_name\\tlocation".

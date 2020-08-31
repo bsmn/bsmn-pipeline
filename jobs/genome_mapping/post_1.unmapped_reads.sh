@@ -18,7 +18,11 @@ set -o pipefail
 
 DONE=$SM/run_status/post_1.unmapped_reads.done
 
-CRAM=$SM/alignment/$SM.cram
+if [ $TARGET_SEQ = "True" ]; then
+    CRAM=$SM/alignment/$SM.merged.$ALIGNFMT
+else
+    CRAM=$SM/alignment/$SM.$ALIGNFMT
+fi
 UNMAPPED=$SM/alignment/$SM.unmapped.bam
 
 printf -- "---\n[$(date)] Start extracting unmapped reads: $CRAM\n"

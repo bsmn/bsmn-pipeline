@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 3
+#$ -pe threaded 10
 
 trap "exit 100" ERR
 
@@ -41,15 +41,23 @@ else
 
         $CAT $FQ
     done |paste - - - - |awk -F"\t" -v SM=$SM -v RD=$RD '{
-        h=$1;
-        sub(/^@/,"",h);
-        sub(/ .+$/,"",h);
-        l=split(h,arr,":");
-        FCX=arr[l-4];
-        LN=arr[l-3];
-        print $1"\n"$2"\n+\n"$4|"gzip >"SM"/fastq/"SM"."FCX"_L"LN"."RD".fastq.gz"}
-        END {
-        print "READ N: "NR}'
+        if ($1 ~ /:/) {
+          h=$1;
+          sub(/^@/,"",h);
+          sub(/ .+$/,"",h);
+          l=split(h,arr,":");
+          FCX=arr[l-4];
+          LN=arr[l-3];
+          print $1"\n"$2"\n+\n"$4|"gzip >"SM"/fastq/"SM"."FCX"_L"LN"."RD".fastq.gz"
+        }
+        else if ($1 ~ /[A-Z]+[0-9]+L[0-9]+C[0-9]+R[0-9]+/) {
+          h=$1; match(h, /@([A-Z]+[0-9]+)L([0-9]+)/, PU);
+          print $1"\n"$2"\n+\n"$4|"gzip >"SM"/fastq/"SM"."PU[1]"_L"PU[2]"."RD".fastq.gz"
+        }
+        else {
+          print $1"\n"$2"\n+\n"$4|"gzip >"SM"/fastq/"SM".NOPU."RD".fastq.gz"
+        }}
+        END {print "READ N: "NR}'
     rm ${FQ_L[@]}
     touch $DONE
 fi

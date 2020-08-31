@@ -22,6 +22,7 @@ def run(args):
         printer('{chrom}\t{pos}\t{ref}\t{alt}\t{vaf_info}'.format(
             chrom=chrom, pos=pos, ref=ref.upper(), alt=alt.upper(), 
             vaf_info=v_info.send((chrom, pos, ref, alt))))
+    sys.stdout.flush()
 
 @coroutine
 def vaf_info(target):
