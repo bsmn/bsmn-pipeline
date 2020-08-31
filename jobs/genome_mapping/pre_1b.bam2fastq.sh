@@ -28,11 +28,11 @@ else
 
     if [[ $(($FSIZE/1024**3)) -lt 128 ]]; then
         TMP_N=128
-    elif [[ $(($FSIZE/1024**3)) -lt 1000 ]]; then
+    elif [[ $(($FSIZE/1024**3)) -lt 2000 ]]; then
         TMP_N=$(($FSIZE/1024**3+1))
     else
-        echo "The bam file is bigger than 1TB."
-        exit 1
+        echo "The bam file is bigger than 2TB."
+        exit 100
     fi
     
     mkdir -p $SM/fastq
