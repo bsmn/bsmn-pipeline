@@ -1,3 +1,10 @@
+bsmn-pipeline implements various cluster jobs, arranged for genome alignment, variant calling and variant filtering.
+
+Getting the bsmn pipeline
+=========================
+
+    git clone https://github.com/bsmn/bsmn-pipeline.git
+
 Creating an environment from YAML file
 ======================================
 
@@ -5,7 +12,7 @@ To create a new conda environment from the given environment.yml file, run:
 
     conda env create -f /path/to/environment.yml 
 
-By default, the name of environment will be 'bp'. you can change it by adding a '-n <name>' option to the command above.
+By default, the name of environment will be 'bp'. you can change it by adding a'-n <name>' option to the command above.
 
 Installing ucsc packages
 ========================
@@ -41,12 +48,6 @@ For the reproducibility and consistency, it is recommended to checkout the revis
     git clone https://github.com/parklab/MosaicForecast.git
     cd MosaicForecast
     git checkout 63d8e60
-
-Getting the bsmn pipeline
-=========================
-
-    cd $CONDA_PREFIX # Within the environment directory (optional, any directory would be fine)
-    git clone https://github.com/bsmn/bsmn-pipeline.git
 
 Downloading resources
 =====================
