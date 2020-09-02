@@ -12,7 +12,7 @@ To create a new conda environment from the given environment.yml file, run:
 
     conda env create -f /path/to/environment.yml 
 
-By default, the name of environment will be 'bp'. you can change it by adding a'-n <name>' option to the command above.
+By default, the name of environment will be 'bp'. you can change it by adding a '-n <name>' option to the command above.
 
 Installing ucsc packages
 ========================
@@ -42,7 +42,7 @@ To build and install CNVnator, activate the 'bp' environment and type the follow
 Installing MosaicForecast
 =========================
 
-For the reproducibility and consistency, it is recommended to checkout the revision which is provided below.
+For the reproducibility and consistency, it is recommended to checkout the specific revision as below.
 
     cd $CONDA_PREFIX # Within the environment directory (optional, any directory would be fine)
     git clone https://github.com/parklab/MosaicForecast.git
