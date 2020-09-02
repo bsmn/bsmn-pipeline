@@ -74,13 +74,13 @@ fi
 
 printf -- "[$(date)] Finish indexing: $SM.$ALIGNFMT\n---\n"
 
-# printf -- "---\n[$(date)] Start flagstat: $SM.$ALIGNFMT\n"
-# 
-# if [[ -f $DONE4 ]]; then
-#     echo "Skip the flagstat step."
-# else
-#     $SAMTOOLS flagstat -@ $NSLOTS $SM/alignment/$SM.$ALIGNFMT > $SM/alignment/flagstat.txt
-#     touch $DONE4
-# fi
-# 
-# printf -- "[$(date)] Finish flagstat: $SM.$ALIGNFMT\n---\n"
+printf -- "---\n[$(date)] Start flagstat: $SM.$ALIGNFMT\n"
+
+if [[ -f $DONE4 ]]; then
+    echo "Skip the flagstat step."
+else
+    $SAMTOOLS flagstat -@ $NSLOTS $SM/alignment/$SM.$ALIGNFMT > $SM/alignment/flagstat.txt
+    touch $DONE4
+fi
+
+printf -- "[$(date)] Finish flagstat: $SM.$ALIGNFMT\n---\n"
