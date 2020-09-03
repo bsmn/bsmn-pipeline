@@ -39,8 +39,11 @@ def main():
         f_run_info = sample + "/run_info"
         run_info(f_run_info, args.reference)
         run_info_append(f_run_info, "\n#RUN_OPTIONS")
+        run_info_append(f_run_info, "Q={}".format(args.queue))
+        run_info_append(f_run_info, "CONDA_ENV={}".format(args.conda_env))
         run_info_append(f_run_info, "SAMPLE_LIST={}".format(args.sample_list))
         run_info_append(f_run_info, "ALIGNFMT={}".format(args.align_fmt))
+        run_info_append(f_run_info, "FILETYPE={}".format(filetype))
         run_info_append(f_run_info, "REFVER={}".format(args.reference))
         run_info_append(f_run_info, "RUN_FILTERS={}".format(args.run_filters))
         run_info_append(f_run_info, "MULTI_ALIGNS={}".format(args.multiple_alignments))
@@ -60,7 +63,7 @@ def main():
         #jid_list = []
         #for fname, loc in sdata:
         #    down_jid = down_jid_queue.popleft()
-        #    jid = q.submit(opt(sample, down_jid), 
+        #    jid = q.submit(opt(sample, args.queue, down_jid), 
         #            "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
         #                job_home=job_home, sample=sample, fname=fname, loc=loc))
         #    jid_list.append(jid)
@@ -68,24 +71,25 @@ def main():
         #jid = ",".join(jid_list)
 
         if args.align_fmt == "cram" and filetype == "bam":
-            jid = q.submit(opt(sample, jid),
+            jid = q.submit(opt(sample, args.queue, jid),
                 "{job_home}/pre_2.bam2cram.sh {sample}".format(
                     job_home=job_home, sample=sample))
-            jid = q.submit(opt(sample, jid),
+            jid = q.submit(opt(sample, args.queue, jid),
                 "{job_home}/pre_2b.unmapped_reads.sh {sample}".format(
                     job_home=job_home, sample=sample))
 
-        #jid = q.submit(opt(sample, jid),
-        jid = q.submit(opt(sample),
+        #jid = q.submit(opt(sample, args.queue, jid),
+        jid = q.submit(opt(sample, args.queue),
             "{job_home}/pre_3.run_variant_calling.sh {sample}".format(
                 job_home=job_home, sample=sample))
-        q.submit(opt(sample, jid),
+        q.submit(opt(sample, args.queue, jid),
             "{job_home}/pre_4.upload_cram.sh {sample}".format(
                 job_home=job_home, sample=sample))
 
         print()
 
-def opt(sample, jid=None):
+def opt(sample, Q, jid=None):
+    # opt = "-V -q {q} -r y -j y -o {log_dir} -l h_vmem=11G".format(q=Q, log_dir=log_dir(sample))
     opt = "-V -r y -j y -o {log_dir} -l h_vmem=11G".format(log_dir=log_dir(sample))
     if jid is not None:
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
@@ -100,6 +104,10 @@ def parse_args():
         help='''Synapse ID of project or folder where to upload result cram files. 
         If it is not set, the result cram files will be locally saved.
         [ Default: None ]''', default=None)
+    parser.add_argument('-q', '--queue', metavar='queue', required=True,
+        help='''Specify the queue name of Sun Grid Engine for jobs to be submitted''')
+    parser.add_argument('-n', '--conda-env', metavar='env',
+        help='''Specify the name of conda environment for pipeline [default is bp]''', default="bp")
     parser.add_argument('-p', '--run-gatk-hc', metavar='ploidy', type=int, nargs='+', default=False)
     parser.add_argument('--run-mutect-single', action='store_true')
     parser.add_argument('--skip-cnvnator', action='store_true', default=False)

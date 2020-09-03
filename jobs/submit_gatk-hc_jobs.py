@@ -20,35 +20,36 @@ def main():
 
     jid_list = []
     for ploidy in args.ploidy:
-        jid_list.append(submit_jobs(args.sample_name, ploidy, args.hold_jid))
+        jid_list.append(submit_jobs(args.sample_name, args.queue, ploidy, args.hold_jid))
     jid = ",".join(jid_list)
-    jid = q.submit(opt(args.sample_name, jid),
+    jid = q.submit(opt(args.sample_name, args.queue, jid),
         "{job_home}/start_variant_filtering.sh {sample}".format(
             job_home = cmd_home + "/variant_filtering/prep", sample=args.sample_name))
     save_hold_jid("{sample}/gatk-hc/hold_jid".format(sample=args.sample_name), jid)
     
 def parse_args():
     parser = argparse.ArgumentParser(description='GATK-HC job submitter')
+    parser.add_argument('--queue', metavar='SGE queue', required=True)
     parser.add_argument('--ploidy', metavar='int', nargs='+', type=int, default=2)
     parser.add_argument('--hold_jid', default=None)
     parser.add_argument('--sample-name', metavar='sample name', required=True)
     return parser.parse_args()
 
-def opt(sample, jid=None):
-    opt = "-V -q 4-day -r y -j y -o {log_dir} -l h_vmem=11G".format(log_dir=log_dir(sample))
+def opt(sample, Q, jid=None):
+    opt = "-V -q {q} -r y -j y -o {log_dir} -l h_vmem=11G".format(q=Q, log_dir=log_dir(sample))
     if jid is not None:
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt
 
-def submit_jobs(sample, ploidy, jid):
+def submit_jobs(sample, Q, ploidy, jid):
     jid = q.submit(
-        "-t 1-24 {opt}".format(opt=opt(sample, jid)),
+        "-t 1-24 {opt}".format(opt=opt(sample, Q, jid)),
         "{job_home}/gatk-hc_1.call.sh {sample} {ploidy}".format(
             job_home=job_home, sample=sample, ploidy=ploidy))
-    jid = q.submit(opt(sample, jid),
+    jid = q.submit(opt(sample, Q, jid),
         "{job_home}/gatk-hc_2.concat_vcf.sh {sample} {ploidy}".format(
             job_home=job_home, sample=sample, ploidy=ploidy))
-    jid = q.submit(opt(sample, jid),
+    jid = q.submit(opt(sample, Q, jid),
         "{job_home}/gatk-hc_3.vqsr.sh {sample} {ploidy}".format(
             job_home=job_home, sample=sample, ploidy=ploidy))
     return jid

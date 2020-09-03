@@ -40,8 +40,11 @@ def main():
         f_run_info = sample + "/run_info"
         run_info(f_run_info, args.reference)
         run_info_append(f_run_info, "\n#RUN_OPTIONS")
+        run_info_append(f_run_info, "Q={}".format(args.queue))
+        run_info_append(f_run_info, "CONDA_ENV={}".format(args.conda_env))
         run_info_append(f_run_info, "SAMPLE_LIST={}".format(args.sample_list))
         run_info_append(f_run_info, "ALIGNFMT={}".format(args.align_fmt))
+        run_info_append(f_run_info, "FILETYPE={}".format(filetype))
         run_info_append(f_run_info, "REFVER={}".format(args.reference))
         run_info_append(f_run_info, "UPLOAD={}".format(args.upload))
         run_info_append(f_run_info, "SKIP_CNVNATOR={}".format(args.skip_cnvnator))
@@ -56,20 +59,20 @@ def main():
             run_info_append(f_run_info, "RUN_GATK_HC={}".format(args.run_gatk_hc))
 
         if filetype == "bam":
-            jid = submit_pre_jobs_bam(sample, sdata)
+            jid = submit_pre_jobs_bam(sample, sdata, args.queue)
         else:
-            jid = submit_pre_jobs_fastq(sample, sdata)
+            jid = submit_pre_jobs_fastq(sample, sdata, args.queue)
 
-        submit_aln_jobs(sample, jid)
+        submit_aln_jobs(sample, args.queue, jid)
         print()
 
-def opt(sample, jid=None):
-    opt = "-V -q 4-day -r y -j y -o {log_dir} -l h_vmem=11G".format(log_dir=log_dir(sample))
+def opt(sample, Q, jid=None):
+    opt = "-V -q {q} -r y -j y -o {log_dir} -l h_vmem=11G".format(q=Q, log_dir=log_dir(sample))
     if jid is not None:
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt
 
-def submit_pre_jobs_fastq(sample, sdata):
+def submit_pre_jobs_fastq(sample, sdata, Q):
     global down_jid_queue
 
     jid_per_read = {"R1":[], "R2":[]}
@@ -78,7 +81,7 @@ def submit_pre_jobs_fastq(sample, sdata):
         read = "R1" if re.search("(.R1|_R1|_r1|_1)(|_001).f(|ast)q(|.gz)", fname) else "R2"
 
         down_jid = down_jid_queue.popleft()
-        jid = q.submit(opt(sample, down_jid), 
+        jid = q.submit(opt(sample, Q, down_jid), 
             "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
                 job_home=job_home, sample=sample, fname=fname, loc=loc))
         down_jid_queue.append(jid)
@@ -90,40 +93,40 @@ def submit_pre_jobs_fastq(sample, sdata):
     for read in ["R1", "R2"]:
         fq_files = " ".join(sorted(fq_per_read[read]))
         jid = ",".join(jid_per_read[read])
-        jid_list.append(q.submit(opt(sample, jid),
+        jid_list.append(q.submit(opt(sample, Q, jid),
             "{job_home}/pre_2.split_fastq_by_RG.sh {fq_files}".format(
                 job_home=job_home, fq_files=fq_files)))
     jid = ",".join(jid_list)
 
     return jid
 
-def submit_pre_jobs_bam(sample, sdata):
+def submit_pre_jobs_bam(sample, sdata, Q):
     fname, loc = sdata[0]
 
     global down_jid_queue
     down_jid = down_jid_queue.popleft()
 
-    jid = q.submit(opt(sample, down_jid), 
+    jid = q.submit(opt(sample, Q, down_jid), 
         "{job_home}/pre_1.download.sh {sample} {fname} {loc}".format(
             job_home=job_home, sample=sample, fname=fname, loc=loc))
 
     down_jid_queue.append(jid)
 
-    jid = q.submit(opt(sample, jid), 
+    jid = q.submit(opt(sample, Q, jid), 
         "{job_home}/pre_1b.bam2fastq.sh {sample} {fname}".format(
             job_home=job_home, sample=sample, fname=fname))
         
     jid_list = []
     for read in ["R1", "R2"]:
-        jid_list.append(q.submit(opt(sample, jid),
+        jid_list.append(q.submit(opt(sample, Q, jid),
             "{job_home}/pre_2.split_fastq_by_RG.sh {sample}/fastq/{fname}.{read}.fastq.gz".format(
                 job_home=job_home, sample=sample, fname=fname, read=read)))
     jid = ",".join(jid_list)
 
     return jid
 
-def submit_aln_jobs(sample, jid):
-    q.submit(opt(sample, jid),
+def submit_aln_jobs(sample, Q, jid):
+    q.submit(opt(sample, Q, jid),
         "{job_home}/pre_3.submit_aln_jobs.sh {sample}".format(
             job_home=job_home, sample=sample))
 
@@ -136,6 +139,10 @@ def parse_args():
         help='''Synapse ID of project or folder where to upload result cram files. 
         If it is not set, the result cram files will be locally saved.
         [ Default: None ]''', default=None)
+    parser.add_argument('-q', '--queue', metavar='queue', required=True,
+        help='''Specify the queue name of Sun Grid Engine for jobs to be submitted''')
+    parser.add_argument('-n', '--conda-env', metavar='env',
+        help='''Specify the name of conda environment for pipeline [default is bp]''', default="bp")
     parser.add_argument('-t', '--target-seq', action='store_true', default=False)
     parser.add_argument('-p', '--run-gatk-hc', metavar='ploidy', type=int, nargs='+', default=False)
     parser.add_argument('--run-mutect-single', action='store_true')
