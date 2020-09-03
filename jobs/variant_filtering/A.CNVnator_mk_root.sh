@@ -24,11 +24,12 @@ if [[ $SKIP_CNVNATOR == "True" ]]; then
     exit 0
 fi
 
-if [[ $ALIGNFMT == "cram" ]]; then
-    BAM=$SM/alignment/$SM.cram
+if [[ $FILETYPE == "fastq" ]]; then
+    BAM=$SM/alignment/$SM.$ALIGNFMT
 else
-    BAM=$SM/alignment/$SM.bam
+    BAM=`awk -v sm="$SM" '$1 == sm {print sm"/alignment/"$2}' $SAMPLE_LIST |head -1`
 fi
+
 OUTDIR=$SM/cnvnator/$BINSIZE
 ROOT=$OUTDIR/${SM}.root
 if [[ $REFVER == "hg19" ]]; then

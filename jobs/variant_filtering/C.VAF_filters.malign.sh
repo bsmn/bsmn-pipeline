@@ -9,18 +9,17 @@
 trap "exit 100" ERR
 set -eu -o pipefail
 
-if [[ $# -lt 3 ]]; then
-    echo "Usage: $JOB_NAME [sample name] [BAM or CRAM list file] [ploidy]"
+if [[ $# -lt 2 ]]; then
+    echo "Usage: $JOB_NAME [sample name] [ploidy]"
     false
 fi
 
 SM=$1
-FBAMLIST=$2
-PL=$3
+PL=$2
 
 source $(pwd)/$SM/run_info
 
-BAMS=`awk -v sm="$SM" '$1 == sm {print sm"/alignment/"$2}' $FBAMLIST | xargs`
+BAMS=`awk -v sm="$SM" '$1 == sm {print sm"/alignment/"$2}' $SAMPLE_LIST | xargs`
 
 IN=$SM/gatk-hc/$SM.ploidy_$PL.gnomAD_AFover0.001_filtered.snvs.PASS.P.txt
 VAF=$SM/vaf/$SM.ploidy_$PL.gnomAD_AFover0.001_filtered.snvs.PASS.P.vaf

@@ -19,18 +19,19 @@ def main():
     q.set_run_jid(args.sample_name + "/run_jid")
 
     jid_cnvnator = q.submit(opt(args.sample_name, args.queue),
-        ("{job_home}/A.CNVnator_mk_root.malign.sh {sample} {sample_list} 100" if args.multiple_alignments else "{job_home}/A.CNVnator_mk_root.sh {sample} 100").format(
-            job_home=job_home, sample=args.sample_name, sample_list=args.sample_list))
+                            "{job_home}/A.CNVnator_mk_root{malign}.sh {sample} 100".format(
+                            job_home = job_home,
+                            malign = ".malign" if args.multiple_alignments else "",
+                            sample = args.sample_name))
 
     for ploidy in args.ploidy:
-        submit_jobs(args.sample_name, args.queue, ploidy, args.sample_list, args.multiple_alignments, jid_cnvnator)
+        submit_jobs(args.sample_name, args.queue, ploidy, args.multiple_alignments, jid_cnvnator)
     
 def parse_args():
     parser = argparse.ArgumentParser(description='Variant filtring job submitter')
     parser.add_argument('--queue', metavar='SGE queue', required=True)
     parser.add_argument('--ploidy', metavar='int', nargs='+', type=int, default=2)
     parser.add_argument('--sample-name', metavar='sample name', required=True)
-    parser.add_argument('--sample-list', metavar='sample list file', required=True)
     parser.add_argument('--multiple-alignments', action='store_true', default=False)
     return parser.parse_args()
 
@@ -40,24 +41,24 @@ def opt(sample, Q, jid=None):
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt
 
-def submit_jobs(sample, Q, ploidy, sample_list, malign, jid_cnvnator):
+def submit_jobs(sample, Q, ploidy, malign, jid_cnvnator):
     jid = q.submit(opt(sample, Q),
         "{job_home}/A.gnomAD_germline_filter.sh {sample} {ploidy}".format(job_home=job_home, sample=sample, ploidy=ploidy))
     jid = q.submit(opt(sample, Q, jid),
         "{job_home}/B.PASS_P.sh {sample} {ploidy}".format(job_home=job_home, sample=sample, ploidy=ploidy))
     jid = q.submit(opt(sample, Q, jid),
-        ("{job_home}/C.VAF_filters.malign.sh {sample} {sample_list} {ploidy}" if malign else "{job_home}/C.VAF_filters.sh {sample} {ploidy}").format(
-            job_home=job_home, sample=sample, sample_list=sample_list, ploidy=ploidy))
+        "{job_home}/C.VAF_filters{malign}.sh {sample} {ploidy}".format(
+            job_home=job_home, malign = ".malign" if malign else "", sample=sample, ploidy=ploidy))
     jid_cnv = q.submit(opt(sample, Q, ",".join([jid_cnvnator, jid])),
         "{job_home}/D.CNVnator_genotype_filter.sh {sample} {ploidy} 100".format(job_home=job_home, sample=sample, ploidy=ploidy))
     jid = q.submit(opt(sample, Q, jid_cnv),
-        ("{job_home}/E.mayo_filters.malign.sh {sample} {sample_list} {ploidy}" if malign else "{job_home}/E.mayo_filters.sh {sample} {ploidy}").format(
-            job_home=job_home, sample=sample, sample_list=sample_list, ploidy=ploidy))
+        "{job_home}/E.mayo_filters{malign}.sh {sample} {ploidy}".format(
+            job_home=job_home, malign = ".malign" if malign else "", sample=sample, ploidy=ploidy))
     jid_mayo_pon = q.submit(opt(sample, Q, jid),
         "{job_home}/F.PON_mask.sh {sample} {ploidy} mayo".format(job_home=job_home, sample=sample, ploidy=ploidy))
     jid = q.submit(opt(sample, Q, jid_cnv),
-        ("{job_home}/E.MosaicForecast.malign.sh {sample} {sample_list} {ploidy}" if malign else "{job_home}/E.MosaicForecast.sh {sample} {ploidy}").format(
-            job_home=job_home, sample=sample, sample_list=sample_list, ploidy=ploidy))
+        "{job_home}/E.MosaicForecast{malign}.sh {sample} {ploidy}".format(
+            job_home=job_home, malign = ".malign" if malign else "", sample=sample, ploidy=ploidy))
     jid_mosaic_pon = q.submit(opt(sample, Q, jid),
         "{job_home}/F.PON_mask.sh {sample} {ploidy} mosaic".format(job_home=job_home, sample=sample, ploidy=ploidy))
     return [jid_mayo_pon, jid_mosaic_pon]

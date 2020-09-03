@@ -11,14 +11,13 @@ if [ -z $JOB_NAME ]; then JOB_NAME=$(basename $0); fi
 trap "exit 100" ERR
 set -e -o pipefail
 
-if [[ $# -lt 3 ]]; then
-    echo "Usage: $JOB_NAME [sample name] [BAM or CRAM list file] [ploidy]"
+if [[ $# -lt 2 ]]; then
+    echo "Usage: $JOB_NAME [sample name] [ploidy]"
     false
 fi
 
 SM=$1
-FBAMLIST=$2
-PL=$3
+PL=$2
 
 source $SM/run_info
 
@@ -28,7 +27,7 @@ printf -- "[$(date)] Start running MosaicForecast.\n"
 printf -- "Sample: $SM \n"
 printf -- "Ploidy: $PL \n-----\n"
 
-SUB_SAMPLES=`awk -v sm="$SM" -v cram="$ALIGNFMT" '$1 == sm {gsub("\\\\."cram, "", $2); print $2}' $FBAMLIST`
+SUB_SAMPLES=`awk -v sm="$SM" -v cram="$ALIGNFMT" '$1 == sm {gsub("\\\\."cram, "", $2); print $2}' $SAMPLE_LIST`
 
 cd $SM
 

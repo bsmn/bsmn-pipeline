@@ -8,14 +8,13 @@
 trap "exit 100" ERR
 set -e -o pipefail
 
-if [[ $# -lt 3 ]]; then
-    echo "Usage: $JOB_NAME <sample name> <BAM or CRAM list file> <BIN size>"
+if [[ $# -lt 2 ]]; then
+    echo "Usage: $JOB_NAME <sample name> <BIN size>"
     exit 1
 fi
 
 SM=$1
-FBAMLIST=$2
-BINSIZE=$3
+BINSIZE=$2
 
 source $(pwd)/$SM/run_info
 
@@ -24,7 +23,7 @@ if [[ $SKIP_CNVNATOR == "True" ]]; then
     exit 0
 fi
 
-BAMS=`awk -v sm="$SM" '$1 == sm {print sm"/alignment/"$2}' $FBAMLIST | xargs`
+BAMS=`awk -v sm="$SM" '$1 == sm {print sm"/alignment/"$2}' $SAMPLE_LIST | xargs`
 OUTDIR=$SM/cnvnator/$BINSIZE
 ROOT=$OUTDIR/${SM}.root
 if [[ $REFVER == "hg19" ]]; then

@@ -16,7 +16,7 @@ SM=$1
 source $(pwd)/$SM/run_info
 
 eval "$(conda shell.bash hook)"
-conda activate $CONDA_ENV
+conda activate --no-stack $CONDA_ENV
 
 printf -- "[$(date)] Start submitting variant filtering jobs.\n---\n"
 
@@ -25,11 +25,11 @@ if [[ $RUN_FILTERS = "False" ]]; then
 else
     mkdir -p $SM/run_status
     if [[ $MULTI_ALIGNS = "False" ]]; then
-        $PYTHON3 $PIPE_HOME/jobs/submit_filtering_jobs.py --queue $Q --ploidy $PLOIDY --sample-name $SM --sample-list $SAMPLE_LIST
+        $PYTHON3 $PIPE_HOME/jobs/submit_filtering_jobs.py --queue $Q --ploidy $PLOIDY --sample-name $SM
         echo "---"
         echo "Submitted filtering jobs with single alignment."
     else
-        $PYTHON3 $PIPE_HOME/jobs/submit_filtering_jobs.py --queue $Q --ploidy $PLOIDY --sample-name $SM --sample-list $SAMPLE_LIST --multiple-alignments
+        $PYTHON3 $PIPE_HOME/jobs/submit_filtering_jobs.py --queue $Q --ploidy $PLOIDY --sample-name $SM --multiple-alignments
         echo "---"
         echo "Submitted filtering jobs with multiple alignments."
     fi

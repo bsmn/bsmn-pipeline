@@ -36,6 +36,7 @@ def main():
         run_info_append(f_run_info, "CONDA_ENV={}".format(args.conda_env))
         run_info_append(f_run_info, "SAMPLE_LIST={}".format(args.sample_list))
         run_info_append(f_run_info, "ALIGNFMT={}".format(args.align_fmt))
+        run_info_append(f_run_info, "FILETYPE={}".format(filetype))
         run_info_append(f_run_info, "REFVER={}".format(args.reference))
         run_info_append(f_run_info, "SKIP_CNVNATOR={}".format(args.skip_cnvnator))
         run_info_append(f_run_info, "RUN_FILTERS={}".format(args.run_filters))
@@ -46,8 +47,8 @@ def main():
         else:
             run_info_append(f_run_info, "RUN_GATK_HC={}".format(args.run_gatk_hc))
 
-        if filetype == "fastq":
-            raise Exception("The input filetype should be bam or cram.")
+        #if filetype == "fastq":
+        #    raise Exception("The input filetype should be bam or cram.")
 
         q.submit(opt(sample, args.queue),
             "{job_home}/prep/start_variant_filtering.sh {sample}".format(

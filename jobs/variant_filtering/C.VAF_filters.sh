@@ -21,12 +21,11 @@ source $(pwd)/$SM/run_info
 
 IN=$SM/gatk-hc/$SM.ploidy_$PL.gnomAD_AFover0.001_filtered.snvs.PASS.P.txt
 VAF=$SM/vaf/$SM.ploidy_$PL.gnomAD_AFover0.001_filtered.snvs.PASS.P.vaf
-if [[ $ALIGNFMT == "cram" ]]; then
-    BAM=$SM/alignment/$SM.cram
+if [[ $FILETYPE == "fastq" ]]; then
+    BAM=$SM/alignment/$SM.$ALIGNFMT
 else
-    BAM=$SM/alignment/$SM.bam
+    BAM=`awk -v sm="$SM" '$1 == sm {print sm"/alignment/"$2}' $SAMPLE_LIST |head -1`
 fi
-
 
 SECONDS=0
 
