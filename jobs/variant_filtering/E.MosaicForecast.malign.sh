@@ -9,7 +9,7 @@ if [ -z $NSLOTS ]; then NSLOTS=$(nproc); fi
 if [ -z $JOB_NAME ]; then JOB_NAME=$(basename $0); fi
 
 trap "exit 100" ERR
-set -e -o pipefail
+#set -e -o pipefail
 
 if [[ $# -lt 2 ]]; then
     echo "Usage: $JOB_NAME [sample name] [ploidy]"
@@ -93,7 +93,7 @@ else
     TOUT=${BED/bed/mosaic.out}
     rm -f $FEATURES $TIN $TOUT $TOUT.tmp $PREDICTION # Just in case of rerunning
     
-    set +e +o pipefail
+    #set +e +o pipefail
     for i in $(seq $(cat $BED|wc -l)); do
         tail -n+$i $BED |head -n1 > $TIN
         echo ">> $(cat $TIN)"
@@ -123,7 +123,7 @@ else
         fi
         rm -f $TIN $TOUT.tmp
     done
-    set -e -o pipefail
+    #set -e -o pipefail
     
     if [[ -s $FEATURES ]]; then
         Rscript $MFDIR/Prediction.R $FEATURES $MFDIR/models_trained/250xRFmodel_addRMSK_Refine.rds Refine $PREDICTION
