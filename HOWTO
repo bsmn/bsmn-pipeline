@@ -8,6 +8,9 @@ Getting the bsmn pipeline
 Creating an environment from YAML file
 ======================================
 
+This step depend on the conda which is a tool for installling and managing dependencies.
+You need to install conda first (https://docs.conda.io/en/latest/miniconda.html).
+
 To create a new conda environment from the given environment.yml file, run:
 
     conda env create -f /path/to/environment.yml 
@@ -62,5 +65,8 @@ TODO
 Running the pipeline
 ====================
 
-TODO
+Align raw reads (fastq) to genome (b37, hg19 or hg38)
+
+    python3 /path/to/pipeline/jobs/run_genome_mapping.py -q 4-day -r hg19 -f bam --target-seq -p 50 --run-filters --skip-cnvnator
+
 
