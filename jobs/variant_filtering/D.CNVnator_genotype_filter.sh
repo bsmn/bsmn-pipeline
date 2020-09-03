@@ -39,15 +39,14 @@ printf -- "[IN] Variants before CNV genotype filtering: $(cat $CAND | wc -l) \n"
 mkdir -p $OUTDIR
 
 if [[ ! -f $OUTDIR/${SM}.ploidy_$PL.genotype ]]; then
-    # $CONDA activate cnvnator
-    CONDADIR=/home/mayo/m216456/miniconda3
-    source $CONDADIR/bin/activate cnvnator
+    #eval "$(conda shell.bash hook)"
+    #conda activate cnvnator
     
     awk '{print $1":"$2-1000"-"$2+1000} END {print "exit"}' $CAND \
-    	|cnvnator -root $ROOT -genotype $BINSIZE \
+    	|$CNVNATOR -root $ROOT -genotype $BINSIZE \
     	|grep Genotype > $OUTDIR/${SM}.ploidy_$PL.genotype
     
-    source $CONDADIR/bin/deactivate
+    #conda deactivate
 else
     echo "Skip CNV genotyping: Already done."
 fi

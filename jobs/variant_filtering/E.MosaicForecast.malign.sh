@@ -90,16 +90,6 @@ DONE=run_status/MosaicForecast.malign.ploidy_$PL.done
 if [[ -f $DONE ]]; then
     echo "Skip this. Already done."
 else
-    # TODO: config.ini
-    #CONDADIR=/home/mayo/m216456/miniconda3
-    #source $CONDADIR/bin/activate MF
-    eval "$(conda shell.bash hook)"
-    conda activate MF
-    
-    # TODO: config.ini
-    MFDIR=$HOME/Playground/MosaicForecast
-    MFRES=/research/bsi/projects/PI/tertiary/Abyzov_Alexej_m124423/s203958.TS_mosaicism/BSMN_ref_tissue.analysis/36.MosaicForecast/resources/hg19
-    
     TIN=${BED/bed/mosaic.in}
     TOUT=${BED/bed/mosaic.out}
     rm -f $FEATURES $TIN $TOUT $TOUT.tmp $PREDICTION # Just in case of rerunning
@@ -142,9 +132,6 @@ else
         echo "No features."
     fi
     
-    #source $CONDADIR/bin/deactivate
-    conda deactivate
-
     rm -rf tmp
     mkdir -p run_status
     touch $DONE

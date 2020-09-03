@@ -34,7 +34,6 @@ fi
 OUT=${IN%.txt}.pon.txt
 #CAND_LIMIT=2000
 CAND_LIMIT=100000
-PONFA=$PIPE_HOME/resources/PON.q20q20.05.5.fa
 
 if [[ ! -f $IN ]]; then 
     echo "[ERROR] $IN does not exist."
@@ -56,26 +55,22 @@ SECONDS=0
 
 if [[ -s $IN ]]; then # Only if the input file is not empty
     if [[ ! -f $OUT ]]; then
-        #CONDADIR=/home/mayo/m216456/miniconda3
-        #source $CONDADIR/bin/activate ucsc
-        eval "$(conda shell.bash hook)"
-        conda activate ucsc
+        #eval "$(conda shell.bash hook)"
+        #conda activate ucsc
 
-        liftOver <(awk '{if(!($1~/^chr/)) $1="chr"$1; print $1"\t"$2-1"\t"$2"\t"$3"\t"$4}' <(sort -k1,1V -k2,2g $IN)) \
-	    $PIPE_HOME/resources/hg19ToHg38.over.chain.gz \
-	    $HG38_BED $UNMAPPED
+        $LIFTOVER <(awk '{if(!($1~/^chr/)) $1="chr"$1; print $1"\t"$2-1"\t"$2"\t"$3"\t"$4}' <(sort -k1,1V -k2,2g $IN)) \
+	    $HG19_TO_HG38 $HG38_BED $UNMAPPED
 
-        #source $CONDADIR/bin/deactivate
-        conda deactivate
-        
-        # samtools faidx -r <(awk '{print $1":"$3"-"$3}' $HG38_BED) $PONFA \
+        #conda deactivate
+
+        # $SAMTOOLS faidx -r <(awk '{print $1":"$3"-"$3}' $HG38_BED) $PONFA \
         #     |paste - - |cut -f2 |paste <(cut -f1,3-5 $HG38_BED) - \
 
         cut -f1,3-5 $HG38_BED \
         |while read CHR POS REF ALT; do
             RE="^chr([0-9]+|[XY])\\b"
             if [[ $CHR =~ $RE ]]; then
-                P=$(samtools faidx $PONFA $CHR:$POS-$POS |tail -1)
+                P=$($SAMTOOLS faidx $PONFA $CHR:$POS-$POS |tail -1)
             else
                 P="?"
             fi

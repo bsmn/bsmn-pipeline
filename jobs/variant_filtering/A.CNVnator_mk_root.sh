@@ -52,22 +52,18 @@ else
     fi
     mkdir -p $OUTDIR
     
-    # $CONDA activate cnvnator
-    #CONDADIR=/home/mayo/m216456/miniconda3
-    #source $CONDADIR/bin/activate cnvnator
-    eval "$(conda shell.bash hook)"
-    conda activate cnvnator
+    #eval "$(conda shell.bash hook)"
+    #conda activate cnvnator
     
     export XDG_CACHE_HOME=$PIPE_HOME/resources/$REFVER.cache
     
-    cnvnator -root $ROOT -chrom $CHROM -tree $BAM -lite
-    cnvnator -root $ROOT -chrom $CHROM -his $BINSIZE -d $REFDIR
-    cnvnator -root $ROOT -chrom $CHROM -stat $BINSIZE
-    cnvnator -root $ROOT -chrom $CHROM -partition $BINSIZE
-    cnvnator -root $ROOT -chrom $CHROM -call $BINSIZE > $OUTDIR/${SM}.cnvcall
+    $CNVNATOR -root $ROOT -chrom $CHROM -tree $BAM -lite
+    $CNVNATOR -root $ROOT -chrom $CHROM -his $BINSIZE -d $REFDIR
+    $CNVNATOR -root $ROOT -chrom $CHROM -stat $BINSIZE
+    $CNVNATOR -root $ROOT -chrom $CHROM -partition $BINSIZE
+    $CNVNATOR -root $ROOT -chrom $CHROM -call $BINSIZE > $OUTDIR/${SM}.cnvcall
     
-    #source $CONDADIR/bin/deactivate
-    conda deactivate
+    #conda deactivate
 
     mkdir -p $SM/run_status
     touch $DONE

@@ -30,8 +30,10 @@ def main():
         q.set_run_jid(f_run_jid, new=True)
 
         f_run_info = sample + "/run_info"
-        run_info(f_run_info, args.reference)
+        run_info(f_run_info, args.reference, args.conda_env)
         run_info_append(f_run_info, "\n#RUN_OPTIONS")
+        run_info_append(f_run_info, "Q={}".format(args.queue))
+        run_info_append(f_run_info, "CONDA_ENV={}".format(args.conda_env))
         run_info_append(f_run_info, "SAMPLE_LIST={}".format(args.sample_list))
         run_info_append(f_run_info, "ALIGNFMT={}".format(args.align_fmt))
         run_info_append(f_run_info, "REFVER={}".format(args.reference))
@@ -47,20 +49,24 @@ def main():
         if filetype == "fastq":
             raise Exception("The input filetype should be bam or cram.")
 
-        q.submit(opt(sample),
+        q.submit(opt(sample, args.queue),
             "{job_home}/prep/start_variant_filtering.sh {sample}".format(
                 job_home=job_home, sample=sample))
 
         print()
 
-def opt(sample, jid=None):
-    opt = "-V -q 1-hour -r y -j y -o {log_dir} -l h_vmem=4G".format(log_dir=log_dir(sample))
+def opt(sample, Q, jid=None):
+    opt = "-V -q {q} -r y -j y -o {log_dir} -l h_vmem=4G".format(q=Q, log_dir=log_dir(sample))
     if jid is not None:
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
     return opt
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Variant Filtering Pipeline')
+    parser.add_argument('-q', '--queue', metavar='queue', required=True,
+        help='''Specify the queue name of Sun Grid Engine for jobs to be submitted''')
+    parser.add_argument('-n', '--conda-env', metavar='env',
+        help='''Specify the name of conda environment for pipeline [default is bp]''', default="bp")
     parser.add_argument('-p', '--run-gatk-hc', metavar='ploidy', type=int, nargs='+', default=False)
     parser.add_argument('--skip-cnvnator', action='store_true', default=False)
     parser.add_argument('--run-filters', action='store_true', default=True)

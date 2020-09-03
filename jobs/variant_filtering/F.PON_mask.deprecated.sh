@@ -53,17 +53,13 @@ SECONDS=0
 
 if [[ -s $IN ]]; then # Only if the input file is not empty
     if [[ ! -f $OUT ]]; then
-        #CONDADIR=/home/mayo/m216456/miniconda3
-        #source $CONDADIR/bin/activate ucsc
-        eval "$(conda shell.bash hook)"
-        conda activate ucsc
+        #eval "$(conda shell.bash hook)"
+        #conda activate ucsc
 
-        liftOver <(awk '{if(!($1~/^chr/)) $1="chr"$1; print $1"\t"$2-1"\t"$2"\t"$3"\t"$4}' $IN) \
-	    $PIPE_HOME/resources/hg19ToHg38.over.chain.gz \
-	    $HG38_BED $UNMAPPED
+        $LIFTOVER <(awk '{if(!($1~/^chr/)) $1="chr"$1; print $1"\t"$2-1"\t"$2"\t"$3"\t"$4}' $IN) \
+	    $HG19_TO_HG38 $HG38_BED $UNMAPPED
 
-        #source $CONDADIR/bin/deactivate
-        conda deactivate
+        #conda deactivate
         
         export XDG_CACHE_HOME=$PIPE_HOME/resources/hg38.cache
         $PYTHON3 $PIPE_HOME/utils/PON_mask.2.py <(cut -f1,3-5 $HG38_BED) $OUT.tmp $HC_1KG_CRAMDIR $((NSLOTS-2)) \
