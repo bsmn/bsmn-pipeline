@@ -18,14 +18,16 @@ fi
 SM=$1
 PL=$2
 
-cd $SM
-source run_info
+source $(pwd)/$SM/run_info
 
 SECONDS=0
 
 printf -- "[$(date)] Start running MosaicForecast.\n"
 printf -- "Sample: $SM \n"
 printf -- "Ploidy: $PL \n-----\n"
+
+SAMPLE_LIST=$(readlink -f $SAMPLE_LIST)
+cd $SM
 
 if [[ $SKIP_CNVNATOR == "True" ]]; then
     IN=candidates/$SM.ploidy_$PL.txt
@@ -36,7 +38,7 @@ BED=${IN/txt/bed}
 FEATURES=${BED/bed/mosaic.features}
 PREDICTION=${FEATURES/features/predictions}
 
-SM_FILE=$(awk -v sm="$SM" '$1 == sm {print $2}' ../$SAMPLE_LIST |head -1)
+SM_FILE=$(awk -v sm="$SM" '$1 == sm {print $2}' $SAMPLE_LIST |head -1)
 if [[ $FILETYPE != "fastq" && $SM_FILE != $SM.$ALIGNFMT ]]; then
     SM_NAME=${SM_FILE/.$ALIGNFMT/}
 else
