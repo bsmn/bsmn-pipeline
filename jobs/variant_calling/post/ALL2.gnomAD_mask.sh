@@ -17,9 +17,9 @@ fi
 INFILE=$1
 OUTFILE=${INFILE%.*}.mask.gnomAD.txt
 
-STRICT_MASK=/home/mayo/m216456/Playground/bsmn-pipeline/resources/hg19/20141020.strict_mask.whole_genome.fasta.gz
-# GNOMAD=/home/mayo/m216456/Playground/bsmn-pipeline/resources/gnomAD.AFover.0.001.b37.txt.gz
-GNOMAD=/home/mayo/m216456/Playground/bsmn-pipeline/resources/gnomAD.r2.1.1.AFover0.001.both.txt.gz
+STRICT_MASK=/home/mayo/m216456/Playground/bsmn-pipeline/resources.old/hg19/20141020.strict_mask.whole_genome.fasta.gz
+# GNOMAD=/home/mayo/m216456/Playground/bsmn-pipeline/resources.old/gnomAD.AFover.0.001.b37.txt.gz
+GNOMAD=/home/mayo/m216456/Playground/bsmn-pipeline/resources.old/gnomAD.r2.1.1.AFover0.001.both.txt.gz
 
 if [ -z $NSLOTS ]; then NSLOTS=$(nproc); fi
 NPROC=$((NSLOTS-2))

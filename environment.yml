@@ -32,6 +32,7 @@ dependencies:
   - pysamstats
   - pyfaidx
   - regex
+  - parallel
   - r-rcolorbrewer
   - r-ggplot2
   - r-paramhelpers
@@ -43,3 +44,5 @@ dependencies:
   - r-xml
   - r-glmnet
   - r-caret
+  - lftp
+  - google-cloud-sdk

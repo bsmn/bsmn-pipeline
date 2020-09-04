@@ -52,8 +52,19 @@ For the reproducibility and consistency, it is recommended to checkout the speci
     cd MosaicForecast
     git checkout 63d8e60
 
-Downloading resources
-=====================
+Resources
+=========
+
+google-cloud-sdk and crcmod
+---------------------------
+
+    conda activate bp # Make sure you've activated the environment you created.
+    pip3 install --no-cache-dir -U crcmod
+    gsutils version -l # You should see the 'compiled crcmod: True'
+    conda deactivate
+
+Start downloading
+-----------------
 
 TODO
 

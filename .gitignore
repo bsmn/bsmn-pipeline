@@ -7,3 +7,4 @@ __pycache__/
 # tools / resources directories
 /tools/
 /resources/
+/resources.old/
