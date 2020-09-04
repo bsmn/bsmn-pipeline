@@ -13,7 +13,7 @@ conda activate --no-stack bp
 # You already have these files? Just copy or link them into $RESDIR/hg19 to skip to the next step.
 if [[ ! -f $RESDIR/hg19/human_g1k_v37_decoy.fasta ]]; then
     gsutil -m cp gs://gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.gz \
-                 gs://gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.fai.gz \
+                 #gs://gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.fai.gz \
                  gs://gatk-legacy-bundles/b37/human_g1k_v37_decoy.dict.gz \
                  gs://gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.amb \
                  gs://gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.ann \
@@ -28,7 +28,8 @@ if [[ ! -f $RESDIR/hg19/human_g1k_v37_decoy.fasta ]]; then
                  gs://gatk-legacy-bundles/b37/1000G_phase1.snps.high_confidence.b37.vcf.gz \
                  $RESDIR/hg19
     gunzip $RESDIR/hg19/human_g1k_v37_decoy.*.gz
-    echo "Indexing VCF files ..."
+    echo "Indexing ..."
+    samtools faidx $RESDIR/hg19/human_g1k_v37_decoy.fasta
     for V in $RESDIR/hg19/*.b37.vcf.gz; do gunzip $V; bgzip -@ 4 ${V/.gz/}; tabix -p vcf -f $V; done
     echo "Done."
 fi
