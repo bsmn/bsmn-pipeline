@@ -8,7 +8,7 @@ Getting the bsmn pipeline
 Creating an environment from YAML file
 ======================================
 
-This step depend on the conda which is a tool for installling and managing dependencies.
+This step depends on the conda which is a tool for installling and managing dependencies.
 You need to install conda first (https://docs.conda.io/en/latest/miniconda.html).
 
 To create a new conda environment from the given environment.yml file, run:
@@ -23,7 +23,7 @@ Installing ucsc packages
 ucsc-* packages were excluded from the environment file because of conflicting with root.
 Here you need to install those packages by running commands as follows:
 
-    conda install -n bp ucsc-fetchchromsizes ucsc-bigwigaverageoverbed ucsc-wigtobigwig ucsc-liftover
+    conda install -c bioconda -n bp ucsc-fetchchromsizes ucsc-bigwigaverageoverbed ucsc-wigtobigwig ucsc-liftover
 
 Building CNVnator
 =================
@@ -63,21 +63,66 @@ google-cloud-sdk and crcmod
     gsutils version -l # You should see the 'compiled crcmod: True'
     conda deactivate
 
-Start downloading
------------------
+Downloading
+-----------
 
-TODO
+    /path/to/pipeline/download_resources.sh
 
 Configuring the pipeline
 ========================
 
-TODO
+    /path/to/pipeline/config.{b37,h19,h38}.ini
 
 Running the pipeline
 ====================
 
-Align raw reads (fastq) to genome (b37, hg19 or hg38)
+sample_list.txt file format
+---------------------------
 
-    python3 /path/to/pipeline/jobs/run_genome_mapping.py -q 4-day -r hg19 -f bam --target-seq -p 50 --run-filters --skip-cnvnator
+If you have fastq files,
 
+    #sample_id    file_name                       location (full path)
+    FVLT          FVLT_S15_L003_R1_001.fastq.gz   /path/to/FVLT_S15_L003_R1_001.fastq.gz
+    FVLT          FVLT_S15_L003_R2_001.fastq.gz   /path/to/FVLT_S15_L003_R2_001.fastq.gz
+
+If you have cram (or bam) files,
+
+    #sample_id    file_name       location (full path)
+    AN02255       AN02255.cram    /path/to/AN02255.cram
+
+Align raw reads (fastq) to genome (b37 (default), hg19 or hg38)
+---------------------------------------------------------------
+
+Align fastq files to GRCh37 reference genome to make a aligned cram, an ummapped bam and flagstats.
+
+    python3 /path/to/pipeline/jobs/run_genome_mapping.py -q 4-day --sample-list /path/to/sample_list.txt 
+
+    -q, --queue       specify the SGE queue for jobs to be submitted.
+    -n, --conda-env   specify the name of conda environment (default: bp)
+    -t, --target-seq  enable targeted sequencing mode to skip mark duplication.
+    -f, --align-fmt   specify alignment format (cram|bam). Default is cram.
+    -r, --reference   specify reference genome (b37|hg19|hg38). Default is b37 (GRCh37).
+    --sample-list     specify sample_list.txt file
+    -p, --run-gatk-hc once alignment complete, run the variant calling with the given ploidy.
+    --run-filters     once variant calling complete, run the varinat filtering as well.
+
+Running the GATK HaplotypeCaller
+--------------------------------
+
+Given the BAM file, run the GATK HaplotypeCaller with ploidy 2, 12 and 50.
+
+    python3 /path/to/pipeline/jobs/run_variant_calling.py -q 4-day -p 2 12 50 --sample-list /path/to/sample_list.txt 
+
+    -p, --run-gatk-hc  specify ploidy options used by GATK.
+    --run-filters      once variant calling complete, run the varinat filtering as well.
+
+Variant filtering
+-----------------
+
+Given the BAM and VCF files, run the variant filtering.
+
+    python3 /path/to/pipeline/jobs/run_variant_calling.py -q 4-day -p 50 --sample-list /path/to/sample_list.txt 
+
+    --skip-cnvnator            skip the CNV filering
+    -m, --multiple-alignments  enable multiple cram (or bam) files mode for combined calling 
 
