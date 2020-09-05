@@ -8,7 +8,7 @@ set -o pipefail
 
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) <sample>"
-    false
+    exit 100
 fi
 
 SM=$1

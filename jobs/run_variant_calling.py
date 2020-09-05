@@ -71,7 +71,7 @@ def main():
         #jid = ",".join(jid_list)
 
         if args.align_fmt == "cram" and filetype == "bam":
-            jid = q.submit(opt(sample, args.queue, jid),
+            jid = q.submit(opt(sample, args.queue),
                 "{job_home}/pre_2.bam2cram.sh {sample}".format(
                     job_home=job_home, sample=sample))
             jid = q.submit(opt(sample, args.queue, jid),
@@ -82,9 +82,10 @@ def main():
         jid = q.submit(opt(sample, args.queue),
             "{job_home}/pre_3.run_variant_calling.sh {sample}".format(
                 job_home=job_home, sample=sample))
-        q.submit(opt(sample, args.queue, jid),
-            "{job_home}/pre_4.upload_cram.sh {sample}".format(
-                job_home=job_home, sample=sample))
+        if args.upload is not None:
+            q.submit(opt(sample, args.queue, jid),
+                "{job_home}/pre_4.upload_cram.sh {sample}".format(
+                    job_home=job_home, sample=sample))
 
         print()
 

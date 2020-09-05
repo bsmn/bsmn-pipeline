@@ -2,7 +2,7 @@
 
 if [[ $# -lt 2 ]]; then
     echo "Usage: $(basename $0) <sample list file> <align fmt>"
-    false
+    exit
 fi
 
 FSMLIST=$1
@@ -14,9 +14,13 @@ for SM in `cut -f1 $FSMLIST |sort -u`; do
     |while read BAM LOC; do
          ln -sf $(readlink -f $LOC) $SM/alignment/$BAM
          if [[ $ALIGNFMT == "cram" ]]; then
-             ln -sf $(readlink -f $LOC.crai) $SM/alignment/$BAM.crai
+             ls -lh $LOC.crai &> /dev/null \
+                && ln -sf $(readlink -f $LOC.crai) $SM/alignment/$BAM.crai \
+                || ln -sf $(readlink -f ${LOC/.cram/.crai}) $SM/alignment/${BAM/.cram/.crai}
          else
-             ln -sf $(readlink -f $LOC.bai) $SM/alignment/$BAM.bai
+             ls -lh $LOC.bai &> /dev/null \
+                && ln -sf $(readlink -f $LOC.bai) $SM/alignment/$BAM.bai \
+                || ln -sf $(readlink -f ${LOC/.bam/.bai}) $SM/alignment/${BAM/.bam/.bai}
          fi
      done
 done
