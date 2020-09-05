@@ -17,40 +17,29 @@ To create a new conda environment from the given environment.yml file, run:
 
 By default, the name of environment will be 'bp'. you can change it by adding a '-n <name>' option to the command above.
 
-Installing ucsc packages
-========================
-
-ucsc-* packages were excluded from the environment file because of conflicting with root.
-Here you need to install those packages by running commands as follows:
-
-    conda install -c bioconda -n bp ucsc-fetchchromsizes ucsc-bigwigaverageoverbed ucsc-wigtobigwig ucsc-liftover
-
-Building CNVnator
+Downloading GATK3
 =================
 
-To build and install CNVnator, activate the 'bp' environment and type the following commands:
+We use GATK3 for the indel realignment through the alignment pipeline.
+Due to license restrictions, you need to download a copy of GATK3 from the Broad Institute.
+
+    wget https://storage.googleapis.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef.tar.bz2 \
+         -O GenomeAnalysisTK-3.8.tar.bz2
+
+Then you can register into your conda environment.
 
     conda activate bp # Make sure you've activated the environment you created.
-    cd $CONDA_PREFIX # Within the environment directory
-    git clone https://github.com/yjjang/CNVnator.git
-    cd CNVnator
-    wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2
-    tar xjf samtools-1.10.tar.bz2 && mv samtools-1.10 samtools
-    cd samtools
-    ./configure && make -j 8
-    cd ..
-    make YEPPPLIBDIR=../lib YEPPPINCLUDEDIR=../include/yeppp
-    cd $CONDA_PREFIX/bin && ln -s ../CNVnator/cnvnator
+    gatk3-register /path/to/GenomeAnalysisTK-3.8.tar.bz2
+
+GATK4, which is used in the variant calling pipeline, doesn't have a such restriction.
 
 Installing MosaicForecast
 =========================
 
-For the reproducibility and consistency, it is recommended to checkout the specific revision as below.
-
-    cd $CONDA_PREFIX # Within the environment directory (optional, any directory would be fine)
+    cd $CONDA_PREFIX # Optional, any directory would be ok if you set it properly in config.ini
     git clone https://github.com/parklab/MosaicForecast.git
     cd MosaicForecast
-    git checkout 63d8e60
+    git checkout 63d8e60 # Optional, this is the revision we used in our analyses.
 
 Resources
 =========
@@ -60,13 +49,13 @@ google-cloud-sdk and crcmod
 
     conda activate bp # Make sure you've activated the environment you created.
     pip3 install --no-cache-dir -U crcmod
-    gsutils version -l # You should see the 'compiled crcmod: True'
-    conda deactivate
+    gsutil version -l # You should see the 'compiled crcmod: True'
 
-Downloading
------------
+Downloading resources
+---------------------
 
-    /path/to/pipeline/download_resources.sh
+    cd /path/to/pipeline
+    ./download_resources.sh
 
 Configuring the pipeline
 ========================
@@ -75,6 +64,9 @@ Configuring the pipeline
 
 Running the pipeline
 ====================
+
+You don't need to activate the conda environment for running the pipeline.  It will be taken care of by the pipeline.
+All commands below should be running in the directory where you want to get results.
 
 sample_list.txt file format
 ---------------------------
@@ -106,8 +98,8 @@ Align fastq files to GRCh37 reference genome to make a aligned cram, an ummapped
     -p, --run-gatk-hc once alignment complete, run the variant calling with the given ploidy.
     --run-filters     once variant calling complete, run the varinat filtering as well.
 
-Running the GATK HaplotypeCaller
---------------------------------
+Run the GATK HaplotypeCaller
+----------------------------
 
 Given the BAM file, run the GATK HaplotypeCaller with ploidy 2, 12 and 50.
 

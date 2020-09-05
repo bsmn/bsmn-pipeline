@@ -9,7 +9,7 @@ mkdir -p $RESDIR $RESDIR/hg19 $RESDIR/hg38
 eval "$(conda shell.bash hook)"
 conda activate --no-stack bp
 
-# Download and index the humnan reference genome (CRCh37 a.k.a. b37)
+# Download and index the humnan reference genome (GRCh37 a.k.a. b37)
 # You already have these files? Just copy or link them into $RESDIR/hg19 to skip to the next step.
 if [[ ! -f $RESDIR/hg19/human_g1k_v37_decoy.fasta ]]; then
     gsutil -m cp gs://gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.gz \

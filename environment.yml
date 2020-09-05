@@ -1,7 +1,7 @@
 name: bp
 channels:
-  - conda-forge
   - bioconda
+  - conda-forge
   - defaults
 dependencies:
   - python=3
@@ -12,15 +12,16 @@ dependencies:
   - vcftools
   - sambamba
   - vt=0.57721
-  - picard
-  - gatk
+  - picard=2.23.3
+  - gatk=3.8
   - gatk4
-  - root
-  - pwwang::yeppp
-#  - ucsc-fetchchromsizes
-#  - ucsc-bigwigaverageoverbed
-#  - ucsc-wigtobigwig
-#  - ucsc-liftover
+#  - root_base=6.20.6
+#  - bioconda::cnvnator=0.4.1
+  - bioconda::cnvnator
+  - ucsc-fetchchromsizes
+  - ucsc-bigwigaverageoverbed
+  - ucsc-wigtobigwig
+  - ucsc-liftover
   - scipy
   - numpy
   - pandas
@@ -44,5 +45,5 @@ dependencies:
   - r-xml
   - r-glmnet
   - r-caret
-  - lftp
+  - hcc::lftp[version='>=4.9.1']
   - google-cloud-sdk
