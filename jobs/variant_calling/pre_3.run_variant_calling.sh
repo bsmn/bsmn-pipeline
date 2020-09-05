@@ -23,7 +23,7 @@ else
     awk -v sm="$SM" -v OFS='\t' '$1 == sm {print $2, $3}' $SAMPLE_LIST |head -1 \
     |while read BAM LOC; do
          if [[ ! -f "$SM/alignment/$BAM" ]]; then # alignment file doesn't exist.
-             echo "Linking alignment files to the sample directory ..."
+             echo "INFO: Linking alignment files to the sample directory ..."
              mkdir -p $SM/alignment
              ln -sf $(readlink -f $LOC) $SM/alignment/$BAM
              if [[ $FILETYPE == "cram" ]]; then

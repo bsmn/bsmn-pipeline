@@ -60,6 +60,9 @@ Downloading resources
 Configuring the pipeline
 ========================
 
+If you changed any directories for tools or resources,
+you need to set them properly in config files for each reference genome.
+
     /path/to/pipeline/config.{b37,h19,h38}.ini
 
 Running the pipeline
@@ -85,7 +88,7 @@ If you have cram (or bam) files,
 Align raw reads (fastq) to genome (b37 (default), hg19 or hg38)
 ---------------------------------------------------------------
 
-Align fastq files to GRCh37 reference genome to make a aligned cram, an ummapped bam and flagstats.
+Align fastq files to a reference genome to make a aligned cram, an ummapped bam and flagstats.
 
     python3 /path/to/pipeline/jobs/run_genome_mapping.py -q 4-day --sample-list /path/to/sample_list.txt 
 
@@ -101,6 +104,7 @@ Align fastq files to GRCh37 reference genome to make a aligned cram, an ummapped
 Run the GATK HaplotypeCaller
 ----------------------------
 
+If you've already done aligning, you can run from the variant calling pipeline.
 Given the BAM file, run the GATK HaplotypeCaller with ploidy 2, 12 and 50.
 
     python3 /path/to/pipeline/jobs/run_variant_calling.py -q 4-day -p 2 12 50 --sample-list /path/to/sample_list.txt 
@@ -110,6 +114,18 @@ Given the BAM file, run the GATK HaplotypeCaller with ploidy 2, 12 and 50.
 
 Variant filtering
 -----------------
+
+If you've already done aligning and calling variants, you can run from the variant filtering pipeline.
+** Please note that you need to link your existing vcf files.
+** Name of vcf and index files must be formed as follows:
+       <sample name>.ploidy_<ploidy>.vcf.gz
+       <sample name>.ploidy_<ploidy>.vcf.gz.tbi
+
+To link vcf files to the sample directory, run:
+
+    # In the directory where you want to get results
+    /path/to/pipeline/jobs/variant_filtering/prep/VCF_files.link.sh \
+        -d /path/to/vcf/directory -p <ploidy> /path/to/sample_list.txt
 
 Given the BAM and VCF files, run the variant filtering.
 

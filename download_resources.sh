@@ -55,7 +55,6 @@ if [[ ! -f $RESDIR/hg38/Homo_sapiens_assembly38.fasta ]]; then
                  gs://gcp-public-data--broad-references/hg38/v0/hapmap_3.3.hg38.vcf.gz \
                  gs://gcp-public-data--broad-references/hg38/v0/hapmap_3.3.hg38.vcf.gz.tbi \
                  $RESDIR/hg38
-    touch $RESDIR/hg38/*.vcf.gz.tbi
     cd $RESDIR/hg38
     lftp -e 'pget -n 10 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp_146.hg38.vcf.gz; exit'
     lftp -e 'pget -n 2 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp_146.hg38.vcf.gz.tbi; exit'
