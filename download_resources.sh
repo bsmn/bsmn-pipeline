@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+set -Ee -o pipefail
+
+SECONDS=0
+
 PIPEHOME=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 RESDIR=$PIPEHOME/resources
 
@@ -11,7 +15,7 @@ conda activate --no-stack bp
 
 # Download and index the humnan reference genome (GRCh37 a.k.a. b37)
 # You already have these files? Just copy or link them into $RESDIR/hg19 to skip to the next step.
-if [[ ! -f $RESDIR/hg19/human_g1k_v37_decoy.fasta ]]; then
+if [[ ! -f $RESDIR/hg19/human_g1k_v37_decoy.fasta.fai ]]; then
     gsutil -m cp gs://gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.gz \
                  gs://gatk-legacy-bundles/b37/human_g1k_v37_decoy.dict.gz \
                  gs://gatk-legacy-bundles/b37/human_g1k_v37_decoy.fasta.amb \
@@ -26,16 +30,16 @@ if [[ ! -f $RESDIR/hg19/human_g1k_v37_decoy.fasta ]]; then
                  gs://gatk-legacy-bundles/b37/hapmap_3.3.b37.vcf.gz \
                  gs://gatk-legacy-bundles/b37/1000G_phase1.snps.high_confidence.b37.vcf.gz \
                  $RESDIR/hg19
-    gunzip $RESDIR/hg19/human_g1k_v37_decoy.*.gz
+    gunzip -f $RESDIR/hg19/human_g1k_v37_decoy.*.gz
     echo "Indexing ..."
+    for V in $RESDIR/hg19/*.b37.vcf.gz; do gunzip -f $V; bgzip -f -@ 4 ${V/.gz/}; tabix -p vcf -f $V; done
     samtools faidx $RESDIR/hg19/human_g1k_v37_decoy.fasta
-    for V in $RESDIR/hg19/*.b37.vcf.gz; do gunzip $V; bgzip -@ 4 ${V/.gz/}; tabix -p vcf -f $V; done
     echo "Done."
 fi
 
 # Download and index the humnan reference genome (hg38)
 # You already have these files? Just copy or link them into $RESDIR/hg38 to skip to the next step.
-if [[ ! -f $RESDIR/hg38/Homo_sapiens_assembly38.fasta ]]; then
+if [[ ! -f $RESDIR/hg38/dbsnp_146.hg38.vcf.gz.tbi ]]; then
     gsutil -m cp gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta \
                  gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta.fai \
                  gs://gcp-public-data--broad-references/hg38/v0/Homo_sapiens_assembly38.fasta.amb \
@@ -58,12 +62,12 @@ if [[ ! -f $RESDIR/hg38/Homo_sapiens_assembly38.fasta ]]; then
     cd $RESDIR/hg38
     lftp -e 'pget -n 10 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp_146.hg38.vcf.gz; exit'
     lftp -e 'pget -n 2 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp_146.hg38.vcf.gz.tbi; exit'
-    cd -
+    cd - &> /dev/null
 fi
 
 # Download and index the humnan reference genome (UCSC hg19)
 # You already have these files? Just copy or link them into $RESDIR/hg19 to skip to the next step.
-if [[ ! -f $RESDIR/hg19/ucsc.hg19.fasta ]]; then
+if [[ ! -f $RESDIR/hg19/Mills_and_1000G_gold_standard.indels.hg19.sites.vcf.gz.tbi ]]; then
     gsutil -m cp gs://gatk-legacy-bundles/hg19/ucsc.hg19.dict \
                  gs://gatk-legacy-bundles/hg19/ucsc.hg19.fasta \
                  gs://gatk-legacy-bundles/hg19/ucsc.hg19.fasta.fai \
@@ -75,20 +79,20 @@ if [[ ! -f $RESDIR/hg19/ucsc.hg19.fasta ]]; then
     lftp -e 'pget -n 4 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/1000G_omni2.5.hg19.sites.vcf.gz; exit'
     lftp -e 'pget -n 4 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/hapmap_3.3.hg19.sites.vcf.gz; exit'
     lftp -e 'pget -n 10 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/1000G_phase1.snps.high_confidence.hg19.sites.vcf.gz; exit'
-    cd -
+    cd - &> /dev/null
     echo "Indexing VCF files ..."
-    for V in $RESDIR/hg19/*.hg19*.vcf.gz; do gunzip $V; bgzip -@ 4 ${V/.gz/}; tabix -p vcf -f $V; done
+    for V in $RESDIR/hg19/*.hg19*.vcf.gz; do gunzip -f $V; bgzip -f -@ 4 ${V/.gz/}; tabix -p vcf -f $V; done
     echo "Done."
 fi
 if [[ ! -f $RESDIR/hg19/ucsc.hg19.fasta.bwt ]]; then bwa index $RESDIR/hg19/ucsc.hg19.fasta; fi
 
 # Strict mask for all chromosomes from 1000 Genomes Project
-if [[ ! -f $RESDIR/hg19/1KG.20141020.strict_mask.hg19_GRCh37.fa.gz ]]; then
+if [[ ! -f $RESDIR/hg19/1KG.20141020.strict_mask.hg19_GRCh37.fa.gz.gzi ]]; then
     wget -c -P $RESDIR/hg19 https://github.com/abyzovlab/CNVnator/raw/master/ExampleData/1KG.20141020.strict_mask.hg19_GRCh37.fa.gz
     wget -c -P $RESDIR/hg19 https://github.com/abyzovlab/CNVnator/raw/master/ExampleData/1KG.20141020.strict_mask.hg19_GRCh37.fa.gz.fai
     wget -c -P $RESDIR/hg19 https://github.com/abyzovlab/CNVnator/raw/master/ExampleData/1KG.20141020.strict_mask.hg19_GRCh37.fa.gz.gzi
 fi
-if [[ ! -f $RESDIR/hg38/1KG.20160622.strict_mask.hg38_GRCh38.fa.gz ]]; then
+if [[ ! -f $RESDIR/hg38/1KG.20160622.strict_mask.hg38_GRCh38.fa.gz.gzi ]]; then
     wget -c -P $RESDIR/hg38 https://github.com/abyzovlab/CNVnator/raw/master/ExampleData/1KG.20160622.strict_mask.hg38_GRCh38.fa.gz
     wget -c -P $RESDIR/hg38 https://github.com/abyzovlab/CNVnator/raw/master/ExampleData/1KG.20160622.strict_mask.hg38_GRCh38.fa.gz.fai
     wget -c -P $RESDIR/hg38 https://github.com/abyzovlab/CNVnator/raw/master/ExampleData/1KG.20160622.strict_mask.hg38_GRCh38.fa.gz.gzi
@@ -106,7 +110,7 @@ if [[ ! -f $RESDIR/PON.q20q20.05.5.fa ]]; then
 fi
 
 # gnomAD variants with AF > 0.001
-if [[ ! -f $RESDIR/hg19/gnomAD.r2.1.1.AFover0.001.snps.txt.gz ]]; then
+if [[ ! -f $RESDIR/hg19/gnomAD.r2.1.1.AFover0.001.snps.txt.gz.tbi ]]; then
     cat $PIPEHOME/downloads/gnomAD.r2.1.1.AFover0.001.snps.txt.gz.part* >$RESDIR/hg19/gnomAD.r2.1.1.AFover0.001.snps.txt.gz
     tabix -p vcf -f $RESDIR/hg19/gnomAD.r2.1.1.AFover0.001.snps.txt.gz
 fi
@@ -133,7 +137,7 @@ if [[ ! -f $RESDIR/hg19/k24.umap.wg.bw ]]; then
     echo "Creating a bigWig file ..."
     wigToBigWig <(zcat $RESDIR/hg19/k24.umap.wg.gz) $RESDIR/hg19/hg19.chrom.sizes $RESDIR/hg19/k24.umap.wg.bw
     echo "Done."
-    cd -
+    cd - &> /dev/null
 fi
 if [[ ! -f $RESDIR/hg38/k24.umap.wg.bw ]]; then
     cd $RESDIR
@@ -142,8 +146,11 @@ if [[ ! -f $RESDIR/hg38/k24.umap.wg.bw ]]; then
     echo "Creating a bigWig file ..."
     wigToBigWig <(zcat $RESDIR/hg38/k24.umap.wg.gz) $RESDIR/hg38/hg38.chrom.sizes $RESDIR/hg38/k24.umap.wg.bw
     echo "Done."
-    cd -
+    cd - &> /dev/null
 fi
 
 conda deactivate
+
+elapsed=$SECONDS
+printf -- "\n>> Total $(($elapsed / 3600)) hours, $(($elapsed % 3600 / 60)) minutes and $(($elapsed % 60)) seconds elapsed.\n"
 
