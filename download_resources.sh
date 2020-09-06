@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 PIPEHOME=$(dirname $(readlink -f ${BASH_SOURCE[0]}))
 RESDIR=$PIPEHOME/resources
