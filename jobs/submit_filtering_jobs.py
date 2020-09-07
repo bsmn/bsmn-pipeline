@@ -61,7 +61,10 @@ def submit_jobs(sample, Q, ploidy, malign, jid_cnvnator):
             job_home=job_home, malign = ".malign" if malign else "", sample=sample, ploidy=ploidy))
     jid_mosaic_pon = q.submit(opt(sample, Q, jid),
         "{job_home}/F.PON_mask.sh {sample} {ploidy} mosaic".format(job_home=job_home, sample=sample, ploidy=ploidy))
-    return [jid_mayo_pon, jid_mosaic_pon]
+    jid = ",".join([jid_mayo_pon, jid_mosaic_pon])
+    jid = q.submit(opt(sample, Q, jid),
+        "{job_home}/G.filtered_VCF.sh {sample} {ploidy}".format(job_home=job_home, sample=sample, ploidy=ploidy))
+    return jid
 
 if __name__ == "__main__":
     main()
