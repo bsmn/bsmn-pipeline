@@ -18,10 +18,10 @@ dependencies:
 #  - root_base=6.20.6
 #  - bioconda::cnvnator=0.4.1
   - bioconda::cnvnator
-  - ucsc-fetchchromsizes
-  - ucsc-bigwigaverageoverbed
-  - ucsc-wigtobigwig
-  - ucsc-liftover
+#  - ucsc-fetchchromsizes
+#  - ucsc-bigwigaverageoverbed
+#  - ucsc-wigtobigwig
+#  - ucsc-liftover
   - scipy
   - numpy
   - pandas
@@ -47,3 +47,6 @@ dependencies:
   - r-caret
   - hcc::lftp[version='>=4.9.1']
   - google-cloud-sdk
+  - pip
+  - pip:
+    - crcmod

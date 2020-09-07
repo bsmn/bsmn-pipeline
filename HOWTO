@@ -5,8 +5,8 @@ Getting the bsmn pipeline
 
     git clone https://github.com/bsmn/bsmn-pipeline.git
 
-Creating an environment from YAML file
-======================================
+Creating a conda environment from YAML file
+===========================================
 
 This step depends on the conda which is a tool for installling and managing dependencies.
 You need to install conda first (https://docs.conda.io/en/latest/miniconda.html).
@@ -16,6 +16,13 @@ To create a new conda environment from the given environment.yml file, run:
     conda env create -f /path/to/environment.yml 
 
 By default, the name of environment will be 'bp'. you can change it by adding a '-n <name>' option to the command above.
+
+Installing ucsc packages
+========================
+
+To install ucsc-* packages, run:
+
+    conda install -n bp -c bioconda ucsc-fetchchromsizes ucsc-bigwigaverageoverbed ucsc-wigtobigwig ucsc-liftover
 
 Downloading GATK3
 =================
@@ -41,18 +48,8 @@ Installing MosaicForecast
     cd MosaicForecast
     git checkout 63d8e60 # Optional, this is the revision we used in our analyses.
 
-Resources
-=========
-
-google-cloud-sdk and crcmod
----------------------------
-
-    conda activate bp # Make sure you've activated the environment you created.
-    pip3 install --no-cache-dir -U crcmod
-    gsutil version -l # You should see the 'compiled crcmod: True'
-
 Downloading resources
----------------------
+=====================
 
     cd /path/to/pipeline
     ./download_resources.sh
