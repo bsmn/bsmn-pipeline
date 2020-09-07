@@ -60,8 +60,8 @@ if [[ ! -f $RESDIR/hg38/dbsnp_146.hg38.vcf.gz.tbi ]]; then
                  gs://gcp-public-data--broad-references/hg38/v0/hapmap_3.3.hg38.vcf.gz.tbi \
                  $RESDIR/hg38
     cd $RESDIR/hg38
-    lftp -e 'pget -n 10 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp_146.hg38.vcf.gz; exit'
-    lftp -e 'pget -n 2 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp_146.hg38.vcf.gz.tbi; exit'
+    lftp -c 'set ftp:web-mode true; pget -n 10 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp_146.hg38.vcf.gz'
+    lftp -c 'set ftp:web-mode true; pget -n 2 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg38/dbsnp_146.hg38.vcf.gz.tbi'
     cd - &> /dev/null
 fi
 
@@ -73,12 +73,12 @@ if [[ ! -f $RESDIR/hg19/Mills_and_1000G_gold_standard.indels.hg19.sites.vcf.gz.t
                  gs://gatk-legacy-bundles/hg19/ucsc.hg19.fasta.fai \
                  $RESDIR/hg19
     cd $RESDIR/hg19
-    lftp -e 'pget -n 10 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/dbsnp_138.hg19.vcf.gz; exit'
-    lftp -e 'pget -n 4 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/Mills_and_1000G_gold_standard.indels.hg19.sites.vcf.gz; exit'
-    lftp -e 'pget -n 4 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/1000G_phase1.indels.hg19.sites.vcf.gz; exit'
-    lftp -e 'pget -n 4 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/1000G_omni2.5.hg19.sites.vcf.gz; exit'
-    lftp -e 'pget -n 4 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/hapmap_3.3.hg19.sites.vcf.gz; exit'
-    lftp -e 'pget -n 10 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/1000G_phase1.snps.high_confidence.hg19.sites.vcf.gz; exit'
+    lftp -c 'set ftp:web-mode true; pget -n 10 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/dbsnp_138.hg19.vcf.gz'
+    lftp -c 'set ftp:web-mode true; pget -n 4 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/Mills_and_1000G_gold_standard.indels.hg19.sites.vcf.gz'
+    lftp -c 'set ftp:web-mode true; pget -n 4 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/1000G_phase1.indels.hg19.sites.vcf.gz'
+    lftp -c 'set ftp:web-mode true; pget -n 4 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/1000G_omni2.5.hg19.sites.vcf.gz'
+    lftp -c 'set ftp:web-mode true; pget -n 4 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/hapmap_3.3.hg19.sites.vcf.gz'
+    lftp -c 'set ftp:web-mode true; pget -n 10 -c ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/hg19/1000G_phase1.snps.high_confidence.hg19.sites.vcf.gz'
     cd - &> /dev/null
     echo "Indexing VCF files ..."
     for V in $RESDIR/hg19/*.hg19*.vcf.gz; do gunzip -f $V; bgzip -f -@ 4 ${V/.gz/}; tabix -p vcf -f $V; done
