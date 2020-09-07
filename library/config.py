@@ -6,7 +6,8 @@ import subprocess
 def read_config(reference = "b37", conda_env = "bp"):
     lib_home = os.path.dirname(os.path.realpath(__file__))
     pipe_home = os.path.normpath(lib_home + "/..")
-    env_dir = subprocess.check_output("conda info -e | grep -w ^{} | awk '{{print $NF}}'".format(conda_env), shell=True, text=True).strip()
+    env_dir = subprocess.check_output("conda info -e | grep -w ^{} | awk '{{print $NF}}'".format(conda_env),
+                                      shell=True, universal_newlines=True).strip()
     config = configparser.ConfigParser()
     config["PATH"] = {
         "pipe_home": pipe_home,
