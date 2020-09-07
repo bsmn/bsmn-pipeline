@@ -44,7 +44,7 @@ Installing MosaicForecast
 =========================
 
     cd $CONDA_PREFIX # Optional, any directory would be ok if you set it properly in config.ini
-    git clone --depth 17 https://github.com/parklab/MosaicForecast.git
+    git clone https://github.com/parklab/MosaicForecast.git
     cd MosaicForecast
     git checkout 63d8e60 # Optional, this is the revision we used in our analyses.
 
