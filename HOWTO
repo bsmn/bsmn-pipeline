@@ -113,21 +113,16 @@ Variant filtering
 -----------------
 
 If you've already done aligning and calling variants, you can run from the variant filtering pipeline.
-** Please note that you need to link your existing vcf files.
-** Name of vcf and index files must be formed as follows:
+In such case, you need to specify a directory where your existing vcf files are using -v (--vcf-directory) option.
+VCF and index file names should be formed as follows:
        <sample name>.ploidy_<ploidy>.vcf.gz
        <sample name>.ploidy_<ploidy>.vcf.gz.tbi
-
-To link vcf files to the sample directory, run:
-
-    # In the directory where you want to get results
-    /path/to/pipeline/jobs/variant_filtering/prep/VCF_files.link.sh \
-        -d /path/to/vcf/directory -p <ploidy> /path/to/sample_list.txt
 
 Given the BAM and VCF files, run the variant filtering.
 
     python3 /path/to/pipeline/jobs/run_variant_calling.py -q 4-day -p 50 --sample-list /path/to/sample_list.txt 
 
     --skip-cnvnator            skip the CNV filering
-    -m, --multiple-alignments  enable multiple cram (or bam) files mode for combined calling 
+    -v, --vcf-directory        If you have VCF files elsewhere, specify the directory where VCF files are.
+    -m, --multiple-alignments  enable multiple cram (or bam) files mode for combined calling
 

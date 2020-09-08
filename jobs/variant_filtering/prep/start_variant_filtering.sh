@@ -7,19 +7,21 @@ trap "exit 100" ERR
 set -o pipefail
 
 if [[ $# -lt 1 ]]; then
-    echo "Usage: $(basename $0) <sample>"
+    echo "Usage: $(basename $0) <sample> [<VCF directory>]"
     exit 100
 fi
 
 SM=$1
+VCFDIR=$2
 
 source $(pwd)/$SM/run_info
+IFS=' ' read -ra PL <<< "$PLOIDY"
 
-# Link alignment files to $SM/alignment
+# Link alignment and vcf files to the $SM directory if required
 awk -v sm="$SM" -v OFS='\t' '$1 == sm {print $2, $3}' $SAMPLE_LIST |head -1 \
 |while read BAM LOC; do
      if [[ ! -f "$SM/alignment/$BAM" ]]; then # alignment file doesn't exist.
-         echo "INFO: Linking alignment files to the sample directory ..."
+         echo "[INFO] Linking $BAM to the alignment directory ..."
          mkdir -p $SM/alignment
          ln -sf $(readlink -f $LOC) $SM/alignment/$BAM
          if [[ $FILETYPE == "cram" ]]; then
@@ -32,15 +34,21 @@ awk -v sm="$SM" -v OFS='\t' '$1 == sm {print $2, $3}' $SAMPLE_LIST |head -1 \
                 || ln -sf $(readlink -f ${LOC/.bam/.bai}) $SM/alignment/${BAM/.bam/.bai}
          fi
      fi
+     for pl in "${PL[@]}"; do
+         if [[ ! -f "$SM/gatk-hc/$SM.ploidy_$pl.vcf.gz" ]]; then # vcf file doesn't exist.
+             if [ -z $VCFDIR ]; then
+                 echo "[ERROR] VCF file for $SM with ploidy $pl is not ready?"
+                 echo "[ERROR] You may forget to set -v (--vcf-directory) option."
+                 exit 100;
+             else
+                 echo "[INFO] Linking $SM.ploidy_$pl.vcf.gz from $VCFDIR ..."
+                 mkdir -p $SM/gatk-hc
+                 ln -sf $(readlink -f $VCFDIR/$SM.ploidy_$pl.vcf.gz) $SM/gatk-hc/$SM.ploidy_$pl.vcf.gz
+                 ln -sf $(readlink -f $VCFDIR/$SM.ploidy_$pl.vcf.gz.tbi) $SM/gatk-hc/$SM.ploidy_$pl.vcf.gz.tbi
+             fi
+         fi
+     done
  done
-IFS=' ' read -ra PL <<< "$PLOIDY"
-for pl in "${PL[@]}"; do
-    if [[ ! -f "$SM/gatk-hc/$SM.ploidy_$pl.vcf.gz" ]]; then
-        echo "ERROR: VCF files for $SM with ploidy $pl are not ready?"
-        echo "ERROR: You may need to use prep/VCF_files.link.sh"
-        exit 100;
-    fi
-done
 
 eval "$(conda shell.bash hook)"
 conda activate --no-stack $CONDA_ENV

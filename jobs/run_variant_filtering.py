@@ -50,9 +50,13 @@ def main():
         #if filetype == "fastq":
         #    raise Exception("The input filetype should be bam or cram.")
 
-        q.submit(opt(sample, args.queue),
-            "{job_home}/prep/start_variant_filtering.sh {sample}".format(
-                job_home=job_home, sample=sample))
+        if args.vcf_directory is not None:
+            q.submit(opt(sample, args.queue),
+                "{job_home}/prep/start_variant_filtering.sh {sample} {vcf_dir}".format(
+                    job_home=job_home, sample=sample, vcf_dir=args.vcf_directory))
+        else:
+            q.submit(opt(sample, args.queue),
+                "{job_home}/prep/start_variant_filtering.sh {sample}".format(job_home=job_home, sample=sample))
 
         print()
 
@@ -76,6 +80,13 @@ def parse_args():
         help='''Alignment format [cram (default) or bam]''', default="cram")
     parser.add_argument('-r', '--reference', metavar='ref',
         help='''Reference version [b37 (default) or hg19]''', default="b37")
+    parser.add_argument('-v', '--vcf-directory', metavar='dir',
+        help='''Specify a directory where existing VCF files are, if you have.
+        VCF file for each ploidy will be linked into the sample directory before running the filtering.
+        VCF and index file names must be formed as follows:
+            <sample name>.ploidy_<ploidy>.vcf.gz
+            <sample name>.ploidy_<ploidy>.vcf.gz.tbi
+        [Default: None]''', default=None)
     parser.add_argument('--sample-list', metavar='sample_list.txt', required=True,
         help='''Sample list file.
         Each line format is "sample_id\\tfile_name\\tlocation".
