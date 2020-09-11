@@ -39,19 +39,23 @@ git clone https://github.com/bsmn/bsmn_pipeline
 ```
 
 Create a [conda](https://docs.conda.io/en/latest/miniconda.html) environment from YAML file to install software dependencies running the following commands.
-By default, the name of environment will be `bp`. you can change it by adding a `-n your\_name` option.
+By default, the name of environment will be `bp`. you can change it by adding a `-n your_name` option.
 ```bash
 conda env create -f /path/to/pipeline/environment.yml
 ```
 
 Install ucsc-\* software packages.
 ```bash
-conda install -n bp -c bioconda ucsc-fetchchromsizes ucsc-bigwigaverageoverbed ucsc-wigtobigwig ucsc-liftover
+conda install -n bp -c bioconda ucsc-fetchchromsizes \
+                                ucsc-bigwigaverageoverbed \
+                                ucsc-wigtobigwig \
+                                ucsc-liftover
 ```
 
 Due to license restrictions, you need to download a copy of GATK3 from the Broad Institute. Then you can register into your conda environment.
 ```bash
-wget https://storage.googleapis.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef.tar.bz2 -O GenomeAnalysisTK-3.8.tar.bz2
+wget https://storage.googleapis.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef.tar.bz2 \
+     -O GenomeAnalysisTK-3.8.tar.bz2
 conda activate bp # Make sure you've activated the environment you created.
 gatk3-register /path/to/GenomeAnalysisTK-3.8.tar.bz2
 ```
@@ -111,7 +115,9 @@ AN02255       AN02255.cram    /path/to/AN02255.cram
 ## Genome mapping
 Align fastq files to a reference genome to make a aligned cram, an ummapped bam and flagstats.
 ```bash
-python3 /path/to/pipeline/jobs/run_genome_mapping.py -q your_queue --sample-list /path/to/sample_list.txt
+python3 /path/to/pipeline/jobs/run_genome_mapping.py \
+        -q your_queue \
+        --sample-list /path/to/sample_list.txt
 ```
 ### options
 ```
@@ -129,7 +135,10 @@ python3 /path/to/pipeline/jobs/run_genome_mapping.py -q your_queue --sample-list
 If you've already done aligning, you can run from the variant calling pipeline.
 Given the BAM file, run the GATK4 HaplotypeCaller with the given ploidy options.
 ```bash
-python3 /path/to/pipeline/jobs/run_variant_calling.py -q your_queue -p 2 12 50 --sample-list /path/to/sample_list.txt
+python3 /path/to/pipeline/jobs/run_variant_calling.py \
+        -q your_queue \
+        -p 2 12 50 \
+        --sample-list /path/to/sample_list.txt
 ```
 ### options
 ```
@@ -151,7 +160,10 @@ VCF and index file names should be formed as follows:
 ```
 Given the BAM and VCF files, run the variant filtering.
 ```bash
-python3 /path/to/pipeline/jobs/run_variant_filtering.py -q your_queue -p 50 --sample-list /path/to/sample_list.txt
+python3 /path/to/pipeline/jobs/run_variant_filtering.py \
+        -q your_queue \
+        -p 50 \
+        --sample-list /path/to/sample_list.txt
 ```
 ### options
 ```
