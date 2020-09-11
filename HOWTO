@@ -120,7 +120,7 @@ VCF and index file names should be formed as follows:
 
 Given the BAM and VCF files, run the variant filtering.
 
-    python3 /path/to/pipeline/jobs/run_variant_calling.py -q 4-day -p 50 --sample-list /path/to/sample_list.txt 
+    python3 /path/to/pipeline/jobs/run_variant_filtering.py -q 4-day -p 50 --sample-list /path/to/sample_list.txt 
 
     --skip-cnvnator            skip the CNV filering
     -v, --vcf-directory        If you have VCF files elsewhere, specify the directory where VCF files are.
