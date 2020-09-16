@@ -18,37 +18,39 @@ source $(pwd)/$SM/run_info
 IFS=' ' read -ra PL <<< "$PLOIDY"
 
 # Link alignment and vcf files to the $SM directory if required
-awk -v sm="$SM" -v OFS='\t' '$1 == sm {print $2, $3}' $SAMPLE_LIST |head -1 \
-|while read BAM LOC; do
-     if [[ ! -f "$SM/alignment/$BAM" ]]; then # alignment file doesn't exist.
-         echo "[INFO] Linking $BAM to the alignment directory ..."
-         mkdir -p $SM/alignment
-         ln -sf $(readlink -f $LOC) $SM/alignment/$BAM
-         if [[ $FILETYPE == "cram" ]]; then
-             ls -lh $LOC.crai &> /dev/null \
-                && ln -sf $(readlink -f $LOC.crai) $SM/alignment/$BAM.crai \
-                || ln -sf $(readlink -f ${LOC/.cram/.crai}) $SM/alignment/${BAM/.cram/.crai}
-         else
-             ls -lh $LOC.bai &> /dev/null \
-                && ln -sf $(readlink -f $LOC.bai) $SM/alignment/$BAM.bai \
-                || ln -sf $(readlink -f ${LOC/.bam/.bai}) $SM/alignment/${BAM/.bam/.bai}
-         fi
-     fi
-     for pl in "${PL[@]}"; do
-         if [[ ! -f "$SM/gatk-hc/$SM.ploidy_$pl.vcf.gz" ]]; then # vcf file doesn't exist.
-             if [ -z $VCFDIR ]; then
-                 echo "[ERROR] VCF file for $SM with ploidy $pl is not ready?"
-                 echo "[ERROR] You may forget to set -v (--vcf-directory) option."
-                 exit 100;
+if [[ $FILETYPE != "fastq" ]]; then
+    awk -v sm="$SM" -v OFS='\t' '$1 == sm {print $2, $3}' $SAMPLE_LIST |head -1 \
+    |while read BAM LOC; do
+         if [[ ! -f "$SM/alignment/$BAM" ]]; then # alignment file doesn't exist.
+             echo "[INFO] Linking $BAM to the alignment directory ..."
+             mkdir -p $SM/alignment
+             ln -sf $(readlink -f $LOC) $SM/alignment/$BAM
+             if [[ $FILETYPE == "cram" ]]; then
+                 ls -lh $LOC.crai &> /dev/null \
+                    && ln -sf $(readlink -f $LOC.crai) $SM/alignment/$BAM.crai \
+                    || ln -sf $(readlink -f ${LOC/.cram/.crai}) $SM/alignment/${BAM/.cram/.crai}
              else
-                 echo "[INFO] Linking $SM.ploidy_$pl.vcf.gz from $VCFDIR ..."
-                 mkdir -p $SM/gatk-hc
-                 ln -sf $(readlink -f $VCFDIR/$SM.ploidy_$pl.vcf.gz) $SM/gatk-hc/$SM.ploidy_$pl.vcf.gz
-                 ln -sf $(readlink -f $VCFDIR/$SM.ploidy_$pl.vcf.gz.tbi) $SM/gatk-hc/$SM.ploidy_$pl.vcf.gz.tbi
+                 ls -lh $LOC.bai &> /dev/null \
+                    && ln -sf $(readlink -f $LOC.bai) $SM/alignment/$BAM.bai \
+                    || ln -sf $(readlink -f ${LOC/.bam/.bai}) $SM/alignment/${BAM/.bam/.bai}
              fi
          fi
+         for pl in "${PL[@]}"; do
+             if [[ ! -f "$SM/gatk-hc/$SM.ploidy_$pl.vcf.gz" ]]; then # vcf file doesn't exist.
+                 if [ -z $VCFDIR ]; then
+                     echo "[ERROR] VCF file for $SM with ploidy $pl is not ready?"
+                     echo "[ERROR] You may forget to set -v (--vcf-directory) option."
+                     exit 100;
+                 else
+                     echo "[INFO] Linking $SM.ploidy_$pl.vcf.gz from $VCFDIR ..."
+                     mkdir -p $SM/gatk-hc
+                     ln -sf $(readlink -f $VCFDIR/$SM.ploidy_$pl.vcf.gz) $SM/gatk-hc/$SM.ploidy_$pl.vcf.gz
+                     ln -sf $(readlink -f $VCFDIR/$SM.ploidy_$pl.vcf.gz.tbi) $SM/gatk-hc/$SM.ploidy_$pl.vcf.gz.tbi
+                 fi
+             fi
+         done
      done
- done
+fi
 
 eval "$(conda shell.bash hook)"
 conda activate --no-stack $CONDA_ENV
