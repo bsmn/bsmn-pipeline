@@ -6,10 +6,15 @@ import subprocess
 from .config import read_config
 from .misc import coroutine
 
-config = read_config()
-SAMTOOLS = config["TOOLS"]["SAMTOOLS"]
-if not os.path.isfile(SAMTOOLS) or not os.access(SAMTOOLS, os.X_OK):
-    SAMTOOLS = shutil.which("samtools")
+# By default, use a samtools in PATH.
+SAMTOOLS = shutil.which("samtools")
+
+def load_config(reference, conda_env):
+    global SAMTOOLS;
+    config = read_config(reference, conda_env)
+    SAMTOOLS = config["TOOLS"]["SAMTOOLS"]
+    if not os.path.isfile(SAMTOOLS) or not os.access(SAMTOOLS, os.X_OK):
+        SAMTOOLS = shutil.which("samtools")
 
 def base_count(bam, min_MQ, min_BQ):
     return pileup(bam, min_MQ, min_BQ, base_n())

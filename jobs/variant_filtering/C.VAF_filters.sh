@@ -47,7 +47,7 @@ else
     else
         export XDG_CACHE_HOME=$PIPE_HOME/resources/b37.cache
     fi
-    $PYTHON3 $PIPE_HOME/utils/somatic_vaf.2.py -q 20 -Q 20 -b $BAM -n $((NSLOTS-2)) $IN > $VAF
+    $PYTHON3 $PIPE_HOME/utils/somatic_vaf.2.py -q 20 -Q 20 -b $BAM -r $REFVER -c $CONDA_ENV -n $((NSLOTS-2)) $IN > $VAF
 
     mkdir -p $SM/run_status
     touch $DONE

@@ -51,7 +51,7 @@ DONE1=$SM/run_status/Mayo_filters.strand.ploidy_$PL.done
 if [[ -f $DONE1 ]]; then
     echo "Skip calculating strand bias. Already done."
 else
-    cut -f1-4 $IN | $PYTHON3 $PIPE_HOME/utils/strand_bias.2.py -q 20 -Q 20 -b $BAM -n $((NSLOTS-2)) > $STR
+    cut -f1-4 $IN | $PYTHON3 $PIPE_HOME/utils/strand_bias.2.py -q 20 -Q 20 -b $BAM -r $REFVER -c $CONDA_ENV -n $((NSLOTS-2)) > $STR
     mkdir -p $SM/run_status
     touch $DONE1
 fi

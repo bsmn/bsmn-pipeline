@@ -3,9 +3,21 @@ import synapseclient
 import subprocess
 from .config import read_config
 
-config = read_config()
-SYNAPSE = config["TOOLS"]["SYNAPSE"]
-NDA_TOKEN = config["PATH"]["pipe_home"] + "/utils/nda_aws_token.sh"
+LIB_DIR = os.path.dirname(os.path.realpath(__file__))
+PIPE_HOME = os.path.normpath(LIB_DIR + "/..")
+NDA_TOKEN = PIPE_HOME + "/utils/nda_aws_token.sh"
+
+# By default, use a synapse in PATH.
+SYNAPSE = shutil.which("synapse")
+
+def load_config(reference, conda_env):
+    global SYNAPSE;
+    global NDA_TOKEN;
+    config = read_config(reference, conda_env)
+    SYNAPSE = config["TOOLS"]["SYNAPSE"]
+    if not os.path.isfile(SYNAPSE) or not os.access(SYNAPSE, os.X_OK):
+        SYNAPSE = shutil.which("synapse")
+    NDA_TOKEN = config["PATH"]["pipe_home"] + "/utils/nda_aws_token.sh"
 
 def synapse_login():
     print("- Check synapse login")

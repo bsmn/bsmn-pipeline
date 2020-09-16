@@ -11,7 +11,7 @@ from multiprocessing import Pool
 pipe_home = os.path.dirname(os.path.realpath(__file__)) + "/.."
 sys.path.append(pipe_home)
 from library.misc import coroutine, printer
-from library.pileup import base_count
+from library.pileup import load_config, base_count
 
 def run(args):
     header = ('#chr\tpos\tref\talt\t'
@@ -97,6 +97,14 @@ def main():
         required=True)
 
     parser.add_argument(
+        '-r', '--reference', metavar='REFVER',
+        help='reference genome to use', default=None)
+
+    parser.add_argument(
+        '-c', '--conda-env', metavar='CONDA_ENV',
+        help='CONDA environment name to use', default=None)
+
+    parser.add_argument(
         '-q', '--min-MQ', metavar='INT',
         help='mapQ cutoff value [20]',
         type=int, default=20)
@@ -122,6 +130,9 @@ def main():
     parser.set_defaults(func=run)
     
     args = parser.parse_args()
+
+    if args.reference is not None and args.conda_env is not None:
+        load_config(args.reference, args.conda_env)
 
     if(len(vars(args)) == 0):
         parser.print_help()
