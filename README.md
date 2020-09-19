@@ -43,6 +43,15 @@ By default, the name of environment will be `bp`. you can change it by adding a 
 ```bash
 conda env create -f /path/to/pipeline/environment.yml
 ```
+Instead you can use a different YAML file for a version-fixed conda environment where major tools for alignment and variant calling are frozen with their exact versions we used in BSMN data analyses as follows:
+* bwa 0.7.17
+* picard 2.17.4
+* GATK3 3.7
+* GATK4 4.1.2
+By default, the name of frozen environment will be `bp_forzen`.
+```bash
+conda env create -f /path/to/pipeline/environment_frozen.yml
+```
 
 Install ucsc-\* software packages.
 ```bash
@@ -52,18 +61,30 @@ conda install -n bp -c bioconda ucsc-fetchchromsizes \
                                 ucsc-liftover
 ```
 
-Due to license restrictions, you need to download a copy of GATK3 from the Broad Institute. Then you can register into your conda environment.
+Due to license restrictions, you need to download a copy of GATK3 from the Broad Institute.
 ```bash
 wget https://storage.googleapis.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef.tar.bz2 \
      -O GenomeAnalysisTK-3.8.tar.bz2
-conda activate bp # Make sure you've activated the environment you created.
-gatk3-register /path/to/GenomeAnalysisTK-3.8.tar.bz2
+```
+If you are on the frozen environment (`bp_frozen`), you should download a copy of verion 3.7.
+```bash
+wget https://storage.googleapis.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2 \
+     -O GenomeAnalysisTK-3.7.tar.bz2
+```
+Then you can register the downloaded GATK3 into your conda environment.
+```bash
+conda activate bp # Make sure you've activated the environment you are working on (bp or bp_frozen).
+gatk3-register /path/to/downloaded/GenomeAnalysisTK-3.8.tar.bz2 # 3.8 for bp, 3.7 for bp_frozen.
 ```
 
 Install [MosaicForecast](https://github.com/parklab/MosaicForecast).
 ```bash
 cd /path/to/conda/environment # Optional, any directory would be ok if you set it properly in config.ini
 git clone https://github.com/parklab/MosaicForecast.git
+```
+If you are on the frozen environment (`bp_frozen`), you should checkout the specific revision (`63d8e60`) as following:
+```bash
+git checkout 63d8e60
 ```
 
 ## Downloading resources
@@ -119,6 +140,7 @@ python3 /path/to/pipeline/jobs/run_genome_mapping.py \
         -q your_queue \
         --sample-list /path/to/sample_list.txt
 ```
+If you are going to use the frozen conda environment, you need to set `-n bp_frozen`.
 ### options
 ```
 -q, --queue        specify the SGE queue for jobs to be submitted.
@@ -140,6 +162,7 @@ python3 /path/to/pipeline/jobs/run_variant_calling.py \
         -p 2 12 50 \
         --sample-list /path/to/sample_list.txt
 ```
+If you are going to use the frozen conda environment, you need to set `-n bp_frozen`.
 ### options
 ```
 -q, --queue        specify the SGE queue for jobs to be submitted.
