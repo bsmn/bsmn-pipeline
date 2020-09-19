@@ -12,8 +12,8 @@ dependencies:
   - vcftools
   - sambamba
   - vt=0.57721
-  - picard=2.23.3
-  - gatk=3.8
+  - picard
+  - gatk
   - gatk4
 #  - root_base=6.20.6
 #  - bioconda::cnvnator=0.4.1

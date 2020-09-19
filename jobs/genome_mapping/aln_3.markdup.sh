@@ -24,7 +24,7 @@ if [[ -f $DONE ]]; then
     echo "Skip this step."
 
 else
-    $JAVA -Xmx30G -Djava.io.tmpdir=tmp -jar $PICARD MarkDuplicates \
+    $PICARD -Xmx30G -Djava.io.tmpdir=tmp MarkDuplicates \
         I=$SM/alignment/$SM.merged.bam \
         O=$SM/alignment/$SM.markduped.bam \
         METRICS_FILE=$SM/alignment/markduplicates_metrics.txt \

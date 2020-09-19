@@ -24,7 +24,7 @@ printf -- "---\n[$(date)] Start RealignerTargetCreator.\n"
 if [[ -f $DONE1 ]]; then
     echo "Skip the target creation step."
 else
-    $JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
+    $GATK -Xmx58G -Djava.io.tmpdir=tmp \
         -T RealignerTargetCreator -nt $NSLOTS \
         -R $REF -known $MILLS -known $INDEL1KG \
         -I $SM/alignment/$SM.markduped.bam \
@@ -39,7 +39,7 @@ printf -- "---\n[$(date)] Start IndelRealigner.\n---\n"
 if [[ -f $DONE2 ]]; then
     echo "Skip the indel realign step."
 else
-    $JAVA -Xmx58G -Djava.io.tmpdir=tmp -jar $GATK \
+    $GATK -Xmx58G -Djava.io.tmpdir=tmp \
         -T IndelRealigner \
         -R $REF -known $MILLS -known $INDEL1KG \
         -targetIntervals $SM/alignment/realigner.intervals \

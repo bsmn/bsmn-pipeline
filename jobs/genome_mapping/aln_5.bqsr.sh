@@ -26,7 +26,7 @@ printf -- "---\n[$(date)] Start BQSR recal_table.\n---\n"
 if [[ -f $DONE1 ]]; then
     echo "Skip the recal_table step."
 else
-    $JAVA -Xmx58G -jar $GATK \
+    $GATK -Xmx58G \
         -T BaseRecalibrator -nct $NSLOTS \
         -R $REF -knownSites $DBSNP -knownSites $MILLS -knownSites $INDEL1KG \
         -I $SM/alignment/$SM.realigned.bam \
@@ -42,14 +42,14 @@ if [[ -f $DONE2 ]]; then
     echo "Skip the print_reads step."
 else
     if [[ $ALIGNFMT == "cram" ]]; then
-        $JAVA -Xmx58G -jar $GATK \
+        $GATK -Xmx58G \
             -T PrintReads -nct $((NSLOTS/2)) \
             --disable_indel_quals \
             -R $REF -BQSR $SM/alignment/recal_data.table \
             -I $SM/alignment/$SM.realigned.bam \
             |$SAMTOOLS view -@ $((NSLOTS/2)) -C -T $REF -o $SM/alignment/$SM.cram
     else
-        $JAVA -Xmx58G -jar $GATK \
+        $GATK -Xmx58G \
             -T PrintReads -nct $((NSLOTS/2)) \
             --disable_indel_quals \
             --disable_bam_indexing \
