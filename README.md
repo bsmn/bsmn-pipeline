@@ -64,18 +64,19 @@ conda install -n bp -c bioconda ucsc-fetchchromsizes \
 
 Due to license restrictions, you need to download a copy of GATK3 from the Broad Institute.
 ```bash
-wget https://storage.googleapis.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef.tar.bz2 \
-     -O GenomeAnalysisTK-3.8.tar.bz2
+conda activate bp # Make sure you've activated the environment you are working on.
+wget -qO- https://storage.googleapis.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef.tar.bz2 \
+     |tar xj GenomeAnalysisTK.jar
+gatk3-register GenomeAnalysisTK.jar
+rm GenomeAnalysisTK.jar # Once register, you can delete the downloaded file.
 ```
 If you are on the frozen environment (`bp_frozen`), you should download a copy of verion 3.7.
 ```bash
-wget https://storage.googleapis.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2 \
-     -O GenomeAnalysisTK-3.7.tar.bz2
-```
-Then you can register the downloaded GATK3 into your conda environment.
-```bash
-conda activate bp # Make sure you've activated the environment you are working on (bp or bp_frozen).
-gatk3-register /path/to/downloaded/GenomeAnalysisTK-3.8.tar.bz2 # 3.8 for bp, 3.7 for bp_frozen.
+conda activate bp_frozen # Make sure you've activated the environment you are working on.
+wget -qO- https://storage.googleapis.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.7-0-gcfedb67.tar.bz2 \
+     |tar xj GenomeAnalysisTK.jar
+gatk-register GenomeAnalysisTK.jar # Not gatk3-register here.
+rm GenomeAnalysisTK.jar
 ```
 
 Install [MosaicForecast](https://github.com/parklab/MosaicForecast).
@@ -85,6 +86,7 @@ git clone https://github.com/parklab/MosaicForecast.git
 ```
 If you are on the frozen environment (`bp_frozen`), you should checkout the specific revision (`63d8e60`) as following:
 ```bash
+cd MosaicForecast
 git checkout 63d8e60
 ```
 
