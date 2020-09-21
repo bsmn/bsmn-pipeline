@@ -56,17 +56,16 @@ conda env create -f /path/to/pipeline/environment_frozen.yml
 
 Install ucsc-\* software packages.
 ```bash
-conda install -n bp -c bioconda ucsc-fetchchromsizes \
-                                ucsc-bigwigaverageoverbed \
-                                ucsc-wigtobigwig \
-                                ucsc-liftover
+conda install -n bp -c bioconda ucsc-fetchchromsizes ucsc-bigwigaverageoverbed ucsc-wigtobigwig ucsc-liftover
+# If you are on bp_frozen
+conda install -n bp_frozen -c bioconda ucsc-fetchchromsizes ucsc-bigwigaverageoverbed ucsc-wigtobigwig ucsc-liftover
 ```
 
 Due to license restrictions, you need to download a copy of GATK3 from the Broad Institute.
 ```bash
 conda activate bp # Make sure you've activated the environment you are working on.
 wget -qO- https://storage.googleapis.com/gatk-software/package-archive/gatk/GenomeAnalysisTK-3.8-1-0-gf15c1c3ef.tar.bz2 \
-     |tar xj GenomeAnalysisTK.jar
+     |tar xj --strip=1 */GenomeAnalysisTK.jar
 gatk3-register GenomeAnalysisTK.jar
 rm GenomeAnalysisTK.jar # Once register, you can delete the downloaded file.
 ```
