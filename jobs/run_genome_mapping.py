@@ -38,7 +38,7 @@ def main():
         q.set_run_jid(f_run_jid, new=True)
 
         f_run_info = sample + "/run_info"
-        run_info(f_run_info, args.reference)
+        run_info(f_run_info, args.reference, args.conda_env)
         run_info_append(f_run_info, "\n#RUN_OPTIONS")
         run_info_append(f_run_info, "Q={}".format(args.queue))
         run_info_append(f_run_info, "CONDA_ENV={}".format(args.conda_env))
