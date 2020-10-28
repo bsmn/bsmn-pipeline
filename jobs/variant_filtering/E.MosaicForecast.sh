@@ -100,7 +100,8 @@ else
         echo "No features."
     fi
     
-    rm -rf tmp
+    # Below cause an error on simultaneous execution of this script (e.g. with multiple ploidy options)
+    # rm -rf tmp
     mkdir -p run_status
     touch $DONE
 fi

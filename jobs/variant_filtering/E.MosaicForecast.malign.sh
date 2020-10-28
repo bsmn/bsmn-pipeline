@@ -131,7 +131,7 @@ else
         echo "No features."
     fi
     
-    rm -rf tmp
+    # rm -rf tmp
     mkdir -p run_status
     touch $DONE
 fi
