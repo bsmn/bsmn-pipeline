@@ -85,7 +85,7 @@ paste <(awk 'NR==FNR{a[$1,$2,$3,$4]=$0;next}{$5=a[$1,$2,$3,$4];print $5}' OFS='\
           |cut -f1-4 > $CAND
 
 if [[ ! -s $CAND ]]; then
-    rm -f $CAND
+    # rm -f $CAND
     printf -- "[OUT] Variants after extra filtering: 0 \n"
 else
     printf -- "[OUT] Variants after extra filtering: $(cat $CAND | wc -l) \n"

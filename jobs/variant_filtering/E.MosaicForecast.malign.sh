@@ -140,21 +140,18 @@ printf -- "---\n[$(date)] Finish exctracting features and prediction.\n"
     
 printf -- "[$(date)] Start selecting mosaic.\n---\n"
 
+if [[ $SKIP_CNVNATOR == "True" ]]; then
+    OUT_ALL=candidates/$SM.ploidy_$PL.mosaic.txt
+    OUT_HC=candidates/$SM.ploidy_$PL.mosaic.hc.txt
+else
+    OUT_ALL=candidates/$SM.ploidy_$PL.cnv.mosaic.txt
+    OUT_HC=candidates/$SM.ploidy_$PL.cnv.mosaic.hc.txt
+fi
 if [[ -s $PREDICTION ]]; then
-    if [[ $SKIP_CNVNATOR == "True" ]]; then
-        OUT_ALL=candidates/$SM.ploidy_$PL.mosaic.txt
-    else
-        OUT_ALL=candidates/$SM.ploidy_$PL.cnv.mosaic.txt
-    fi
     awk '$35~/^mosaic/ {print $1}' $PREDICTION \
         |cut -f2- -d~ \
         |tr '~' '\t' \
         |sort -u -k1,1V -k2,2g > $OUT_ALL
-    if [[ $SKIP_CNVNATOR == "True" ]]; then
-        OUT_HC=candidates/$SM.ploidy_$PL.mosaic.hc.txt
-    else
-        OUT_HC=candidates/$SM.ploidy_$PL.cnv.mosaic.hc.txt
-    fi
     awk '$35~/^mosaic/ && $37>=0.6 {print $1}' $PREDICTION \
         |cut -f2- -d~ \
         |tr '~' '\t' \
@@ -163,6 +160,8 @@ if [[ -s $PREDICTION ]]; then
     printf -- "[OUT] Mosaic variants predicted by MosaicForecast (High Confidence): $(cat $OUT_HC | wc -l) \n"
 else
     echo "No predictions."
+    cat /dev/null >$OUT_ALL
+    cat /dev/null >$OUT_HC
 fi
 
 printf -- "---\n[$(date)] Finish selecting mosaic.\n"

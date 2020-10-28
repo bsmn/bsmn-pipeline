@@ -32,21 +32,6 @@ else
     IN=$SM/candidates/$SM.ploidy_$PL.cnv.$FROM.txt
 fi
 OUT=${IN%.txt}.pon.txt
-#CAND_LIMIT=2000
-CAND_LIMIT=100000
-
-if [[ ! -f $IN ]]; then 
-    echo "[ERROR] $IN does not exist."
-    printf -- "---\n[$(date)] Finish PON mask.\n"
-    exit 0
-elif [[ $(cat $IN |wc -l) -gt $CAND_LIMIT ]]; then
-    echo "[ERROR] Too many candidates (> $CAND_LIMIT) in $IN."
-    echo "[ERROR] Something is wrong with $SM."
-    printf -- "---\n[$(date)] Finish PON mask.\n"
-    exit 0
-else
-    printf -- "[IN] Variants before PON masking: $(cat $IN | wc -l) \n"
-fi
 
 HG38_BED=${IN%.txt}.hg38.bed
 UNMAPPED=${IN%.txt}.hg38.unmapped.bed
@@ -54,6 +39,7 @@ UNMAPPED=${IN%.txt}.hg38.unmapped.bed
 SECONDS=0
 
 if [[ -s $IN ]]; then # Only if the input file is not empty
+    printf -- "[IN] Variants before PON masking: $(cat $IN | wc -l) \n"
     if [[ ! -f $OUT ]]; then
         #eval "$(conda shell.bash hook)"
         #conda activate ucsc
@@ -125,7 +111,7 @@ if [[ -s $IN ]]; then # Only if the input file is not empty
         fi
         if [[ ! -s $OUT ]]; then
             echo "No results."
-            rm $OUT
+            # rm $OUT
         fi
         rm $OUT.tmp $OUT.tmp.2
     else
@@ -133,6 +119,7 @@ if [[ -s $IN ]]; then # Only if the input file is not empty
     fi
 else
     echo "$IN is empty. No results."
+    cat /dev/null >$OUT
 fi
 
 if [[ $FROM == "mosaic" ]]; then
@@ -143,6 +130,7 @@ if [[ $FROM == "mosaic" ]]; then
             |sort -k1,1V -k2,2g > $OUT2
     else
         echo "$IN2 is empty. No results."
+        cat /dev/null >$OUT2
     fi
 fi
 

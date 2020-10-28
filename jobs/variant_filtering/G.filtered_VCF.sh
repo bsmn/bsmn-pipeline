@@ -26,10 +26,10 @@ OUTVCF=$SM/candidates/$SM.ploidy_$PL.filtered.vcf
 printf -- "[$(date)] Start making the final vcf file.\n"
 printf -- "[INFO] Writing to $OUTVCF.\n"
 
-if [ $(ls -1 $INPREFIX.*.pon.txt |wc -l) -lt 1 ]; then
-    echo "ERROR:: Filtered results are not available."
-    false
-fi
+# if [ $(ls -1 $INPREFIX.*.pon.txt |wc -l) -lt 1 ]; then
+#     echo "ERROR:: Filtered results are not available."
+#     false
+# fi
 
 cat <(awk '{print $0, "HC"}' OFS='\t' $INPREFIX.mosaic.hc.pon.txt) \
     <(awk '{print $0, "EXT"}' OFS='\t' \
