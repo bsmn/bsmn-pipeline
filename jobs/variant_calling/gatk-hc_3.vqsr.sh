@@ -15,6 +15,8 @@ PL=$2
 source $(pwd)/$SM/run_info
 export PATH=$(dirname $JAVA):$PATH
 
+if [ -z $MAX_GAUSSIANS ]; then MAX_GAUSSIANS=4; fi
+
 set -eu -o pipefail
 
 DONE1=$SM/run_status/gatk-hc_3.vqsr.ploidy_$PL.1-recal_snp.done
@@ -29,8 +31,6 @@ RECAL_SNP=$SM/gatk-hc/$SM.recalibrate_SNP.ploidy_$PL.recal
 RECAL_INDEL=$SM/gatk-hc/$SM.recalibrate_INDEL.ploidy_$PL.recal
 TRANCHES_SNP=$SM/gatk-hc/$SM.recalibrate_SNP.ploidy_$PL.tranches
 TRANCHES_INDEL=$SM/gatk-hc/$SM.recalibrate_INDEL.ploidy_$PL.tranches
-# RSCRIPT_SNP=$SM/gatk-hc/$SM.recalibrate_SNP_plots.ploidy_$PL.R
-# RSCRIPT_INDEL=$SM/gatk-hc/$SM.recalibrate_INDEL_plots.ploidy_$PL.R
 
 printf -- "---\n[$(date)] Start VQSR.\n" 
 
@@ -53,7 +53,7 @@ else
         -an MQRankSum \
         -an ReadPosRankSum \
         --mode SNP \
-        --max-gaussians 4 \
+        --max-gaussians $MAX_GAUSSIANS \
         --maximum-training-variants 5000000 \
         -tranche 100.0 -tranche 99.9 -tranche 99.0 -tranche 90.0 \
         -O $RECAL_SNP \
@@ -92,7 +92,7 @@ else
         -an ReadPosRankSum \
         --mode INDEL \
         -tranche 100.0 -tranche 99.9 -tranche 99.0 -tranche 90.0 \
-        --max-gaussians 4 \
+        --max-gaussians $MAX_GAUSSIANS \
         -O $RECAL_INDEL \
         --tranches-file $TRANCHES_INDEL \
 #        --rscript-file $RSCRIPT_INDEL

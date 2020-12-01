@@ -53,6 +53,7 @@ def main():
         if args.run_gatk_hc:
             ploidy = " ".join(str(i) for i in args.run_gatk_hc)
             run_info_append(f_run_info, "RUN_GATK_HC=True\nPLOIDY=\"{}\"".format(ploidy))
+            run_info_append(f_run_info, "MAX_GAUSSIANS={}".format(args.max_gaussians))
         else:
             run_info_append(f_run_info, "RUN_GATK_HC={}".format(args.run_gatk_hc))
 
@@ -110,6 +111,8 @@ def parse_args():
     parser.add_argument('-n', '--conda-env', metavar='env',
         help='''Specify the name of conda environment for pipeline [default is bp]''', default="bp")
     parser.add_argument('-p', '--run-gatk-hc', metavar='ploidy', type=int, nargs='+', default=False)
+    parser.add_argument('--max-gaussians', metavar='int', type=int,
+        help='''Set the maximum number of Gaussians for gatk VQSR step''', default=4)
     parser.add_argument('--run-mutect-single', action='store_true')
     parser.add_argument('--skip-cnvnator', action='store_true', default=False)
     parser.add_argument('--run-filters', action='store_true', default=False)
