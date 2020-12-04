@@ -49,7 +49,7 @@ Instead you can use a different YAML file for a version-fixed conda environment 
 * GATK3 3.7
 * GATK4 4.1.2
 
-By default, the name of frozen environment will be `bp_forzen`.
+By default, the name of frozen environment will be `bp_frozen`.
 ```bash
 conda env create -f /path/to/pipeline/environment_frozen.yml
 ```
