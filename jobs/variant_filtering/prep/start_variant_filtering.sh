@@ -19,7 +19,7 @@ IFS=' ' read -ra PL <<< "$PLOIDY"
 
 # Link alignment and vcf files to the $SM directory if required
 if [[ $FILETYPE != "fastq" ]]; then
-    awk -v sm="$SM" -v OFS='\t' '$1 == sm {print $2, $3}' $SAMPLE_LIST |head -1 \
+    awk -v sm="$SM" -v OFS='\t' '$1 == sm {print $2, $3}' $SAMPLE_LIST \
     |while read BAM LOC; do
          if [[ ! -f "$SM/alignment/$BAM" ]]; then # alignment file doesn't exist.
              echo "[INFO] Linking $BAM to the alignment directory ..."
