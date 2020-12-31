@@ -200,7 +200,6 @@ python3 /path/to/pipeline/jobs/run_variant_filtering.py \
 -p, --run-gatk-hc    specify ploidy options used by GATK.
 --skip-cnvnator      skip the CNV filering
 -v, --vcf-directory  If you have VCF files elsewhere, specify the directory where VCF files are.
--m, --multiple-alignments  enable multiple cram (or bam) files mode for combined calling
 ```
 
 # Contributing
