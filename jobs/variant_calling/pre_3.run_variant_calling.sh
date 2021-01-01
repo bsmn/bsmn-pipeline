@@ -20,10 +20,10 @@ if [[ $FILETYPE == "fastq" ]]; then
     echo "You need to run the alignment pipeline first?"
     exit 100
 else
-    awk -v sm="$SM" -v OFS='\t' '$1 == sm {print $2, $3}' $SAMPLE_LIST |head -1 \
+    awk -v sm="$SM" -v OFS='\t' '$1 == sm {print $2, $3}' $SAMPLE_LIST \
     |while read BAM LOC; do
          if [[ ! -f "$SM/alignment/$BAM" ]]; then # alignment file doesn't exist.
-             echo "INFO: Linking alignment files to the sample directory ..."
+             echo "INFO: Linking $BAM to the alignment directory ..."
              mkdir -p $SM/alignment
              ln -sf $(readlink -f $LOC) $SM/alignment/$BAM
              if [[ $FILETYPE == "cram" ]]; then
@@ -51,10 +51,15 @@ if [[ $RUN_GATK_HC = "False" ]] \
 else
     mkdir -p $SM/run_status
     if [[ $RUN_GATK_HC = "True" ]]; then
-        #ssh -o StrictHostKeyChecking=no $SGE_O_HOST \
-        #    "bash --login -c 'cd $SGE_O_WORKDIR; $PYTHON3 $PIPE_HOME/jobs/submit_gatk-hc_jobs.py --ploidy $PLOIDY --sample-name $SM'"
-        $PYTHON3 $PIPE_HOME/jobs/submit_gatk-hc_jobs.py --queue $Q --ploidy $PLOIDY --sample-name $SM
-        echo "Submitted gatk-hc jobs."
+        if [[ $MULTI_ALIGNS = "True" ]]; then
+            $PYTHON3 $PIPE_HOME/jobs/submit_gatk-hc_jobs.py --queue $Q --ploidy $PLOIDY --sample-name $SM --multiple-alignments
+            echo "[INFO] Submitted gatk-hc jobs for combined calling."
+        else
+            #ssh -o StrictHostKeyChecking=no $SGE_O_HOST \
+            #    "bash --login -c 'cd $SGE_O_WORKDIR; $PYTHON3 $PIPE_HOME/jobs/submit_gatk-hc_jobs.py --ploidy $PLOIDY --sample-name $SM'"
+            $PYTHON3 $PIPE_HOME/jobs/submit_gatk-hc_jobs.py --queue $Q --ploidy $PLOIDY --sample-name $SM
+            echo "[INFO] Submitted gatk-hc jobs."
+        fi
     fi
     if [[ $RUN_MUTECT_SINGLE = "True" ]]; then
         #ssh -o StrictHostKeyChecking=no $SGE_O_HOST \

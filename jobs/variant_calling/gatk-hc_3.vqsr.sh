@@ -4,7 +4,7 @@
 
 trap "exit 100" ERR
 
-if [[ $# -lt 1 ]]; then
+if [[ $# -lt 2 ]]; then
     echo "Usage: $(basename $0) <sample name> <ploidy>"
     exit 1
 fi

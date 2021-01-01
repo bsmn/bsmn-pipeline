@@ -12,6 +12,9 @@ fi
 SM=$1
 PL=$2
 
+JXMX=$3
+if [ -z $JXMX ]; then JXMX=52G; fi
+
 source $(pwd)/$SM/run_info
 export PATH=$(dirname $JAVA):$PATH
 
@@ -28,26 +31,30 @@ fi
 DONE1=$SM/run_status/gatk-hc_1.call.ploidy_$PL.$CHR.1-gvcf.done
 DONE2=$SM/run_status/gatk-hc_1.call.ploidy_$PL.$CHR.2-joint_gt.done
 
-#CRAM=$SM/alignment/$SM.cram
-if [[ $ALIGNFMT == "cram" ]]; then
-    CRAM=$SM/alignment/$SM.cram
+if [[ $FILETYPE == "fastq" ]]; then
+    if [[ $ALIGNFMT == "cram" ]]; then
+        IN="-I $SM/alignment/$SM.cram"
+    else
+        IN="-I $SM/alignment/$SM.bam"
+    fi
 else
-    CRAM=$SM/alignment/$SM.bam
+    IN=$(awk -v sm="$SM" '$1 == sm {print sm"/alignment/"$2}' $SAMPLE_LIST |sed 's/^/-I /' |xargs)
 fi
 CHR_GVCF=$SM/gatk-hc/$SM.ploidy_$PL.$CHR.g.vcf.gz
-CHR_RAW_VCF=$SM/gatk-hc//$SM.ploidy_$PL.$CHR.vcf.gz
+CHR_RAW_VCF=$SM/gatk-hc/$SM.ploidy_$PL.$CHR.vcf.gz
 
 printf -- "---\n[$(date)] Start HC_GVCF: ploidy_$PL, $CHR\n"
+echo "IN: $IN"
 
 if [[ -f $DONE1 ]]; then
     echo "Skip the gvcf step."
 else
     mkdir -p $SM/gatk-hc tmp
-    $GATK4 --java-options "-Xmx52G -Djava.io.tmpdir=tmp -XX:-UseParallelGC" \
+    $GATK4 --java-options "-Xmx$JXMX -Djava.io.tmpdir=tmp -XX:-UseParallelGC" \
         HaplotypeCaller \
         --native-pair-hmm-threads $NSLOTS \
         -R $REF \
-        -I $CRAM \
+        $IN \
         -ERC GVCF \
         -ploidy $PL \
         -L $CHR \
@@ -63,7 +70,7 @@ printf -- "---\n[$(date)] Start Joint GT: ploidy_$PL, $CHR\n"
 if [[ -f $DONE2 ]]; then
     echo "Skip the joint gt step."
 else
-    $GATK4 --java-options "-Xmx52G -Djava.io.tmpdir=tmp -XX:-UseParallelGC" \
+    $GATK4 --java-options "-Xmx$JXMX -Djava.io.tmpdir=tmp -XX:-UseParallelGC" \
         GenotypeGVCFs \
         -R $REF \
         -ploidy $PL \

@@ -1,8 +1,8 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 32
+#$ -pe threaded 1
 #$ -j y
-#$ -l h_vmem=2G
+#$ -l h_vmem=4G
 #$ -V
 
 if [ -z $NSLOTS ]; then NSLOTS=$(nproc); fi

@@ -1,1 +1,0 @@
-../post/mutect2.merge_chrs.sh

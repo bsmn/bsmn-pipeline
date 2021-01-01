@@ -46,7 +46,7 @@ def main():
         run_info_append(f_run_info, "FILETYPE={}".format(filetype))
         run_info_append(f_run_info, "REFVER={}".format(args.reference))
         run_info_append(f_run_info, "RUN_FILTERS={}".format(args.run_filters))
-        run_info_append(f_run_info, "MULTI_ALIGNS={}".format(args.multiple_alignments))
+        run_info_append(f_run_info, "MULTI_ALIGNS={}".format(len(sdata) > 1))
         run_info_append(f_run_info, "UPLOAD={}".format(args.upload))
         run_info_append(f_run_info, "SKIP_CNVNATOR={}".format(args.skip_cnvnator))
         run_info_append(f_run_info, "RUN_MUTECT_SINGLE={}".format(args.run_mutect_single))
@@ -116,7 +116,6 @@ def parse_args():
     parser.add_argument('--run-mutect-single', action='store_true')
     parser.add_argument('--skip-cnvnator', action='store_true', default=False)
     parser.add_argument('--run-filters', action='store_true', default=False)
-    parser.add_argument('-m', '--multiple-alignments', action='store_true', default=False)
     parser.add_argument('-f', '--align-fmt', metavar='fmt',
         help='''Alignment format [cram (default) or bam]''', default="cram")
     parser.add_argument('-r', '--reference', metavar='ref',

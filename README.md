@@ -83,7 +83,7 @@ Install [MosaicForecast](https://github.com/parklab/MosaicForecast).
 cd /path/to/conda/environment # Optional, any directory would be ok if you set it properly in config.ini
 git clone https://github.com/parklab/MosaicForecast.git
 ```
-If you are on the frozen environment (`bp_frozen`), you should checkout the specific revision (`63d8e60`) as following:
+Then, you should checkout the specific revision (`63d8e60`) as following:
 ```bash
 cd MosaicForecast
 git checkout 63d8e60
