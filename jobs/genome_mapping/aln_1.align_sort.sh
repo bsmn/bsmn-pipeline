@@ -25,13 +25,14 @@ printf -- "---\n[$(date)] Start align_sort.\n"
 if [[ -f $DONE ]]; then
     echo "Skip this step."
 else
-    mkdir -p $SM/alignment/
+    mkdir -p $SM/alignment $SM/tmp
     $BWA mem -M -t $((NSLOTS - 4)) \
         -R "@RG\tID:$SM.$PU\tSM:$SM\tPL:illumina\tLB:$SM\tPU:$PU" \
         $REF $SM/fastq/$SM.$PU.R{1,2}.fastq.gz \
         |$SAMBAMBA view -S -f bam -l 0 /dev/stdin \
-        |$SAMBAMBA sort -m 24GB -t 3 -o $SM/alignment/$SM.$PU.sorted.bam --tmpdir=tmp /dev/stdin 
+        |$SAMBAMBA sort -m 24GB -t 3 -o $SM/alignment/$SM.$PU.sorted.bam --tmpdir=$SM/tmp /dev/stdin 
     rm $SM/fastq/$SM.$PU.R{1,2}.fastq.gz
+    rm -rf $SM/tmp
     touch $DONE
 fi
 

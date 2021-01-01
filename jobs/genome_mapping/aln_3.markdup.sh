@@ -24,15 +24,17 @@ if [[ -f $DONE ]]; then
     echo "Skip this step."
 
 else
-    $PICARD -Xmx30G -Djava.io.tmpdir=tmp MarkDuplicates \
+    mkdir -p $SM/tmp
+    $PICARD -Xmx30G -Djava.io.tmpdir=$SM/tmp MarkDuplicates \
         I=$SM/alignment/$SM.merged.bam \
         O=$SM/alignment/$SM.markduped.bam \
         METRICS_FILE=$SM/alignment/markduplicates_metrics.txt \
         OPTICAL_DUPLICATE_PIXEL_DISTANCE=2500 \
         CREATE_INDEX=true \
-        TMP_DIR=tmp
+        TMP_DIR=$SM/tmp
 
     rm $SM/alignment/$SM.merged.bam{,.bai}
+    rm -rf $SM/tmp
     touch $DONE
 fi
 

@@ -21,10 +21,12 @@ DONE2=$SM/run_status/aln_4.indel_realign.2-realign.done
 
 printf -- "---\n[$(date)] Start RealignerTargetCreator.\n"
 
+mkdir -p $SM/tmp
+
 if [[ -f $DONE1 ]]; then
     echo "Skip the target creation step."
 else
-    $GATK -Xmx58G -Djava.io.tmpdir=tmp \
+    $GATK -Xmx58G -Djava.io.tmpdir=$SM/tmp \
         -T RealignerTargetCreator -nt $NSLOTS \
         -R $REF -known $MILLS -known $INDEL1KG \
         -I $SM/alignment/$SM.markduped.bam \
@@ -39,7 +41,7 @@ printf -- "---\n[$(date)] Start IndelRealigner.\n---\n"
 if [[ -f $DONE2 ]]; then
     echo "Skip the indel realign step."
 else
-    $GATK -Xmx58G -Djava.io.tmpdir=tmp \
+    $GATK -Xmx58G -Djava.io.tmpdir=$SM/tmp \
         -T IndelRealigner \
         -R $REF -known $MILLS -known $INDEL1KG \
         -targetIntervals $SM/alignment/realigner.intervals \
@@ -48,5 +50,7 @@ else
     rm $SM/alignment/$SM.markduped.{bam,bai} $SM/alignment/realigner.intervals
     touch $DONE2
 fi
+
+rm -rf $SM/tmp
 
 printf -- "[$(date)] Finish IndelRealigner.\n---\n"

@@ -43,14 +43,15 @@ fi
 CHR_GVCF=$SM/gatk-hc/$SM.ploidy_$PL.$CHR.g.vcf.gz
 CHR_RAW_VCF=$SM/gatk-hc/$SM.ploidy_$PL.$CHR.vcf.gz
 
+mkdir -p $SM/gatk-hc $SM/tmp
+
 printf -- "---\n[$(date)] Start HC_GVCF: ploidy_$PL, $CHR\n"
 echo "IN: $IN"
 
 if [[ -f $DONE1 ]]; then
     echo "Skip the gvcf step."
 else
-    mkdir -p $SM/gatk-hc tmp
-    $GATK4 --java-options "-Xmx$JXMX -Djava.io.tmpdir=tmp -XX:-UseParallelGC" \
+    $GATK4 --java-options "-Xmx$JXMX -Djava.io.tmpdir=$SM/tmp -XX:-UseParallelGC" \
         HaplotypeCaller \
         --native-pair-hmm-threads $NSLOTS \
         -R $REF \
@@ -70,7 +71,7 @@ printf -- "---\n[$(date)] Start Joint GT: ploidy_$PL, $CHR\n"
 if [[ -f $DONE2 ]]; then
     echo "Skip the joint gt step."
 else
-    $GATK4 --java-options "-Xmx$JXMX -Djava.io.tmpdir=tmp -XX:-UseParallelGC" \
+    $GATK4 --java-options "-Xmx$JXMX -Djava.io.tmpdir=$SM/tmp -XX:-UseParallelGC" \
         GenotypeGVCFs \
         -R $REF \
         -ploidy $PL \
@@ -80,5 +81,7 @@ else
     rm $CHR_GVCF $CHR_GVCF.tbi
     touch $DONE2
 fi
+
+rm -rf $SM/tmp
 
 printf -- "[$(date)] Finish Joint GT: ploidy_$PL, $CHR\n---\n"
