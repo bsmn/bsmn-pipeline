@@ -82,6 +82,4 @@ else
     touch $DONE2
 fi
 
-rm -rf $SM/tmp
-
 printf -- "[$(date)] Finish Joint GT: ploidy_$PL, $CHR\n---\n"
