@@ -36,4 +36,6 @@ else
     touch $DONE
 fi
 
+rm -rf $SM/tmp
+
 printf -- "[$(date)] Finish merge_bam.\n---\n"
