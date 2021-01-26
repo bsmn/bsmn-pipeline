@@ -34,12 +34,12 @@ TRANCHES_INDEL=$SM/gatk-hc/$SM.recalibrate_INDEL.ploidy_$PL.tranches
 
 printf -- "---\n[$(date)] Start VQSR.\n" 
 
-mkdir -p $SM/tmp
+mkdir -p $SM/tmp.$PL
 
 if [[ -f $DONE1 ]]; then
     echo "Skip the recal_snp step."
 else
-    $GATK4 --java-options "-Xmx24G -Djava.io.tmpdir=$SM/tmp -XX:-UseParallelGC" \
+    $GATK4 --java-options "-Xmx24G -Djava.io.tmpdir=$SM/tmp.$PL -XX:-UseParallelGC" \
         VariantRecalibrator \
         -R $REF \
         -V $RAW_VCF \
@@ -66,7 +66,7 @@ fi
 if [[ -f $DONE2 ]]; then
     echo "Skip the apply_snp step."
 else
-    $GATK4 --java-options "-Xmx24G -Djava.io.tmpdir=$SM/tmp -XX:-UseParallelGC" \
+    $GATK4 --java-options "-Xmx24G -Djava.io.tmpdir=$SM/tmp.$PL -XX:-UseParallelGC" \
         ApplyVQSR \
         -R $REF \
         -V $RAW_VCF \
@@ -80,7 +80,7 @@ fi
 if [[ -f $DONE3 ]]; then
     echo "Skip the recal_indel step."
 else
-    $GATK4 --java-options "-Xmx24G -Djava.io.tmpdir=$SM/tmp -XX:-UseParallelGC" \
+    $GATK4 --java-options "-Xmx24G -Djava.io.tmpdir=$SM/tmp.$PL -XX:-UseParallelGC" \
         VariantRecalibrator \
         -R $REF \
         -V $RECAL_VCF_SNP \
@@ -103,7 +103,7 @@ fi
 if [[ -f $DONE4 ]]; then
     echo "Skip the apply_indel step."
 else
-    $GATK4 --java-options "-Xmx24G -Djava.io.tmpdir=$SM/tmp -XX:-UseParallelGC" \
+    $GATK4 --java-options "-Xmx24G -Djava.io.tmpdir=$SM/tmp.$PL -XX:-UseParallelGC" \
         ApplyVQSR \
         -R $REF \
         -V $RECAL_VCF_SNP \
@@ -120,6 +120,6 @@ else
     touch $DONE4
 fi
 
-# rm -rf $SM/tmp
+rm -rf $SM/tmp.$PL
 
 printf -- "[$(date)] Finish VQSR.\n---\n"
