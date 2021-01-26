@@ -120,6 +120,6 @@ else
     touch $DONE4
 fi
 
-rm -rf $SM/tmp
+# rm -rf $SM/tmp
 
 printf -- "[$(date)] Finish VQSR.\n---\n"
