@@ -1,6 +1,6 @@
 #!/bin/bash
 #$ -cwd
-#$ -pe threaded 2
+#$ -pe threaded 4
 #$ -o q.log
 #$ -j y
 #$ -l h_vmem=11G
@@ -9,7 +9,7 @@
 trap "exit 100" ERR
 
 # submit the script like below:
-# for F in *.R1.fastq.gz; do qsub -q 1-day x.repair_fastq.sh $F; done
+# for F in *.R1.fastq.gz; do qsub -q 1-day /path/to/this.sh $F; done
 
 if [[ $# -lt 1 ]]; then
     echo "Usage: $(basename $0) [R1 or R2 FQSTQ file]"
@@ -25,7 +25,7 @@ R2OLD=${R2FIX/fixed/old}
 
 printf -- "---\n[$(date)] Start fixing paired-end fastq files: $(basename $R1) $(basename $R2)\n"
 
-/home/mayo/m216456/opt/bbmap/repair.sh -Xmx16G \
+/home/mayo/m216456/opt/bbmap/repair.sh -Xmx32G \
     in1=$R1 in2=$R2 \
     out1=$R1FIX out2=$R2FIX \
     outsingle=${R1/.R1.*/.single.fq} \

@@ -13,6 +13,8 @@ SM=$1
 
 source $(pwd)/$SM/run_info
 
+if [ -z $INDEL_REALIGN_PARAMS ]; then INDEL_REALIGN_PARAMS=""; fi
+
 set -o nounset
 set -o pipefail
 
@@ -30,7 +32,8 @@ else
         -T RealignerTargetCreator -nt $NSLOTS \
         -R $REF -known $MILLS -known $INDEL1KG \
         -I $SM/alignment/$SM.markduped.bam \
-        -o $SM/alignment/realigner.intervals
+        -o $SM/alignment/realigner.intervals \
+        $INDEL_REALIGN_PARAMS
     touch $DONE1
 fi
 
@@ -46,7 +49,8 @@ else
         -R $REF -known $MILLS -known $INDEL1KG \
         -targetIntervals $SM/alignment/realigner.intervals \
         -I $SM/alignment/$SM.markduped.bam \
-        -o $SM/alignment/$SM.realigned.bam
+        -o $SM/alignment/$SM.realigned.bam \
+        $INDEL_REALIGN_PARAMS
     rm $SM/alignment/$SM.markduped.{bam,bai} $SM/alignment/realigner.intervals
     touch $DONE2
 fi
