@@ -29,7 +29,8 @@ printf -- "---\n[$(date)] Start fixing paired-end fastq files: $(basename $R1) $
     in1=$R1 in2=$R2 \
     out1=$R1FIX out2=$R2FIX \
     outsingle=${R1/.R1.*/.single.fq} \
-    tossbrokenreads
+    qout=33 \
+    repair
 mv $R1 $R1OLD; mv $R2 $R2OLD
 mv $R1FIX $R1; mv $R2FIX $R2
 
