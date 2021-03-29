@@ -15,7 +15,7 @@ PL=$2
 source $(pwd)/$SM/run_info
 export PATH=$(dirname $JAVA):$PATH
 
-if [ -z $MAX_GAUSSIANS ]; then MAX_GAUSSIANS=4; fi
+if [ -z "$MAX_GAUSSIANS" ]; then MAX_GAUSSIANS=4; fi
 
 set -eu -o pipefail
 

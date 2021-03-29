@@ -13,7 +13,7 @@ SM=$1
 
 source $(pwd)/$SM/run_info
 
-if [ -z $INDEL_REALIGN_PARAMS ]; then INDEL_REALIGN_PARAMS=""; fi
+if [ -z "$INDEL_REALIGN_PARAMS" ]; then INDEL_REALIGN_PARAMS=""; fi
 
 set -o nounset
 set -o pipefail
