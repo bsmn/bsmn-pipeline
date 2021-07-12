@@ -4,6 +4,7 @@ import argparse
 import glob
 import os
 import sys
+import re
 
 cmd_home = os.path.dirname(os.path.realpath(__file__))
 pipe_home = os.path.normpath(cmd_home + "/..")
@@ -20,10 +21,12 @@ def main():
 
     jid_list = []
 
-    fastq_path = "{sample}/fastq/{sample}.*.R1.fastq.gz".format(sample=args.sample_name)
-    done_path = "{sample}/run_status/aln_1.align_sort.*.done".format(sample=args.sample_name)
-    pu_list = set([fastq.replace(".R1.fastq.gz","").split(".")[-1] for fastq in glob.glob(fastq_path)] +
-                  [done.split(".")[-2] for done in glob.glob(done_path)])
+    #fastq_path = "{sample}/fastq/{sample}.*.R1.fastq.gz".format(sample=args.sample_name)
+    #done_path = "{sample}/run_status/aln_1.align_sort.*.done".format(sample=args.sample_name)
+    #pu_list = set([fastq.replace(".R1.fastq.gz","").split(".")[-1] for fastq in glob.glob(fastq_path)] +
+    #              [done.split(".")[-2] for done in glob.glob(done_path)])
+    pu_list = set([re.match(rf"{re.escape(args.sample_name)}\.(.+).R1.fastq.gz", fastq.split("/")[-1]).group(1)
+                   for fastq in glob.glob("{sample}/fastq/{sample}.*.R1.fastq.gz".format(sample=args.sample_name))])
     for pu in pu_list: 
         jid_list.append(q.submit(opt(args.sample_name, args.queue), 
             "{job_home}/aln_1.align_sort.sh {sample} {pu}".format(job_home=job_home, sample=args.sample_name, pu=pu)))
