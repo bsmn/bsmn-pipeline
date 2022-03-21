@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/115846048.svg)](https://zenodo.org/badge/latestdoi/115846048)
+
 # bsmn\_pipeline
 BSMN common data processing pipeline implementing various SGE (Sun Grid Engine) jobs arranged for genome alignment, variant calling and filtering.
 
