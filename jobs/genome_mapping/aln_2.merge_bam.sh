@@ -1,6 +1,14 @@
 #!/bin/bash
-#$ -cwd
-#$ -pe threaded 16
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=6
+#SBATCH --mem=20G
+##SBATCH --time=14:00:00
+#SBATCH --time=7-00:00:00
+#SBATCH --signal=USR1@60
+
+NSLOTS=$SLURM_CPUS_ON_NODE
 
 trap "exit 100" ERR
 

@@ -1,11 +1,16 @@
 #!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --mem=4G
+#SBATCH --time=24:00:00
+#SBATCH --signal=USR1@60
+
 #$ -cwd
 #$ -pe threaded 1
 #$ -j y
 #$ -l h_vmem=4G
 #$ -V
 
-if [ -z $NSLOTS ]; then NSLOTS=$(nproc); fi
 if [ -z $JOB_NAME ]; then JOB_NAME=$(basename $0); fi
 
 trap "exit 100" ERR
@@ -41,18 +46,22 @@ SECONDS=0
 if [[ -s $IN ]]; then # Only if the input file is not empty
     printf -- "[IN] Variants before PON masking: $(cat $IN | wc -l) \n"
     if [[ ! -f $OUT ]]; then
-        #eval "$(conda shell.bash hook)"
-        #conda activate ucsc
+        if [[ $REFVER == "hg38" ]]; then
+            cat $IN
+        else
+            #eval "$(conda shell.bash hook)"
+            #conda activate ucsc
 
-        $LIFTOVER <(awk '{if(!($1~/^chr/)) $1="chr"$1; print $1"\t"$2-1"\t"$2"\t"$3"\t"$4}' <(sort -k1,1V -k2,2g $IN)) \
-	    $HG19_TO_HG38 $HG38_BED $UNMAPPED
+            $LIFTOVER <(awk '{if(!($1~/^chr/)) $1="chr"$1; print $1"\t"$2-1"\t"$2"\t"$3"\t"$4}' <(sort -k1,1V -k2,2g $IN)) \
+	        $HG19_TO_HG38 $HG38_BED $UNMAPPED
 
-        #conda deactivate
+            #conda deactivate
 
-        # $SAMTOOLS faidx -r <(awk '{print $1":"$3"-"$3}' $HG38_BED) $PONFA \
-        #     |paste - - |cut -f2 |paste <(cut -f1,3-5 $HG38_BED) - \
+            # $SAMTOOLS faidx -r <(awk '{print $1":"$3"-"$3}' $HG38_BED) $PONFA \
+            #     |paste - - |cut -f2 |paste <(cut -f1,3-5 $HG38_BED) - \
 
-        cut -f1,3-5 $HG38_BED \
+            cut -f1,3-5 $HG38_BED 
+        fi \
         |while read CHR POS REF ALT; do
             RE="^chr([0-9]+|[XY])\\b"
             if [[ $CHR =~ $RE ]]; then
@@ -61,34 +70,43 @@ if [[ -s $IN ]]; then # Only if the input file is not empty
                 P="?"
             fi
             echo -e "$CHR\t$POS\t$REF\t$ALT\t$P"
-         done > $OUT.tmp.2
+        done > $OUT.tmp.2
+
         cat $OUT.tmp.2 |awk 'BEGIN { print "#chrm\tpos\tref\talt\tPON1kg" }
               { switch ($5) {
-                case "*":
+                case "*": 
                     $5 = "Pass"; break
-                case "R":
+                case "A": 
+                    $5 = ($4 == "A") ? "Fail" : "Pass"; break 
+                case "C": 
+                    $5 = ($4 == "C") ? "Fail" : "Pass"; break
+                case "G": 
+                    $5 = ($4 == "G") ? "Fail" : "Pass"; break
+                case "T": 
+                    $5 = ($4 == "T") ? "Fail" : "Pass"; break
+                case "R": 
                     $5 = ($4 == "A" || $4 == "G") ? "Fail" : "Pass"; break
-                case "Y":
+                case "Y": 
                     $5 = ($4 == "C" || $4 == "T") ? "Fail" : "Pass"; break
-                case "S":
+                case "S": 
                     $5 = ($4 == "G" || $4 == "C") ? "Fail" : "Pass"; break
-                case "W":
+                case "W": 
                     $5 = ($4 == "A" || $4 == "T") ? "Fail" : "Pass"; break
-                case "K":
+                case "K": 
                     $5 = ($4 == "G" || $4 == "T") ? "Fail" : "Pass"; break
-                case "M":
+                case "M": 
                     $5 = ($4 == "A" || $4 == "C") ? "Fail" : "Pass"; break
-                case "B":
+                case "B": 
                     $5 = ($4 == "C" || $4 == "G" || $4 == "T") ? "Fail" : "Pass"; break
-                case "D":
+                case "D": 
                     $5 = ($4 == "A" || $4 == "G" || $4 == "T") ? "Fail" : "Pass"; break
-                case "H":
+                case "H": 
                     $5 = ($4 == "A" || $4 == "C" || $4 == "T") ? "Fail" : "Pass"; break
-                case "V":
+                case "V": 
                     $5 = ($4 == "A" || $4 == "C" || $4 == "G") ? "Fail" : "Pass"; break
-                case "N":
+                case "N": 
                     $5 = "Fail"; break
-                default:
+                default: 
                     $5 = "Fail"; break
                 }
                 print $0

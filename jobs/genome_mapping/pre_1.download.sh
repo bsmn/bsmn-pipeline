@@ -1,6 +1,10 @@
 #!/bin/bash
-#$ -cwd
-#$ -pe threaded 1
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --mem=1G
+#SBATCH --time=04:00:00
+#SBATCH --signal=USR1@60
 
 trap "exit 100" ERR
 

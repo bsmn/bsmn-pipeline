@@ -1,6 +1,14 @@
 #!/bin/bash
-#$ -cwd
-#$ -pe threaded 16
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+##SBATCH --time=30:00:00
+#SBATCH --time=7-00:00:00
+#SBATCH --signal=USR1@60
+
+NSLOTS=$SLURM_CPUS_ON_NODE
 
 trap "exit 100" ERR
 
@@ -28,7 +36,7 @@ mkdir -p $SM/tmp
 if [[ -f $DONE1 ]]; then
     echo "Skip the target creation step."
 else
-    $GATK -Xmx58G -Djava.io.tmpdir=$SM/tmp \
+    $GATK -Xmx12G -Djava.io.tmpdir=$SM/tmp \
         -T RealignerTargetCreator -nt $NSLOTS \
         -R $REF -known $MILLS -known $INDEL1KG \
         -I $SM/alignment/$SM.markduped.bam \
@@ -44,14 +52,15 @@ printf -- "---\n[$(date)] Start IndelRealigner.\n---\n"
 if [[ -f $DONE2 ]]; then
     echo "Skip the indel realign step."
 else
-    $GATK -Xmx58G -Djava.io.tmpdir=$SM/tmp \
+    $GATK -Xmx12G -Djava.io.tmpdir=$SM/tmp \
         -T IndelRealigner \
         -R $REF -known $MILLS -known $INDEL1KG \
         -targetIntervals $SM/alignment/realigner.intervals \
         -I $SM/alignment/$SM.markduped.bam \
         -o $SM/alignment/$SM.realigned.bam \
         $INDEL_REALIGN_PARAMS
-    rm $SM/alignment/$SM.markduped.{bam,bai} $SM/alignment/realigner.intervals
+    #rm $SM/alignment/$SM.markduped.{bam,bai} $SM/alignment/realigner.intervals
+    rm $SM/alignment/$SM.markduped.{bam,bai}
     touch $DONE2
 fi
 

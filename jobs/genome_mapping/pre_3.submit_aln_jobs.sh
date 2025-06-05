@@ -1,6 +1,10 @@
 #!/bin/bash
-#$ -cwd
-#$ -pe threaded 1
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --mem=4G
+#SBATCH --time=04:00:00
+#SBATCH --signal=USR1@60
 
 trap "exit 100" ERR
 
@@ -20,9 +24,9 @@ conda activate --no-stack $CONDA_ENV
 
 printf -- "---\n[$(date)] Start submit aln jobs.\n"
 
-for jid in $(awk -v job_id=$JOB_ID '$1 > job_id' $SM/run_jid);do
-    qdel $jid
-done
+#for jid in $(awk -v job_id=$JOB_ID '$1 > job_id' $SM/run_jid);do
+#    qdel $jid
+#done
 
 #ssh -o StrictHostKeyChecking=no $SGE_O_HOST \
 #    "bash --login -c 'cd $SGE_O_WORKDIR; $PYTHON3 $PIPE_HOME/jobs/submit_aln_jobs.py --sample-name $SM'"

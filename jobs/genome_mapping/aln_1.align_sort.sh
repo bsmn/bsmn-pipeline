@@ -1,6 +1,14 @@
 #!/bin/bash
-#$ -cwd
-#$ -pe threaded 12 
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=32G
+##SBATCH --time=30:00:00
+#SBATCH --time=7-00:00:00
+#SBATCH --signal=USR1@60
+
+NSLOTS=$SLURM_CPUS_ON_NODE
 
 trap "exit 100" ERR
 
@@ -26,11 +34,11 @@ if [[ -f $DONE ]]; then
     echo "Skip this step."
 else
     mkdir -p $SM/alignment $SM/tmp
-    $BWA mem -M -t $((NSLOTS - 4)) \
+    $BWA mem -M -t $((NSLOTS - 5)) \
         -R "@RG\tID:$SM.$PU\tSM:$SM\tPL:illumina\tLB:$SM\tPU:$PU" \
         $REF $SM/fastq/$SM.$PU.R{1,2}.fastq.gz \
         |$SAMBAMBA view -S -f bam -l 0 /dev/stdin \
-        |$SAMBAMBA sort -m 24GB -t 3 -o $SM/alignment/$SM.$PU.sorted.bam --tmpdir=$SM/tmp /dev/stdin 
+        |$SAMBAMBA sort -m 6GB -t 4 -o $SM/alignment/$SM.$PU.sorted.bam --tmpdir=$SM/tmp /dev/stdin 
     rm $SM/fastq/$SM.$PU.R{1,2}.fastq.gz
     touch $DONE
 fi

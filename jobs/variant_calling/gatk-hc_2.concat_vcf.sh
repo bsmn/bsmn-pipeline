@@ -1,6 +1,12 @@
 #!/bin/bash
-#$ -cwd
-#$ -pe threaded 2
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=2G
+#SBATCH --time=4-00:00:00
+#SBATCH --signal=USR1@60
+
+NSLOTS=$SLURM_CPUS_ON_NODE
 
 trap "exit 100" ERR
 
@@ -35,7 +41,7 @@ printf -- "---\n[$(date)] Start concat vcfs.\n"
 if [[ -f $DONE ]]; then
     echo "Skip this step."
 else
-    $GATK4 --java-options "-Xmx4G"  GatherVcfs \
+    $GATK4 --java-options "-Xmx1G"  GatherVcfs \
         -R $REF \
         $CHR_RAW_VCFS \
         -O $RAW_VCF
@@ -45,7 +51,7 @@ else
         rm $SM/gatk-hc/$SM.ploidy_$PL.$CHR.vcf.gz.tbi
     done
 
-    $BCFTOOLS index --threads $((NSLOTS-1)) -t $RAW_VCF
+    $BCFTOOLS index --threads $NSLOTS -t $RAW_VCF
     touch $DONE
 fi
 

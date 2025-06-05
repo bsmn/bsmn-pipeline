@@ -30,7 +30,10 @@ def main():
     for pu in pu_list: 
         jid_list.append(q.submit(opt(args.sample_name, args.queue), 
             "{job_home}/aln_1.align_sort.sh {sample} {pu}".format(job_home=job_home, sample=args.sample_name, pu=pu)))
-    jid = ",".join(jid_list)
+    if jid_list:
+        jid = ",".join(jid_list)
+    else:
+        jid = None
     
     jid = q.submit(opt(args.sample_name, args.queue, jid), 
         "{job_home}/aln_2.merge_bam.sh {sample}".format(job_home=job_home, sample=args.sample_name))
@@ -38,12 +41,23 @@ def main():
     if not args.target_seq:
         jid = q.submit(opt(args.sample_name, args.queue, jid),
             "{job_home}/aln_3.markdup.sh {sample}".format(job_home=job_home, sample=args.sample_name))
+        #jid = q.submit(opt(args.sample_name, args.queue, jid),
+        #    "{job_home}/aln_3.markdup_spark.sh {sample}".format(job_home=job_home, sample=args.sample_name))
 
+        #jid = q.submit(opt(args.sample_name, args.queue, jid) + " --time=60:00:00",
         jid = q.submit(opt(args.sample_name, args.queue, jid),
             "{job_home}/aln_4.indel_realign.sh {sample}".format(job_home=job_home, sample=args.sample_name))
+        #jid = q.submit(opt_array(args.sample_name, args.queue, jid),
+        #    "{job_home}/aln_4.indel_realign_array.sh {sample}".format(job_home=job_home, sample=args.sample_name))
+        #jid = q.submit(opt(args.sample_name, args.queue, jid),
+        #    "{job_home}/aln_4.indel_realign_gather.sh {sample}".format(job_home=job_home, sample=args.sample_name))
 
+        #jid = q.submit(opt(args.sample_name, args.queue, jid), 
+        #    "{job_home}/aln_5.bqsr.sh {sample}".format(job_home=job_home, sample=args.sample_name))
+        jid = q.submit(opt_array(args.sample_name, args.queue, jid), 
+            "{job_home}/aln_5.bqsr_array.sh {sample}".format(job_home=job_home, sample=args.sample_name))
         jid = q.submit(opt(args.sample_name, args.queue, jid), 
-            "{job_home}/aln_5.bqsr.sh {sample}".format(job_home=job_home, sample=args.sample_name))
+            "{job_home}/aln_5.bqsr_gather.sh {sample}".format(job_home=job_home, sample=args.sample_name))
     aln_jid = jid
 
     jid = q.submit(opt(args.sample_name, args.queue, aln_jid), 
@@ -65,9 +79,15 @@ def parse_args():
     return parser.parse_args()
 
 def opt(sample, Q, jid=None):
-    opt = "-V -q {q} -r y -j y -o {log_dir} -l h_vmem=11G".format(q=Q, log_dir=log_dir(sample))
+    opt = "--partition={q} --output {log_dir}/%x.%j.stdout --error {log_dir}/%x.%j.stderr --parsable".format(q=Q, log_dir=log_dir(sample))
     if jid is not None:
-        opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
+        opt = "-d afterok:{jid} {opt}".format(jid=jid, opt=opt)
+    return opt
+
+def opt_array(sample, Q, jid=None):
+    opt = "--partition={q} --output {log_dir}/%x.%A.%a.stdout --error {log_dir}/%x.%A.%a.stderr --parsable".format(q=Q, log_dir=log_dir(sample))
+    if jid is not None:
+        opt = "-d afterok:{jid} {opt}".format(jid=jid, opt=opt)
     return opt
 
 if __name__ == "__main__":

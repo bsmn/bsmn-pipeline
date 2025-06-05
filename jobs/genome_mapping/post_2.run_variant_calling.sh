@@ -1,6 +1,11 @@
 #!/bin/bash
-#$ -cwd
-#$ -pe threaded 1
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --mem=1G
+##SBATCH --time=04:00:00
+#SBATCH --time=30:00:00
+#SBATCH --signal=USR1@60
 
 trap "exit 100" ERR
 
@@ -15,8 +20,9 @@ SM=$1
 
 source $(pwd)/$SM/run_info
 
-eval "$(conda shell.bash hook)"
-conda activate --no-stack $CONDA_ENV
+# Already done in pre_3.submit_aln_jobs.sh
+#eval "$(conda shell.bash hook)"
+#conda activate --no-stack $CONDA_ENV
 
 printf -- "---\n[$(date)] Start submit variant calling jobs.\n"
 
@@ -44,6 +50,6 @@ else
     fi
 fi
 
-conda deactivate
+#conda deactivate
 
 printf -- "[$(date)] Finish submit variant calling jobs.\n---\n"

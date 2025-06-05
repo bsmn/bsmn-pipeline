@@ -1,10 +1,19 @@
 #!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=12
+#SBATCH --mem=24G
+#SBATCH --time=24:00:00
+#SBATCH --signal=USR1@60
+
 #$ -cwd
 #$ -j y
 #$ -o logs
 #$ -pe threaded 12
 #$ -l h_vmem=2G
 #$ -V
+
+NSLOTS=$SLURM_CPUS_ON_NODE
 
 trap "exit 100" ERR
 set -eu -o pipefail

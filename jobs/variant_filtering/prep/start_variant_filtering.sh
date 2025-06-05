@@ -1,6 +1,9 @@
 #!/bin/bash
-#$ -cwd
-#$ -pe threaded 1
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --mem=1G
+#SBATCH --time=04:00:00
+#SBATCH --signal=USR1@60
 
 trap "exit 100" ERR
 
@@ -15,6 +18,12 @@ SM=$1
 VCFDIR=$2
 
 source $(pwd)/$SM/run_info
+
+if [[ $RUN_FILTERS = "False" ]]; then
+    echo "Skip this step. --run-filters option is not set."
+    exit 0
+fi
+
 IFS=' ' read -ra PL <<< "$PLOIDY"
 
 # Link alignment and vcf files to the $SM directory if required
@@ -52,27 +61,23 @@ if [[ $FILETYPE != "fastq" ]]; then
      done
 fi
 
-eval "$(conda shell.bash hook)"
-conda activate --no-stack $CONDA_ENV
+#eval "$(conda shell.bash hook)"
+#conda activate --no-stack $CONDA_ENV
 
 printf -- "[$(date)] Start submitting variant filtering jobs.\n---\n"
 
-if [[ $RUN_FILTERS = "False" ]]; then
-    echo "Skip this step. --run-filters option is not set."
+mkdir -p $SM/run_status
+if [[ $MULTI_ALIGNS = "False" ]]; then
+    $PYTHON3 $PIPE_HOME/jobs/submit_filtering_jobs.py --queue $Q --ploidy $PLOIDY --sample-name $SM
+    echo "---"
+    echo "Submitted filtering jobs with single alignment."
 else
-    mkdir -p $SM/run_status
-    if [[ $MULTI_ALIGNS = "False" ]]; then
-        $PYTHON3 $PIPE_HOME/jobs/submit_filtering_jobs.py --queue $Q --ploidy $PLOIDY --sample-name $SM
-        echo "---"
-        echo "Submitted filtering jobs with single alignment."
-    else
-        $PYTHON3 $PIPE_HOME/jobs/submit_filtering_jobs.py --queue $Q --ploidy $PLOIDY --sample-name $SM --multiple-alignments
-        echo "---"
-        echo "Submitted filtering jobs with multiple alignments."
-    fi
+    $PYTHON3 $PIPE_HOME/jobs/submit_filtering_jobs.py --queue $Q --ploidy $PLOIDY --sample-name $SM --multiple-alignments
+    echo "---"
+    echo "Submitted filtering jobs with multiple alignments."
 fi
 
-conda deactivate
+#conda deactivate
 
 printf -- "---\n[$(date)] Finish submitting variant filtering jobs.\n"
 

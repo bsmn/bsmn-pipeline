@@ -1,6 +1,10 @@
 #!/bin/bash
-#$ -cwd
-#$ -pe threaded 6
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=12G
+#SBATCH --time=4-00:00:00
+#SBATCH --signal=USR1@60
 
 trap "exit 100" ERR
 
@@ -39,7 +43,7 @@ mkdir -p $SM/tmp.$PL
 if [[ -f $DONE1 ]]; then
     echo "Skip the recal_snp step."
 else
-    $GATK4 --java-options "-Xmx24G -Djava.io.tmpdir=$SM/tmp.$PL -XX:-UseParallelGC" \
+    $GATK4 --java-options "-Xmx8G -Djava.io.tmpdir=$SM/tmp.$PL -XX:-UseParallelGC" \
         VariantRecalibrator \
         -R $REF \
         -V $RAW_VCF \
@@ -66,7 +70,7 @@ fi
 if [[ -f $DONE2 ]]; then
     echo "Skip the apply_snp step."
 else
-    $GATK4 --java-options "-Xmx24G -Djava.io.tmpdir=$SM/tmp.$PL -XX:-UseParallelGC" \
+    $GATK4 --java-options "-Xmx8G -Djava.io.tmpdir=$SM/tmp.$PL -XX:-UseParallelGC" \
         ApplyVQSR \
         -R $REF \
         -V $RAW_VCF \
@@ -80,7 +84,7 @@ fi
 if [[ -f $DONE3 ]]; then
     echo "Skip the recal_indel step."
 else
-    $GATK4 --java-options "-Xmx24G -Djava.io.tmpdir=$SM/tmp.$PL -XX:-UseParallelGC" \
+    $GATK4 --java-options "-Xmx8G -Djava.io.tmpdir=$SM/tmp.$PL -XX:-UseParallelGC" \
         VariantRecalibrator \
         -R $REF \
         -V $RECAL_VCF_SNP \
@@ -103,7 +107,7 @@ fi
 if [[ -f $DONE4 ]]; then
     echo "Skip the apply_indel step."
 else
-    $GATK4 --java-options "-Xmx24G -Djava.io.tmpdir=$SM/tmp.$PL -XX:-UseParallelGC" \
+    $GATK4 --java-options "-Xmx8G -Djava.io.tmpdir=$SM/tmp.$PL -XX:-UseParallelGC" \
         ApplyVQSR \
         -R $REF \
         -V $RECAL_VCF_SNP \

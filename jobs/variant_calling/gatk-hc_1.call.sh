@@ -1,6 +1,15 @@
 #!/bin/bash
-#$ -cwd
-#$ -pe threaded 6
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=6
+#SBATCH --mem=12G
+##SBATCH --time=7-00:00:00 # cpu-short
+#SBATCH --time=14-00:00:00 # cpu-med
+#SBATCH --array=1-24
+#SBATCH --signal=USR1@60
+
+NSLOTS=$SLURM_CPUS_ON_NODE
 
 trap "exit 100" ERR
 
@@ -13,18 +22,18 @@ SM=$1
 PL=$2
 
 JXMX=$3
-if [ -z $JXMX ]; then JXMX=52G; fi
+if [ -z $JXMX ]; then JXMX=8G; fi
 
 source $(pwd)/$SM/run_info
 export PATH=$(dirname $JAVA):$PATH
 
 set -eu -o pipefail
 
-if [[ ${SGE_TASK_ID} -le 22 ]]; then
-    if [ $REFVER == "hg19" -o  $REFVER == "hg38" ]; then CHR="chr${SGE_TASK_ID}"; else CHR=${SGE_TASK_ID}; fi
-elif [[ ${SGE_TASK_ID} -eq 23 ]]; then
+if [[ ${SLURM_ARRAY_TASK_ID} -le 22 ]]; then
+    if [ $REFVER == "hg19" -o  $REFVER == "hg38" ]; then CHR="chr${SLURM_ARRAY_TASK_ID}"; else CHR=${SLURM_ARRAY_TASK_ID}; fi
+elif [[ ${SLURM_ARRAY_TASK_ID} -eq 23 ]]; then
     if [ $REFVER == "hg19" -o  $REFVER == "hg38" ]; then CHR=chrX; else CHR=X; fi
-elif [[ ${SGE_TASK_ID} -eq 24 ]]; then
+elif [[ ${SLURM_ARRAY_TASK_ID} -eq 24 ]]; then
     if [ $REFVER == "hg19" -o  $REFVER == "hg38" ]; then CHR=chrY; else CHR=Y; fi
 fi
 

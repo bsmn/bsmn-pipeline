@@ -72,29 +72,29 @@ def main():
         #jid = ",".join(jid_list)
 
         if args.align_fmt == "cram" and filetype == "bam":
-            jid = q.submit(opt(sample, args.queue),
-                "{job_home}/pre_2.bam2cram.sh {sample}".format(
-                    job_home=job_home, sample=sample))
-            jid = q.submit(opt(sample, args.queue, jid),
-                "{job_home}/pre_2b.unmapped_reads.sh {sample}".format(
-                    job_home=job_home, sample=sample))
+            raise Exception("alignment format should be set to {}".format(filetype))
+            #jid = q.submit(opt(sample, args.queue),
+            #    "{job_home}/pre_2.bam2cram.sh {sample}".format(
+            #        job_home=job_home, sample=sample))
+            #jid = q.submit(opt(sample, args.queue, jid),
+            #    "{job_home}/pre_2b.unmapped_reads.sh {sample}".format(
+            #        job_home=job_home, sample=sample))
 
         #jid = q.submit(opt(sample, args.queue, jid),
         jid = q.submit(opt(sample, args.queue),
             "{job_home}/pre_3.run_variant_calling.sh {sample}".format(
                 job_home=job_home, sample=sample))
-        if args.upload is not None:
-            q.submit(opt(sample, args.queue, jid),
-                "{job_home}/pre_4.upload_cram.sh {sample}".format(
-                    job_home=job_home, sample=sample))
+        #if args.upload is not None:
+        #    q.submit(opt(sample, args.queue, jid),
+        #        "{job_home}/pre_4.upload_cram.sh {sample}".format(
+        #            job_home=job_home, sample=sample))
 
         print()
 
 def opt(sample, Q, jid=None):
-    # opt = "-V -q {q} -r y -j y -o {log_dir} -l h_vmem=11G".format(q=Q, log_dir=log_dir(sample))
-    opt = "-V -r y -j y -o {log_dir} -l h_vmem=11G".format(log_dir=log_dir(sample))
+    opt = "--partition={q} --output {log_dir}/%x.%j.stdout --error {log_dir}/%x.%j.stderr --parsable".format(q=Q, log_dir=log_dir(sample))
     if jid is not None:
-        opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
+        opt = "-d afterok:{jid} {opt}".format(jid=jid, opt=opt)
     return opt
 
 def parse_args():

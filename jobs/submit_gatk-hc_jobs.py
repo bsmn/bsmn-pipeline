@@ -37,20 +37,26 @@ def parse_args():
     return parser.parse_args()
 
 def opt(sample, Q, jid=None):
-    opt = "-V -q {q} -r y -j y -o {log_dir} -l h_vmem=11G".format(q=Q, log_dir=log_dir(sample))
+    opt = "--partition={q} --output {log_dir}/%x.%j.stdout --error {log_dir}/%x.%j.stderr --parsable".format(q=Q, log_dir=log_dir(sample))
     if jid is not None:
-        opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
+        opt = "-d afterok:{jid} {opt}".format(jid=jid, opt=opt)
+    return opt
+
+def opt_array(sample, Q, jid=None):
+    opt = "--partition={q} --output {log_dir}/%x.%A.%a.stdout --error {log_dir}/%x.%A.%a.stderr --parsable".format(q=Q, log_dir=log_dir(sample))
+    if jid is not None:
+        opt = "-d afterok:{jid} {opt}".format(jid=jid, opt=opt)
     return opt
 
 def submit_jobs(sample, Q, ploidy, jid, malign):
     if malign:
         jid = q.submit(
-            "-t 1-24 -pe threaded 10 {opt}".format(opt=opt(sample, Q, jid)),
-            "{job_home}/gatk-hc_1.call.sh {sample} {ploidy} 92G".format(
+            "--cpus-per-task=8 --mem=16G {opt}".format(opt=opt_array(sample, Q, jid)),
+            "{job_home}/gatk-hc_1.call.sh {sample} {ploidy} 12G".format(
                 job_home=job_home, sample=sample, ploidy=ploidy))
     else:
         jid = q.submit(
-            "-t 1-24 {opt}".format(opt=opt(sample, Q, jid)),
+            "{opt}".format(opt=opt_array(sample, Q, jid)),
             "{job_home}/gatk-hc_1.call.sh {sample} {ploidy}".format(
                 job_home=job_home, sample=sample, ploidy=ploidy))
     jid = q.submit(opt(sample, Q, jid),

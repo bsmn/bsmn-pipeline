@@ -1,4 +1,10 @@
 #!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --mem=12G
+#SBATCH --time=24:00:00
+#SBATCH --signal=USR1@60
+
 #$ -cwd
 #$ -pe threaded 2
 #$ -j y 

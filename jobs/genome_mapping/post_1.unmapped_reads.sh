@@ -1,6 +1,14 @@
 #!/bin/bash
-#$ -cwd
-#$ -pe threaded 4
+
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=2G
+##SBATCH --time=04:00:00
+#SBATCH --time=30:00:00
+#SBATCH --signal=USR1@60
+
+NSLOTS=$SLURM_CPUS_ON_NODE
 
 trap "exit 100" ERR
 
@@ -38,7 +46,7 @@ else
     $SAMTOOLS view -@ $NSLOTS -T $REF -f 12 -F 256 -u -o $SM/alignment/tmps3.bam $CRAM
     
     $SAMTOOLS merge -u - $SM/alignment/tmps[123].bam \
-        |$SAMTOOLS sort -@ $((NSLOTS-1)) -m 3700M -n -o $UNMAPPED -
+        |$SAMTOOLS sort -@ $NSLOTS -m 3700M -n -o $UNMAPPED -
 
     rm $SM/alignment/tmps[123].bam
     touch $DONE

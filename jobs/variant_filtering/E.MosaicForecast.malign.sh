@@ -1,11 +1,23 @@
 #!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=64G
+#SBATCH --time=24:00:00
+#SBATCH --signal=USR1@60
+
 #$ -cwd
 #$ -pe threaded 32
 #$ -j y
 #$ -l h_vmem=2G
 #$ -V
 
-if [ -z $NSLOTS ]; then NSLOTS=$(nproc); fi
+#if [ -z $NSLOTS ]; then NSLOTS=$(nproc); fi
+if [ -z $SLURM_CPUS_ON_NODE ]; 
+    then NSLOTS=$(nproc)
+else
+    NSLOTS=$SLURM_CPUS_ON_NODE
+fi
 if [ -z $JOB_NAME ]; then JOB_NAME=$(basename $0); fi
 
 trap "exit 100" ERR

@@ -67,9 +67,9 @@ def main():
         print()
 
 def opt(sample, Q, jid=None):
-    opt = "-V -q {q} -r y -j y -o {log_dir} -l h_vmem=11G".format(q=Q, log_dir=log_dir(sample))
+    opt = "--partition={q} --output {log_dir}/%x.%j.stdout --error {log_dir}/%x.%j.stderr --parsable".format(q=Q, log_dir=log_dir(sample))
     if jid is not None:
-        opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
+        opt = "-d afterok:{jid} {opt}".format(jid=jid, opt=opt)
     return opt
 
 def submit_pre_jobs_fastq(sample, sdata, Q):

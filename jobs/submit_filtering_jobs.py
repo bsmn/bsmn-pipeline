@@ -35,10 +35,16 @@ def parse_args():
     parser.add_argument('--multiple-alignments', action='store_true', default=False)
     return parser.parse_args()
 
-def opt(sample, Q, jid=None):
+def opt_old(sample, Q, jid=None):
     opt = "-V -q {q} -r y -j y -o {log_dir}".format(q=Q, log_dir=log_dir(sample))
     if jid is not None:
         opt = "-hold_jid {jid} {opt}".format(jid=jid, opt=opt)
+    return opt
+
+def opt(sample, Q, jid=None):
+    opt = "--partition={q} --output {log_dir}/%x.%j.stdout --error {log_dir}/%x.%j.stderr --parsable".format(q=Q, log_dir=log_dir(sample))
+    if jid is not None:
+        opt = "-d afterok:{jid} {opt}".format(jid=jid, opt=opt)
     return opt
 
 def submit_jobs(sample, Q, ploidy, malign, jid_cnvnator):
