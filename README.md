@@ -4,34 +4,7 @@
 BSMN common data processing pipeline implementing various SGE (Sun Grid Engine) jobs arranged for genome alignment, variant calling and filtering.
 
 # Setup and installation
-This pipeline can be run in any cluster system using SGE job scheduler. We would recommend set your own cluster in AWS using AWS ParallelCluster.
-
-## AWS ParallelCluster
-For installing and setting up `parallelcluster`, please see the [`Getting Started Guide`](https://aws-parallelcluster.readthedocs.io/en/latest/getting_started.html) for AWS ParallelCluster.
-
-## Extra set up for SGE
-The pipeline require a parallel environment named "threaded" in  your SGE system. If your SGE system doen't have this parallel environment, you should add it into yours.
-```
-$ cat >threaded.conf <<END
-pe_name            threaded
-slots              99999
-user_lists         NONE
-xuser_lists        NONE
-start_proc_args    NONE
-stop_proc_args     NONE
-allocation_rule    \$pe_slots
-control_slaves     FALSE
-job_is_first_task  TRUE
-urgency_slots      min
-accounting_summary TRUE
-qsort_args         NONE
-END
-```
-```
-$ sudo su
-# qconf -Ap threaded.conf
-# qconf -mattr queue pe_list threaded all.q
-```
+This pipeline can be run in any cluster system using SLURM job scheduler. 
 
 ## Installing pipeline
 Clone this repository where you want it installed in your cluster. If you work with an m5.large type AWS EC2 instance we recommend the file systems mounted at `/shared` or `/efs`.
