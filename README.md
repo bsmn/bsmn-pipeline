@@ -1,15 +1,15 @@
 [![DOI](https://zenodo.org/badge/115846048.svg)](https://zenodo.org/badge/latestdoi/115846048)
 
 # bsmn\_pipeline
-BSMN common data processing pipeline implementing various SGE (Sun Grid Engine) jobs arranged for genome alignment, variant calling and filtering.
+BSMN common data processing pipeline implementing various SLURM jobs arranged for genome alignment, variant calling and filtering.
 
 # Setup and installation
 This pipeline can be run in any cluster system using SLURM job scheduler. 
 
 ## Installing pipeline
-Clone this repository where you want it installed in your cluster. If you work with an m5.large type AWS EC2 instance we recommend the file systems mounted at `/shared` or `/efs`.
+Clone this repository where you want it installed in your cluster. 
+
 ```bash
-cd /shared
 git clone https://github.com/bsmn/bsmn_pipeline
 ```
 
