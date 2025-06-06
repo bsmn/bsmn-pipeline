@@ -11,16 +11,12 @@ job_home = cmd_home + "/variant_calling"
 sys.path.append(pipe_home)
 
 from library.config import run_info, run_info_append, log_dir
-#from library.login import synapse_login, nda_login
 from library.parser import sample_list
 from library.job_queue import GridEngineQueue
 q = GridEngineQueue()
 
 def main():
     args = parse_args()
-
-    #synapse_login()
-    #nda_login()
 
     global down_jid_queue
     down_jid_queue = deque([None] * args.con_down_limit)
